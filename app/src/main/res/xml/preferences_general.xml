@@ -4,13 +4,18 @@
     xmlns:sample="http://schemas.android.com/apk/res-auto">
 
     <CheckBoxPreference
-        android:key="@string/use_mph"
-        android:title="Use MPH"
-        android:summary="Show speed in miles rather than kilometers" />
+        android:key="@string/use_mi"
+        android:title="Speed and distance in miles"
+        android:summary="Show speed and distance in miles rather than kilometers" />
+
+    <CheckBoxPreference
+        android:key="@string/use_f"
+        android:title="Temperature in degrees Fahrenheit"
+        android:summary="Show temperature in degrees Fahrenheit rather than Celsius" />
 
     <com.pavelsikun.seekbarpreference.SeekBarPreference
         android:key="@string/max_speed"
-        android:title="Max Speed"
+        android:title="Max speed"
         android:summary="The maximum speed shown on the outer dial"
         android:enabled="true"
         android:defaultValue="30"

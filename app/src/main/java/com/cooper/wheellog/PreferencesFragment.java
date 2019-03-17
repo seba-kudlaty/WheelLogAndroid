@@ -13,17 +13,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.*;
 import android.text.InputType;
-import android.text.TextUtils;
 
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 import com.cooper.wheellog.utils.SettingsUtil;
-import com.cooper.wheellog.BuildConfig;
 import com.pavelsikun.seekbarpreference.SeekBarPreference;
-
-
-
-import timber.log.Timber;
 
 public class PreferencesFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -31,7 +25,10 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         Main,
         Speed,
         Logs,
+        Livemap,
         Alarms,
+        Speech,
+        SpeechMessages,
         Watch,
 		Wheel
     }
@@ -194,6 +191,16 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         Toolbar tb = (Toolbar) getActivity().findViewById(R.id.preference_toolbar);
         if (currentScreen == SettingsScreen.Main)
             tb.setNavigationIcon(null);
+        else
+        if (currentScreen == SettingsScreen.SpeechMessages) {
+            tb.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+            tb.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    show_speech_menu();
+                }
+            });
+        }
         else {
             tb.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
             tb.setNavigationOnClickListener(new View.OnClickListener() {
@@ -208,9 +215,11 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         switch (currentScreen) {
             case Main:
                 tb.setTitle("Settings");
-                Preference speed_button = findPreference(getString(R.string.speed_preferences));
+                Preference speed_button = findPreference(getString(R.string.general_preferences));
                 Preference logs_button = findPreference(getString(R.string.log_preferences));
+                Preference livemap_button = findPreference(getString(R.string.livemap_preferences));
                 Preference alarm_button = findPreference(getString(R.string.alarm_preferences));
+                Preference speech_button = findPreference(getString(R.string.speech_preferences));
                 Preference watch_button = findPreference(getString(R.string.watch_preferences));
 				Preference wheel_button = findPreference(getString(R.string.wheel_settings));
 				Preference reset_top_button = findPreference(getString(R.string.reset_top_speed));
@@ -226,7 +235,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         public boolean onPreferenceClick(Preference preference) {
                             currentScreen = SettingsScreen.Speed;
                             getPreferenceScreen().removeAll();
-                            addPreferencesFromResource(R.xml.preferences_speed);
+                            addPreferencesFromResource(R.xml.preferences_general);
                             setup_screen();
                             return true;
                         }
@@ -244,6 +253,18 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
+                if (livemap_button != null) {
+                    livemap_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            currentScreen = SettingsScreen.Livemap;
+                            getPreferenceScreen().removeAll();
+                            addPreferencesFromResource(R.xml.preferences_livemap);
+                            setup_screen();
+                            return true;
+                        }
+                    });
+                }
                 if (alarm_button != null) {
                     alarm_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
@@ -251,6 +272,18 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                             currentScreen = SettingsScreen.Alarms;
                             getPreferenceScreen().removeAll();
                             addPreferencesFromResource(R.xml.preferences_alarms);
+                            setup_screen();
+                            return true;
+                        }
+                    });
+                }
+                if (speech_button != null) {
+                    speech_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            currentScreen = SettingsScreen.Speech;
+                            getPreferenceScreen().removeAll();
+                            addPreferencesFromResource(R.xml.preferences_speech);
                             setup_screen();
                             return true;
                         }
@@ -324,7 +357,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                             String buildTime = BuildConfig.BUILD_TIME;
                             new AlertDialog.Builder(getActivity())
                                     .setTitle("About WheelLog")
-                                    .setMessage(Html.fromHtml(String.format("Version %s <br>build at %s <br>by <i>Palachzzz</i> <br><a href=\"palachzzz.wl@gmail.com\">palachzzz.wl@gmail.com</a>", versionName, buildTime)))
+                                    .setMessage(Html.fromHtml(String.format("Version %s built at %s<br>by Sebastian Łastowski <a href=\"sebastian@euc.world\">sebastian@euc.world</a><br><br><small>Hey, are you interested in using live map feature? Learn more and register for free at <a href=\"https://euc.world\">https://euc.world</a></small>", versionName, buildTime)))
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
 
@@ -412,9 +445,31 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
             case Logs:
                 tb.setTitle("Log Settings");
                 break;
+            case Livemap:
+                tb.setTitle("Live Map Settings");
+                break;
             case Alarms:
                 tb.setTitle("Alarm Settings");
                 hideShowSeekBars();
+                break;
+            case Speech:
+                tb.setTitle("Voice Settings");
+                Preference speech_messages_button = findPreference(getString(R.string.speech_messages_preferences));
+                if (speech_messages_button != null) {
+                    speech_messages_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            currentScreen = SettingsScreen.SpeechMessages;
+                            getPreferenceScreen().removeAll();
+                            addPreferencesFromResource(R.xml.preferences_speech_messages);
+                            setup_screen();
+                            return true;
+                        }
+                    });
+                }
+                break;
+            case SpeechMessages:
+                tb.setTitle("Messages configuration");
                 break;
             case Watch:
                 tb.setTitle("Watch Settings");
@@ -442,10 +497,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         correctWheelBarState(getString(R.string.wheel_max_speed), maxSpeed);
 		correctWheelBarState(getString(R.string.speaker_volume), speakerVolume);
 		correctWheelBarState(getString(R.string.pedals_adjustment), pedals);
-
-		
-
-    }	
+    }
 	
 	private void correctWheelCheckState(String preference, boolean state) {
         CheckBoxPreference cb_preference = (CheckBoxPreference) findPreference(preference);
@@ -544,4 +596,19 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         setup_screen();
         return true;
     }
+
+    public boolean is_speech_messages_menu() {
+        if (currentScreen == SettingsScreen.SpeechMessages)
+            return true;
+        else return false;
+    }
+
+    public boolean show_speech_menu() {
+        currentScreen = SettingsScreen.Speech;
+        getPreferenceScreen().removeAll();
+        addPreferencesFromResource(R.xml.preferences_speech);
+        setup_screen();
+        return true;
+    }
+
 }

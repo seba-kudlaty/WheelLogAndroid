@@ -14,6 +14,7 @@ import com.cooper.wheellog.LoggingService;
 import com.cooper.wheellog.MainActivity;
 import com.cooper.wheellog.PebbleService;
 import com.cooper.wheellog.R;
+import com.cooper.wheellog.SpeechService;
 import com.cooper.wheellog.WheelData;
 
 public class NotificationUtil {
@@ -95,6 +96,8 @@ public class NotificationUtil {
                 new Intent(Constants.NOTIFICATION_BUTTON_WATCH), 0);
         PendingIntent pendingLoggingIntent = PendingIntent.getBroadcast(mContext, 0,
                 new Intent(Constants.NOTIFICATION_BUTTON_LOGGING), 0);
+        PendingIntent pendingSpeechIntent = PendingIntent.getBroadcast(mContext, 0,
+                new Intent(Constants.NOTIFICATION_BUTTON_SPEECH), 0);
 
         notificationView.setOnClickPendingIntent(R.id.ib_connection,
                 pendingConnectionIntent);
@@ -102,6 +105,8 @@ public class NotificationUtil {
                 pendingWatchIntent);
         notificationView.setOnClickPendingIntent(R.id.ib_logging,
                 pendingLoggingIntent);
+        notificationView.setOnClickPendingIntent(R.id.ib_speech,
+                pendingSpeechIntent);
 
         switch (mConnectionState) {
             case BluetoothLeService.STATE_CONNECTING:
@@ -135,6 +140,11 @@ public class NotificationUtil {
         else
             notificationView.setImageViewResource(R.id.ib_logging, R.drawable.ic_action_logging_grey);
 
+        if (SpeechService.isInstanceCreated())
+            notificationView.setImageViewResource(R.id.ib_speech, R.drawable.ic_action_speech_orange);
+        else
+            notificationView.setImageViewResource(R.id.ib_speech, R.drawable.ic_action_speech_grey);
+
         return new NotificationCompat.Builder(mContext)
                 .setSmallIcon(R.drawable.ic_stat_wheel)
                 .setContentIntent(pendingIntent)
@@ -158,6 +168,7 @@ public class NotificationUtil {
         intentFilter.addAction(Constants.ACTION_WHEEL_DATA_AVAILABLE);
         intentFilter.addAction(Constants.ACTION_LOGGING_SERVICE_TOGGLED);
         intentFilter.addAction(Constants.ACTION_PEBBLE_SERVICE_TOGGLED);
+        intentFilter.addAction(Constants.ACTION_SPEECH_SERVICE_TOGGLED);
         return intentFilter;
     }
 
@@ -173,12 +184,20 @@ public class NotificationUtil {
                     context.stopService(pebbleServiceIntent);
                 else
                     context.startService(pebbleServiceIntent);
-            } else if (Constants.NOTIFICATION_BUTTON_LOGGING.equals(action)) {
+            }
+            else if (Constants.NOTIFICATION_BUTTON_LOGGING.equals(action)) {
                 Intent loggingServiceIntent = new Intent(context.getApplicationContext(), LoggingService.class);
                 if (LoggingService.isInstanceCreated())
                     context.stopService(loggingServiceIntent);
                 else
                     context.startService(loggingServiceIntent);
+            }
+            else if (Constants.NOTIFICATION_BUTTON_SPEECH.equals(action)) {
+                Intent speechServiceIntent = new Intent(context.getApplicationContext(), SpeechService.class);
+                if (SpeechService.isInstanceCreated())
+                    context.stopService(speechServiceIntent);
+                else
+                    context.startService(speechServiceIntent);
             }
         }
     }

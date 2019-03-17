@@ -76,7 +76,7 @@ public class PebbleService extends Service {
             }
 
             if (refreshAll) {
-                outgoingDictionary.addInt32(KEY_USE_MPH, SettingsUtil.isUseMPH(PebbleService.this) ? 1 : 0);
+                outgoingDictionary.addInt32(KEY_USE_MPH, SettingsUtil.isUseMiles(PebbleService.this) ? 1 : 0);
                 outgoingDictionary.addInt32(KEY_MAX_SPEED, SettingsUtil.getMaxSpeed(PebbleService.this));
             }
 

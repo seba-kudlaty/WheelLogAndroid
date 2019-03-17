@@ -28,6 +28,8 @@
     <string name="stop_pebble_service">Stop Pebble Dash</string>
     <string name="start_data_service">Start Logging</string>
     <string name="stop_data_service">Stop Logging</string>
+    <string name="start_speech_service">Enable Voice Messages</string>
+    <string name="stop_speech_service">Disable Voice Messages</string>
     <string name="started_logging">Started logging to %1$s</string>
     <string name="wheel_type_recognized">Detected wheel protocol %1$s</string>
     <string name="search_for_wheel">Search for Wheel</string>
@@ -66,29 +68,38 @@
     <string name="icon_watch">Watch Icon</string>
     <string name="icon_logging">Logging Icon</string>
     <string name="icon_connection">Connection Icon</string>
+    <string name="icon_speech">Voice Icon</string>
     <string name="connection_lost_at">Connection lost at %1s</string>
 
     <string name="logging_error_no_storage_permission">No permission to write to external storage. Logging cancelled.</string>
     <string name="logging_error_storage_unavailable">External storage is unavailable. Logging cancelled.</string>
     <string name="logging_error_no_location_permission">Log location was requested but no permission to location data was provided. No location data will be logged.</string>
-    <string name="logging_error_gps_disabled">Location logging using GPS was requested but GPS is disabled. Location will be logged using Network data.</string>
-    <string name="logging_error_network_disabled">Location logging using GSM Network was requested but this location provider is disabled. No location data will be logged.</string>
+    <string name="logging_error_gps_disabled">Location logging using GPS was requested but GPS is disabled. Location will be logged using cellular network data.</string>
+    <string name="logging_error_network_disabled">Location logging using cellular network was requested but this location provider is disabled. No location data will be logged.</string>
     <string name="logging_error_all_location_providers_disabled">Location has been disabled within Android. No location data will be logged.</string>
     <string name="raw_distance">Raw Distance</string>
 
 	<string name="alarm_text_speed">Speed alarm triggered</string>
 	<string name="alarm_text_current">Current alarm triggered</string>
 	<string name="alarm_text_temperature">Temperature alarm triggered</string>
-	
-	
+
+    <string name="livemap_error_no_location_permission" translatable="false">Live map requires permission to access location data.</string>
+    <string name="livemap_error_no_gps_provider" translatable="false">GPS is required for live map, but is not available.</string>
+    <string name="livemap_offline" translatable="false">You are offline</string>
+    <string name="livemap_gps_wait" translatable="false">Waiting for GPS...</string>
+    <string name="livemap_live" translatable="false">You are live now!</string>
+    <string name="livemap_last_update" translatable="false">Last update at %1$s</string>
+
     // PREFERENCES
-    <string name="speed_preferences" translatable="false">speed_preferences</string>
+    <string name="general_preferences" translatable="false">speed_preferences</string>
     <string name="log_preferences" translatable="false">log_preferences</string>
     <string name="alarm_preferences" translatable="false">alarm_preferences</string>
     <string name="watch_preferences" translatable="false">watch_preferences</string>
     <string name="wheel_settings" translatable="false">wheel_settings</string> 
 	<string name="trip_settings" translatable="false">trip_settings</string>
-
+    <string name="speech_preferences" translatable="false">speech_preferences</string>
+    <string name="speech_messages_preferences" translatable="false">speech_messages_preferences</string>
+    <string name="livemap_preferences" translatable="false">livemap_preferences</string>
 
     // ALARM PREFERENCES
     <string name="alarms_enabled" translatable="false">alarms_enabled</string>
@@ -119,27 +130,66 @@
     <string name="gotway_voltage" translatable="false">gotway_voltage</string>
     <string name="no_settings" translatable="false">no_settings</string>
 	
-
     // LOG PREFERENCES
     <string name="auto_log" translatable="false">auto_log</string>
     <string name="auto_upload" translatable="false">auto_upload</string>
     <string name="log_location_data" translatable="false">log_location_data</string>
     <string name="use_gps" translatable="false">use_gps</string>
 
-    // SPEED PREFERENCES
-    <string name="use_mph" translatable="false">use_mph</string>
+    // GENERAL PREFERENCES
+    <string name="use_mi" translatable="false">use_mi</string>
+    <string name="use_f" translatable="false">use_f</string>
     <string name="max_speed" translatable="false">max_speed</string>
 	<string name="use_ratio" translatable="false">use_ratio</string>
 
     // WATCH PREFERENCES
     <string name="horn_mode" translatable="false">horn_mode</string>
 
-	
 	// TRIP PREFERENCES
 	<string name="reset_top_speed" translatable="false">reset_top_speed</string>
 	<string name="reset_user_distance" translatable="false">reset_user_distance</string>
     <string name="last_mac" translatable="false">last_mac</string>
     <string name="about" translatable="false">about</string>
 
-	
+    // LIVEMAP PREFERENCES
+    <string name="livemap_api_key" translatable="false">livemap_api_key</string>
+    <string name="livemap_update_interval" translatable="false">livemap_update_interval</string>
+    <string name="livemap_publish" translatable="false">livemap_publish</string>
+    <string name="livemap_publication_delay" translatable="false">livemap_publication_delay</string>
+    <string name="livemap_start_new_segment">livemap_start_new_segment</string>
+
+    // SPEECH PREFERENCES
+    <string name="speech_messages" translatable="false">speech_messages</string>
+    <string name="speech_msg_interval" translatable="false">speech_msg_rate</string>
+    <string name="speech_enable" translatable="false">speech_enable</string>
+    <string name="speech_rate" translatable="false">speech_rate</string>
+    <string name="speech_pitch" translatable="false">speech_pitch</string>
+    <string name="speech_only_when_moving" translatable="false">speech_only_when_moving</string>
+    <string name="speech_msg_mode" translatable="false">speech_msg_mode</string>
+    <string name="speech_enable_on_startup" translatable="false">speech_enable_on_startup</string>
+    <string name="speech_messages_speed">speech_messages_speed</string>
+    <string name="speech_messages_avg_speed">speech_messages_avg_speed</string>
+    <string name="speech_messages_distance">speech_messages_distance</string>
+    <string name="speech_messages_battery">speech_messages_battery</string>
+    <string name="speech_messages_phone_battery">speech_messages_phone_battery</string>
+    <string name="speech_messages_voltage">speech_messages_voltage</string>
+    <string name="speech_messages_current">speech_messages_current</string>
+    <string name="speech_messages_power">speech_messages_power</string>
+    <string name="speech_messages_temperature">speech_messages_temperature</string>
+    <string name="speech_messages_time">speech_messages_time</string>
+    <string name="speech_messages_time_from_start">speech_messages_time_from_start</string>
+    <string name="speech_messages_time_in_motion">speech_messages_time_in_motion</string>
+    <string name="speech_messages_battery_low_level">speech_messages_battery_low_level</string>
+    <string name="speech_messages_phone_battery_low_level">speech_messages_phone_battery_low_level</string>
+    <string name="speech_messages_distance_use_location">speech_messages_distance_use_location</string>
+    <string name="speech_messages_weather">speech_messages_weather</string>
+    <string name="livemap_api_connected">Connected!</string>
+    <string name="livemap_api_error_general">General server error, try again later.</string>
+    <string name="livemap_api_error_invalid_api_key">Login failed, check your API key.</string>
+    <string name="livemap_api_error_accound_needs_activation">You have to activate your account prior to use.</string>
+    <string name="livemap_api_error_forbidden">Server access forbidden.</string>
+    <string name="livemap_api_error_unknown">Unknown error, try again later.</string>
+    <string name="livemap_api_error_no_connection">Can\'t connect. Check your Internet connection and try again.</string>
+    <string name="livemap_connecting">Connecting...</string>
+
 </resources>

@@ -26,13 +26,16 @@ class ViewPageAdapter extends PagerAdapter {
             case 2:
                 resId = R.id.page_three;
                 break;
+            case 3:
+                resId = R.id.page_four;
+                break;
         }
         return mActivity.findViewById(resId);
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override

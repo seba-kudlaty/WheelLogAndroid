@@ -3,29 +3,39 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
-        android:key="@string/speed_preferences"
-        android:title="Speed Settings"
-        android:icon="@drawable/ic_speedometer_white_24dp"/>
+        android:key="@string/general_preferences"
+        android:title="General settings"
+        android:icon="@drawable/ic_settings_white_24dp"/>
 
     <Preference
         android:key="@string/log_preferences"
-        android:title="Log Settings"
+        android:title="Log settings"
         android:icon="@drawable/ic_show_chart_white_24dp"/>
 
     <Preference
         android:key="@string/alarm_preferences"
-        android:title="Alarm Settings"
+        android:title="Alarm settings"
         android:icon="@drawable/ic_vibration_white_24dp"/>
 
     <Preference
+        android:key="@string/livemap_preferences"
+        android:title="Live map settings"
+        android:icon="@drawable/ic_action_livemap_white"/>
+
+    <Preference
+        android:key="@string/speech_preferences"
+        android:title="Voice settings"
+        android:icon="@drawable/ic_action_speech_white"/>
+
+    <Preference
         android:key="@string/watch_preferences"
-        android:title="Watch Preferences"
+        android:title="Watch preferences"
         android:icon="@drawable/ic_watch_white_24dp" />
 
     <Preference
         android:key="@string/wheel_settings"
 		android:enabled="false"
-        android:title="Wheel Settings"
+        android:title="Wheel settings"
         android:icon="@drawable/ic_action_wheel_white" />
 	
 	<Preference

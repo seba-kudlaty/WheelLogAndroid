@@ -1,16 +1,12 @@
 package com.cooper.wheellog;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Vibrator;
 
-import android.text.InputType;
-import android.widget.EditText;
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.Constants.ALARM_TYPE;
 import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
@@ -40,6 +36,12 @@ public class WheelData {
     private ArrayList<Float> currentAxis = new ArrayList<>();
     private ArrayList<Float> speedAxis = new ArrayList<>();
 
+    private long mLastTimestamp;
+    private double mWattHoursDischarge;
+    private double mAmpHoursDischarge;
+    private double mWattHoursRecharge;
+    private double mAmpHoursRecharge;
+
     private int mSpeed;
     private long mTotalDistance;
     private int mCurrent;
@@ -66,7 +68,7 @@ public class WheelData {
     private String mModel = "Unknown";
 	private String mModeStr = "Unknown";
 	private String mBtName = "";
-	
+
 	private String mAlert = "";
 
 //    private int mVersion; # sorry King, but INT not good for Inmo
@@ -94,7 +96,6 @@ public class WheelData {
     private int mAlarmCurrent = 0;
 	private int mAlarmTemperature = 0;
     private int mGotwayVoltageScaler = 0;
-
 
 	private boolean mUseRatio = false;
 	//private boolean mGotway84V = false;
@@ -375,15 +376,26 @@ public class WheelData {
 			InMotionAdapter.getInstance().setTiltHorizon(pedalAdjustment);
 		}
     }
-	
-    public int getTemperature() {
-        return mTemperature / 100;
-    }
-	
+
+    public double getWattHours() { return mWattHoursDischarge - mWattHoursRecharge; }
+    public double getAmpHours() { return mAmpHoursDischarge - mAmpHoursRecharge; }
+    public double getWattHoursDischarge() { return mWattHoursDischarge; }
+    public double getAmpHoursDischarge() { return mAmpHoursDischarge; }
+    public double getWattHoursRecharge() { return mWattHoursRecharge; }
+    public double getAmpHoursRecharge() { return mAmpHoursRecharge; }
+
+    public int getTemperature() { return mTemperature / 100; }
+
+    public double getTemperatureDouble() { return mTemperature / 100.0; }
+
     public int getTemperature2() {
         return mTemperature2 / 100;
     }
-	
+
+    public double getTemperature2Double() {
+        return mTemperature2 / 100.0;
+    }
+
 	public double getAngle() {
         return mAngle;
     }
@@ -395,6 +407,8 @@ public class WheelData {
     public int getBatteryLevel() {
         return mBattery;
     }
+
+    public double getAverageBatteryLevelDouble() { return mAverageBattery; }
 
     int getFanStatus() {
         return mFanStatus;
@@ -474,7 +488,48 @@ public class WheelData {
                 TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(mRidingTime));
         return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
     }
-	
+
+    String getRideTimeHumanReadable() {
+        String text = "";
+        int currentTime = mRideTime + mLastRideTime;
+        if (currentTime > 0) {
+            long hours = TimeUnit.SECONDS.toHours(currentTime);
+            long minutes = TimeUnit.SECONDS.toMinutes(currentTime) -
+                    TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(currentTime));
+            if (hours > 0) {
+                if (hours == 1)
+                    text += "1 hour and";
+                else
+                    text += String.format(Locale.US, "%d hours and", hours);
+            }
+            if (minutes == 1)
+                text += "1 minute";
+            else
+                text += String.format(Locale.US, "%d minutes", minutes);
+        }
+        return text;
+    }
+
+    String getRidingTimeHumanReadable() {
+        String text = "";
+        if (mRidingTime > 0) {
+            long hours = TimeUnit.SECONDS.toHours(mRidingTime);
+            long minutes = TimeUnit.SECONDS.toMinutes(mRidingTime) -
+                    TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(mRidingTime));
+            if (hours > 0) {
+                if (hours == 1)
+                    text += "1 hour and";
+                else
+                    text += String.format(Locale.US, "%d hours and", hours);
+            }
+            if (minutes == 1)
+                text += "1 minute";
+            else
+                text += String.format(Locale.US, "%d minutes", minutes);
+        }
+        return text;
+    }
+
     double getSpeedDouble() {
         return mSpeed / 100.0;
     }
@@ -633,6 +688,41 @@ public class WheelData {
         mAverageBattery += (battery - mAverageBattery) / mAverageBatteryCount;
     }
 
+    boolean isSpeedAlarm1Active() {
+        if (mAlarmsEnabled)
+            return (mAlarm1Speed > 0 && mAlarm1Battery > 0 && mAverageBattery <= mAlarm1Battery && mSpeed >= mAlarm1Speed);
+        else
+            return false;
+    }
+
+    boolean isSpeedAlarm2Active() {
+        if (mAlarmsEnabled)
+            return (mAlarm2Speed > 0 && mAlarm2Battery > 0 && mAverageBattery <= mAlarm2Battery && mSpeed >= mAlarm2Speed);
+        else
+            return false;
+    }
+
+    boolean isSpeedAlarm3Active() {
+        if (mAlarmsEnabled)
+            return (mAlarm3Speed > 0 && mAlarm3Battery > 0 && mAverageBattery <= mAlarm3Battery && mSpeed >= mAlarm3Speed);
+        else
+            return false;
+    }
+
+    boolean isCurrentAlarmActive() {
+        if (mAlarmsEnabled)
+            return (mAlarmCurrent > 0 && mCurrent >= mAlarmCurrent);
+        else
+            return false;
+    }
+
+    boolean isTemperatureAlarmActive() {
+        if (mAlarmsEnabled)
+            return (mAlarmTemperature > 0 && mTemperature >= mAlarmTemperature);
+        else
+            return false;
+    }
+
     private void checkAlarmStatus(Context mContext) {
         // SPEED ALARM
         if (!mSpeedAlarmExecuted) {
@@ -733,7 +823,7 @@ public class WheelData {
         if (!new_data)
 			return;
 
-		Intent intent = new Intent(Constants.ACTION_WHEEL_DATA_AVAILABLE);       
+		Intent intent = new Intent(Constants.ACTION_WHEEL_DATA_AVAILABLE);
 		
 		if (mNewWheelSettings) {
 			intent.putExtra(Constants.INTENT_EXTRA_WHEEL_SETTINGS, true);
@@ -759,10 +849,7 @@ public class WheelData {
 		if (mAlarmsEnabled) 
 			checkAlarmStatus(mContext);
 		mContext.sendBroadcast(intent);
-        
-       
 
-        
     }
 
     private boolean decodeKingSong(byte[] data) {
@@ -777,6 +864,8 @@ public class WheelData {
                 return false;
             }
             if ((data[16] & 255) == 169) { // Live data
+
+
                 mVoltage = byteArrayInt2(data[2], data[3]);
                 mSpeed = byteArrayInt2(data[4], data[5]);
                 mTotalDistance = byteArrayInt4(data[6], data[7], data[8], data[9]);
@@ -791,6 +880,22 @@ public class WheelData {
 
                 int battery;
 
+                if (mModel.compareTo("KS-18L") == 0) {
+                    if (mLastTimestamp > 0) {
+                        double dt = (double)(System.currentTimeMillis() - mLastTimestamp) / (3600 * 1000);
+                        double dah = getCurrentDouble() * dt;
+                        double dwh = getVoltageDouble() * getCurrentDouble() * dt;
+                        if (dah < 0) {
+                            mAmpHoursRecharge += Math.abs(dah);
+                            mWattHoursRecharge += Math.abs(dwh);
+                        }
+                        else {
+                            mAmpHoursDischarge += dah;
+                            mWattHoursDischarge += dwh;
+                        }
+                    }
+                    mLastTimestamp = System.currentTimeMillis();
+                }
 
                 if ((mModel.compareTo("KS-18L") == 0) || (mBtName.compareTo("RW") == 0 )) {
 
@@ -1032,6 +1137,11 @@ public class WheelData {
     }
 
     void reset() {
+        mLastTimestamp = 0;
+        mWattHoursDischarge = 0;
+        mAmpHoursDischarge = 0;
+        mWattHoursRecharge = 0;
+        mAmpHoursRecharge = 0;
         mSpeed = 0;
         mTotalDistance = 0;
         mCurrent = 0;
@@ -1064,7 +1174,6 @@ public class WheelData {
 		mWheelButtonDisabled = false;
 		mWheelMaxSpeed = 25;
 		mWheelSpeakerVolume = 50;
-	
     }
 
     boolean detectWheel(BluetoothLeService bluetoothService) {
@@ -1193,4 +1302,5 @@ public class WheelData {
         }
         return false;
     }
+
 }

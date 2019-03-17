@@ -24,4 +24,10 @@
         android:icon="@drawable/ic_action_watch_white"
         android:title="@string/start_pebble_service">
     </item>
+    <item
+        android:id="@+id/miSpeech"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_speech_white"
+        android:title="@string/start_speech_service">
+    </item>
 </menu>

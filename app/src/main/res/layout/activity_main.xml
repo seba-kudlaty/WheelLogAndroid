@@ -46,6 +46,8 @@
 
             <include layout="@layout/main_view_three" />
 
+            <include layout="@layout/main_view_four" />
+
         </android.support.v4.view.ViewPager>
 
         <com.viewpagerindicator.LinePageIndicator

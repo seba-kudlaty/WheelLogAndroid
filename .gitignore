@@ -46,3 +46,7 @@ captures/
 .idea/libraries/*
 .idea/dictionaries/*
 .idea/copyright/*
+
+# Build informative files
+app/debug/output.json
+app/release/output.json

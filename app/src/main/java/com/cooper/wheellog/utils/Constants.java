@@ -12,6 +12,11 @@ public class Constants {
     public static final String ACTION_REQUEST_KINGSONG_HORN = "com.cooper.wheellog.requestHorn";
     public static final String ACTION_PEBBLE_SERVICE_TOGGLED = "com.cooper.wheellog.pebbleServiceToggled";
     public static final String ACTION_LOGGING_SERVICE_TOGGLED = "com.cooper.wheellog.loggingServiceToggled";
+    public static final String ACTION_SPEECH_SERVICE_TOGGLED = "com.cooper.wheellog.speechServiceToggled";
+    public static final String ACTION_LIVEMAP_SERVICE_TOGGLED = "com.cooper.wheellog.livemapServiceToggled";
+    public static final String ACTION_LIVEMAP_PAUSE_TOGGLED = "com.cooper.wheellog.livemapPauseToggled";
+    public static final String ACTION_LIVEMAP_TIMER = "com.cooper.wheellog.livemapTimer";
+    public static final String ACTION_LIVEMAP_STATUS = "com.cooper.wheellog.livemapStatus";
     public static final String ACTION_REQUEST_CONNECTION_TOGGLE = "com.cooper.wheellog.requestConnectionToggle";
     public static final String ACTION_PREFERENCE_CHANGED = "com.cooper.wheellog.preferenceChanged";
     public static final String ACTION_PEBBLE_AFFECTING_PREFERENCE_CHANGED = "com.cooper.wheellog.pebblePreferenceChanged";
@@ -19,10 +24,12 @@ public class Constants {
     public static final String ACTION_PEBBLE_APP_READY = "com.cooper.wheellog.pebbleAppReady";
     public static final String ACTION_PEBBLE_APP_SCREEN = "com.cooper.wheellog.pebbleAppScreen";
 	public static final String ACTION_WHEEL_TYPE_RECOGNIZED = "com.cooper.wheellog.wheelTypeRecognized";
+    public static final String ACTION_SPEECH_SAY = "com.cooper.wheellog.speechSay";
 
     static final String NOTIFICATION_BUTTON_CONNECTION = "com.cooper.wheellog.notificationConnectionButton";
     static final String NOTIFICATION_BUTTON_LOGGING = "com.cooper.wheellog.notificationLoggingButton";
     static final String NOTIFICATION_BUTTON_WATCH = "com.cooper.wheellog.notificationWatchButton";
+    static final String NOTIFICATION_BUTTON_SPEECH = "com.cooper.wheellog.notificationSpeechButton";
 
     public static final String KINGSONG_DESCRIPTER_UUID = "00002902-0000-1000-8000-00805f9b34fb";
     public static final String KINGSONG_READ_CHARACTER_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
@@ -67,6 +74,16 @@ public class Constants {
 	public static final String INTENT_EXTRA_WHEEL_REFRESH = "wheel_refresh";
 	public static final String INTENT_EXTRA_WHEEL_PEDALS_ADJUSTMENT = "pedals_adjustment";
 	public static final String INTENT_EXTRA_WHEEL_TYPE = "wheel_type";
+
+    public static final String INTENT_EXTRA_SPEECH_TEXT = "speech_text";
+    public static final String INTENT_EXTRA_SPEECH_EARCON = "speech_earcon";
+    public static final String INTENT_EXTRA_SPEECH_NOW = "speech_now";
+
+    public static final String INTENT_EXTRA_LIVEMAP_START = "livemap_start";
+    public static final String INTENT_EXTRA_LIVEMAP_UPDATE = "livemap_update";
+    public static final String INTENT_EXTRA_LIVEMAP_PAUSE = "livemap_pause";
+    public static final String INTENT_EXTRA_LIVEMAP_RESUME = "livemap_resume";
+    public static final String INTENT_EXTRA_LIVEMAP_STOP = "livemap_stop";
 
     public static final String PREFERENCES_FRAGMENT_TAG = "tagPrefs";
 

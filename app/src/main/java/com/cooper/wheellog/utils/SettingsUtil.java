@@ -86,8 +86,12 @@ public class SettingsUtil {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public static boolean isUseMPH(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(R.string.use_mph), false);
+    public static boolean isUseMiles(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.use_mi), false);
+    }
+
+    public static boolean isUseF(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.use_f), false);
     }
 
     public static int getMaxSpeed(Context context) {
@@ -114,4 +118,101 @@ public class SettingsUtil {
         }
         getSharedPreferences(context).edit().putString("wheel_password_"+id, password).apply();
     }
+
+    public static boolean isSpeechEnabledOnStartup(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_enable_on_startup), false);
+    }
+
+    public static int getSpeechRate(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_rate), "1"));
+    }
+
+    public static int getSpeechPitch(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_pitch), "1"));
+    }
+
+    public static int getSpeechMsgInterval(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_msg_interval), "60"));
+    }
+
+    public static boolean getSpeechOnlyInMotion(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_only_when_moving), false);
+    }
+
+    public static boolean getSpeechMessagesSpeed(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_speed), true);
+    }
+
+    public static boolean getSpeechMessagesAvgSpeed(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_avg_speed), false);
+    }
+
+    public static boolean getSpeechMessagesDistance(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_distance), true);
+    }
+
+    public static boolean getSpeechMessagesBattery(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_battery), true);
+    }
+
+    public static boolean getSpeechMessagesPhoneBattery(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_phone_battery), true);
+    }
+
+    public static boolean getSpeechMessagesVoltage(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_voltage), false);
+    }
+
+    public static boolean getSpeechMessagesCurrent(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_current), false);
+    }
+
+    public static boolean getSpeechMessagesPower(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_power), false);
+    }
+
+    public static boolean getSpeechMessagesTemperature(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_temperature), false);
+    }
+
+    public static boolean getSpeechMessagesTime(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_time), false);
+    }
+
+    public static boolean getSpeechMessagesTimeFromStart(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_time_from_start), true);
+    }
+
+    public static boolean getSpeechMessagesTimeInMotion(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_time_in_motion), false);
+    }
+
+    public static int getSpeechMessagesBatteryLowLevel(Context context) {
+        return getSharedPreferences(context).getInt(context.getString(R.string.speech_messages_battery_low_level), 20);
+    }
+
+    public static int getSpeechMessagesPhoneBatteryLowLevel(Context context) {
+        return getSharedPreferences(context).getInt(context.getString(R.string.speech_messages_phone_battery_low_level), 20);
+    }
+
+    public static String getLivemapApiKey(Context context) {
+        return getSharedPreferences(context).getString(context.getString(R.string.livemap_api_key), "");
+    }
+
+    public static int getLivemapPublish(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_publish), "0"));
+    }
+
+    public static int getLivemapPublicationDelay(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_publication_delay), "0"));
+    }
+
+    public static int getLivemapUpdateInterval(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_update_interval), "15"));
+    }
+
+    public static boolean getLivemapStartNewSegment(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.livemap_start_new_segment), false);
+    }
+
 }

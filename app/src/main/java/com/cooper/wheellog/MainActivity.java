@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +41,6 @@ import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 import com.cooper.wheellog.utils.Constants.ALARM_TYPE;
 import com.cooper.wheellog.utils.SettingsUtil;
-//import com.cooper.wheellog.utils.NotificationUtil;
 import com.cooper.wheellog.utils.Typefaces;
 import com.cooper.wheellog.views.WheelView;
 import com.github.mikephil.charting.charts.LineChart;
@@ -59,6 +59,7 @@ import com.viewpagerindicator.LinePageIndicator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import permissions.dispatcher.NeedsPermission;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     MenuItem miWheel;
     MenuItem miWatch;
     MenuItem miLogging;
+    MenuItem miSpeech;
 
     TextView tvSpeed;
     TextView tvTemperature;
@@ -102,15 +104,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     TextView tvRideTime;
 	TextView tvRidingTime;
     TextView tvMode;
+    TextView tvLivemapStatus;
+    TextView tvLivemapLastUpdated;
+
+    ImageButton ibLivemapStartStop;
+    ImageButton ibLivemapPause;
 
     LineChart chart1;
 
     WheelView wheelView;
-    
+
     private BluetoothLeService mBluetoothLeService;
     private BluetoothAdapter mBluetoothAdapter;
     private String mDeviceAddress;
     private int mConnectionState = BluetoothLeService.STATE_DISCONNECTED;
+    int tourStatus = 0;
     private boolean doubleBackToExitPressedOnce = false;
     private Snackbar snackbar;
     int viewPagerPage = 0;
@@ -173,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 case Constants.ACTION_PEBBLE_SERVICE_TOGGLED:
                     setMenuIconStates();
                     break;
+                case Constants.ACTION_SPEECH_SERVICE_TOGGLED:
+                    setMenuIconStates();
+                    break;
 				//case Constants.ACTION_WHEEL_SETTING_CHANGED:
 				//	if (intent.hasExtra(Constants.INTENT_EXTRA_WHEEL_REFRESH)) {
 				//		setWheelPreferences();
@@ -209,6 +220,50 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 						showSnackBar(getResources().getString(R.string.alarm_text_temperature), 3000);						
 					}
 					break;
+                case Constants.ACTION_LIVEMAP_STATUS:
+                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_START)) {
+                        int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_START, -1);
+                        ibLivemapStartStop.setClickable(true);
+                        switch (error) {
+                            case 0:
+                                tourStatus = 0;
+                                tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
+                                ibLivemapStartStop.setImageResource(R.drawable.ic_action_livemap_play_orange);
+                                ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_white);
+                                ibLivemapPause.setClickable(true);
+                                break;
+                            default:
+                                tvLivemapStatus.setText(getString(R.string.livemap_offline));
+                                break;
+                        }
+                    }
+                    else
+                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_UPDATE)) {
+                        int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_UPDATE, -1);
+                        switch (error) {
+                            case 0:
+                                if (tourStatus == 0) {
+                                    tourStatus = 1;
+                                    tvLivemapStatus.setText(getString(R.string.livemap_live));
+                                }
+                                SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss", Locale.US);
+                                tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, df.format(new Date())));
+                                break;
+                            default:
+                                tvLivemapLastUpdated.setText("");
+                                break;
+                        }
+                    }
+                    else
+                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_STOP)) {
+                        tvLivemapStatus.setText(getString(R.string.livemap_offline));
+                        tvLivemapLastUpdated.setText("");
+                        ibLivemapStartStop.setImageResource(R.drawable.ic_action_livemap_play_white);
+                        ibLivemapStartStop.setClickable(true);
+                        ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_grey);
+                        ibLivemapPause.setClickable(false);
+                    }
+                    break;
             }
         }
     };
@@ -240,8 +295,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mConnectionState = connectionState;
         setMenuIconStates();
     }
-	
-	
+
 	private void setWheelPreferences() {
 		Timber.i("SetWheelPreferences");
 		((PreferencesFragment) getPreferencesFragment()).refreshWheelSettings(WheelData.getInstance().getWheelLight(), 
@@ -299,6 +353,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             miLogging.setTitle(R.string.start_data_service);
             miLogging.setIcon(R.drawable.ic_action_logging_white);
         }
+
+        if (SpeechService.isInstanceCreated()) {
+            miSpeech.setTitle(R.string.stop_speech_service);
+            miSpeech.setIcon(R.drawable.ic_action_speech_orange);
+        } else {
+            miSpeech.setTitle(R.string.start_speech_service);
+            miSpeech.setIcon(R.drawable.ic_action_speech_white);
+        }
+
     }
     
     private void configureDisplay(WHEEL_TYPE wheelType) {
@@ -696,7 +759,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ViewPageAdapter adapter = new ViewPageAdapter(this);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(3);
+        pager.setOffscreenPageLimit(4);
 
         LinePageIndicator titleIndicator = (LinePageIndicator)findViewById(R.id.indicator);
         titleIndicator.setViewPager(pager);
@@ -732,6 +795,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         tvMode = (TextView) findViewById(R.id.tvMode);
         wheelView = (WheelView) findViewById(R.id.wheelView);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        tvLivemapStatus = (TextView) findViewById(R.id.tvLivemapStatus);
+        tvLivemapLastUpdated = (TextView) findViewById(R.id.tvLivemapLastUpdated);
+        ibLivemapStartStop = (ImageButton) findViewById(R.id.ibLivemapStartStop);
+        ibLivemapPause = (ImageButton) findViewById(R.id.ibLivemapPause);
 
         mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -752,11 +819,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
+        ibLivemapStartStop.setOnClickListener(new ImageButton.OnClickListener() {
+            public void onClick(View v)  {
+                tvLivemapStatus.setText(getString(R.string.livemap_connecting));
+                ibLivemapStartStop.setClickable(false);
+                MainActivityPermissionsDispatcher.toggleLivemapServiceWithCheck(MainActivity.this);
+            }
+        });
+
+        ibLivemapPause.setOnClickListener(new ImageButton.OnClickListener() {
+            public void onClick(View v)  {
+                ibLivemapPause.setClickable(false);
+            }
+        });
+
         Typeface typefacePrime = Typefaces.get(this, "fonts/prime.otf");
         TextClock textClock = (TextClock) findViewById(R.id.textClock);
         TextView tvWaitText = (TextView) findViewById(R.id.tvWaitText);
         textClock.setTypeface(typefacePrime);
         tvWaitText.setTypeface(typefacePrime);
+        tvLivemapStatus.setTypeface(typefacePrime);
 
         chart1 = (LineChart) findViewById(R.id.chart);
         chart1.setDrawGridBackground(false);
@@ -816,6 +898,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         } else {
             startBluetoothService();
         }
+
+        // Enable voice messages on startup
+        if (SettingsUtil.isSpeechEnabledOnStartup(this))
+            startSpeechService();
     }
 
     @Override
@@ -852,8 +938,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     protected void onDestroy() {
+        stopLivemapService();
         stopPebbleService();
         stopLoggingService();
+        stopSpeechService();
         WheelData.getInstance().full_reset();
         if (mBluetoothLeService != null) {
             unbindService(mServiceConnection);
@@ -886,6 +974,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         miWheel = mMenu.findItem(R.id.miWheel);
         miWatch = mMenu.findItem(R.id.miWatch);
         miLogging = mMenu.findItem(R.id.miLogging);
+        miSpeech = mMenu.findItem(R.id.miSpeech);
         return true;
     }
 
@@ -903,6 +992,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 return true;
             case R.id.miWatch:
                 togglePebbleService();
+                return true;
+            case R.id.miSpeech:
+                toggleSpeechService();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -923,7 +1015,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (mDrawer.isDrawerOpen(settings_layout)) {
                     if (((PreferencesFragment) getPreferencesFragment()).is_main_menu())
                         mDrawer.closeDrawer(GravityCompat.START, true);
-					else ((PreferencesFragment) getPreferencesFragment()).show_main_menu();
+					else
+                    if (((PreferencesFragment) getPreferencesFragment()).is_speech_messages_menu())
+                        ((PreferencesFragment) getPreferencesFragment()).show_speech_menu();
+                    else
+					    ((PreferencesFragment) getPreferencesFragment()).show_main_menu();
                 } else {
                     if (doubleBackToExitPressedOnce) {
                         finish();
@@ -957,7 +1053,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void loadPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        use_mph = sharedPreferences.getBoolean(getString(R.string.use_mph), false);
+        use_mph = sharedPreferences.getBoolean(getString(R.string.use_mi), false);
         int max_speed = sharedPreferences.getInt(getString(R.string.max_speed), 30) * 10;
         wheelView.setMaxSpeed(max_speed);
         wheelView.setUseMPH(use_mph);
@@ -1080,6 +1176,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             startService(pebbleServiceIntent);
     }
 
+    private void startSpeechService() {
+        if (!SpeechService.isInstanceCreated())
+            toggleSpeechService();
+    }
+    private void stopSpeechService() {
+        if (SpeechService.isInstanceCreated())
+            toggleSpeechService();
+    }
+    private void toggleSpeechService() {
+        Intent speechServiceIntent = new Intent(getApplicationContext(), SpeechService.class);
+        if (SpeechService.isInstanceCreated())
+            stopService(speechServiceIntent);
+        else
+            startService(speechServiceIntent);
+    }
+
+    private void stopLivemapService() {
+        if (LivemapService.isInstanceCreated())
+            toggleLivemapService();
+    }
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    void toggleLivemapService() {
+        Intent livemapServiceIntent = new Intent(getApplicationContext(), LivemapService.class);
+        if (LivemapService.isInstanceCreated())
+            stopService(livemapServiceIntent);
+        else
+            startService(livemapServiceIntent);
+    }
+
     private void startBluetoothService() {
         Intent bluetoothServiceIntent = new Intent(getApplicationContext(), BluetoothLeService.class);
         startService(bluetoothServiceIntent);
@@ -1146,6 +1271,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         intentFilter.addAction(Constants.ACTION_WHEEL_DATA_AVAILABLE);
         intentFilter.addAction(Constants.ACTION_LOGGING_SERVICE_TOGGLED);
         intentFilter.addAction(Constants.ACTION_PEBBLE_SERVICE_TOGGLED);
+        intentFilter.addAction(Constants.ACTION_SPEECH_SERVICE_TOGGLED);
+        intentFilter.addAction(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED);
+        intentFilter.addAction(Constants.ACTION_LIVEMAP_STATUS);
         intentFilter.addAction(Constants.ACTION_PREFERENCE_CHANGED);
 		intentFilter.addAction(Constants.ACTION_WHEEL_SETTING_CHANGED);
 		intentFilter.addAction(Constants.ACTION_WHEEL_TYPE_RECOGNIZED);	
@@ -1203,4 +1331,5 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         return frag;
     }
+
 }
