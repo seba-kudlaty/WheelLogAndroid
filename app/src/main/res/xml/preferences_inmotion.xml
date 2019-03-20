@@ -5,24 +5,24 @@
 
     <CheckBoxPreference
         android:key="@string/light_enabled"
-        android:title="Switch on the light"
-        android:summary="Activate headlight" />
+        android:title="@string/light_enabled_title"
+        android:summary="@string/light_enabled_summary" />
 
     <CheckBoxPreference
         android:key="@string/led_enabled"
-        android:title="Switch on wheel illumination"
-        android:summary="Activate leds on the sides" />
+        android:title="@string/led_enabled_title"
+        android:summary="@string/led_enabled_summary" />
 
     <CheckBoxPreference
         android:key="@string/handle_button_disabled"
-        android:title="Disable handle button"
-        android:summary="Wheel will not disable when you press the button on the handle" />
+        android:title="@string/handle_button_disabled_title"
+        android:summary="@string/handle_button_disabled_summary" />
 
 
     <com.pavelsikun.seekbarpreference.SeekBarPreference
         android:key="@string/wheel_max_speed"
-        android:title="Wheel speed limit"
-        android:summary="Tiltback speed"
+        android:title="@string/wheel_max_speed_title"
+        android:summary="@string/wheel_max_speed_summary_inmotion"
         android:defaultValue="25"
         sample:msbp_minValue="3"
         sample:msbp_maxValue="45"
@@ -32,8 +32,8 @@
 
     <com.pavelsikun.seekbarpreference.SeekBarPreference
         android:key="@string/speaker_volume"
-        android:title="Speaker volume"
-        android:summary="Change built-in speaker volume"
+        android:title="@string/speaker_volume_title"
+        android:summary="@string/speaker_volume_summary"
         android:defaultValue="50"
         sample:msbp_minValue="0"
         sample:msbp_maxValue="100"
@@ -43,8 +43,8 @@
 
     <com.pavelsikun.seekbarpreference.SeekBarPreference
         android:key="@string/pedals_adjustment"
-        android:title="Pedals"
-        android:summary="Horizontal pedals adjustment"
+        android:title="@string/pedals_adjustment_title"
+        android:summary="@string/pedals_adjustment_summary"
         android:defaultValue="0"
         sample:msbp_minValue="-80"
         sample:msbp_maxValue="80"

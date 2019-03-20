@@ -1,5 +1,6 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/page_four"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -24,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="32dp"
         android:textSize="12sp"
         app:layout_columnSpan="2"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
@@ -47,6 +48,7 @@
             android:id="@+id/ibLivemapStartStop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/common_google_signin_btn_text_light_default"
             android:padding="32dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -56,13 +58,28 @@
             android:id="@+id/ibLivemapPause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:padding="32dp"
+            android:layout_marginStart="16dp"
+            android:background="@color/common_google_signin_btn_text_light_default"
             android:clickable="false"
+            android:padding="32dp"
             app:layout_constraintStart_toEndOf="@+id/ibLivemapStartStop"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_action_livemap_pause_grey" />
 
+        <ImageButton
+            android:id="@+id/ibLivemapShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@color/common_google_signin_btn_text_light_default"
+            android:clickable="true"
+            android:padding="32dp"
+            android:visibility="visible"
+            app:layout_constraintStart_toEndOf="@+id/ibLivemapPause"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_action_share_grey" />
+
     </android.support.constraint.ConstraintLayout>
+
 
 </android.support.constraint.ConstraintLayout>

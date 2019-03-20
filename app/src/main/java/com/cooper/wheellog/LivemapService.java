@@ -47,9 +47,22 @@ public class LivemapService extends Service {
     private BatteryManager batteryManager;
     private SimpleDateFormat df;
 
+    private long weatherTimestamp = 0;
+    private double weatherTemperature;
+    private double weatherTemperatureFeels;
+    private double weatherWindSpeed;
+    private double weatherWindDir;
+    private double weatherHumidity;
+    private double weatherPressure;
+    private double weatherPrecipitation;
+    private double weatherVisibility;
+    private double weatherCloudCoverage;
+    private int weatherCondition;
+
     public static boolean isInstanceCreated() {
         return instance != null;
     }
+    public static LivemapService getInstance() { return instance; }
 
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
@@ -84,6 +97,12 @@ public class LivemapService extends Service {
                     wheelTime = System.currentTimeMillis();
                     updateLivemap();
                     break;
+                case Constants.ACTION_LIVEMAP_PAUSE:
+                    pauseLivemap();
+                    break;
+                case Constants.ACTION_LIVEMAP_RESUME:
+                    resumeLivemap();
+                    break;
             }
         }
     };
@@ -94,6 +113,8 @@ public class LivemapService extends Service {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_WHEEL_DATA_AVAILABLE);
         intentFilter.addAction(Constants.ACTION_BLUETOOTH_CONNECTION_STATE);
+        intentFilter.addAction(Constants.ACTION_LIVEMAP_PAUSE);
+        intentFilter.addAction(Constants.ACTION_LIVEMAP_RESUME);
         registerReceiver(receiver, intentFilter);
         if (!PermissionsUtil.checkLocationPermission(this)) {
             showToast(R.string.livemap_error_no_location_permission, Toast.LENGTH_LONG);
@@ -175,6 +196,19 @@ public class LivemapService extends Service {
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
                     try {
                         int error = response.getInt("error");
+                        if ((error == 0) && (response.getJSONObject("data").has("xtm"))) {
+                            weatherTimestamp = SystemClock.elapsedRealtime();
+                            weatherTemperature = response.getJSONObject("data").getDouble("xtm");
+                            weatherTemperatureFeels = response.getJSONObject("data").getDouble("xtf");
+                            weatherWindSpeed = response.getJSONObject("data").getDouble("xws");
+                            weatherWindDir = response.getJSONObject("data").getDouble("xwd");
+                            weatherHumidity = response.getJSONObject("data").getDouble("xhu");
+                            weatherPressure = response.getJSONObject("data").getDouble("xpr");
+                            weatherPrecipitation = response.getJSONObject("data").getDouble("xpc");
+                            weatherVisibility = response.getJSONObject("data").getDouble("xvi");
+                            weatherCloudCoverage = response.getJSONObject("data").getDouble("xcl");
+                            weatherCondition = response.getJSONObject("data").getInt("xco");
+                        }
                         Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
                                 .putExtra(Constants.INTENT_EXTRA_LIVEMAP_UPDATE, error);
                         sendBroadcast(intent);
@@ -182,7 +216,6 @@ public class LivemapService extends Service {
                     catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Log.d("", String.format("updateLivemap() %d: %s", statusCode, response.toString()));
                 }
                 @Override
                 public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) { }
@@ -208,6 +241,7 @@ public class LivemapService extends Service {
                             status = 1;
                             showToast(R.string.livemap_api_connected, Toast.LENGTH_LONG);
                             tourKey = response.getJSONObject("data").getString("k");
+                            sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS).putExtra(Constants.INTENT_EXTRA_LIVEMAP_URL, "https://euc.world/tour/" + tourKey));
                             break;
                         case 1:
                             showToast(R.string.livemap_api_error_general, Toast.LENGTH_LONG);
@@ -272,14 +306,26 @@ public class LivemapService extends Service {
         final RequestParams requestParams = new RequestParams();
         requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
         requestParams.put("k", tourKey);
+        requestParams.put("p", SettingsUtil.getLivemapPublish(this));
+        requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
+        requestParams.put("d", SettingsUtil.getLivemapPublicationDelay(this));
         HttpClient.post(LivemapApiURL + "/tour/pause", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                Log.d("", String.format("pauseLivemap() %d: %s", statusCode, response.toString()));
+                int error = -1;
+                try {
+                    error = response.getInt("error");
+                }
+                catch (JSONException e) { }
+                Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
+                        .putExtra(Constants.INTENT_EXTRA_LIVEMAP_PAUSE, error);
+                sendBroadcast(intent);
             }
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e("", String.format("pauseLivemap() %d: %s", statusCode, errorResponse.toString()));
+                Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
+                        .putExtra(Constants.INTENT_EXTRA_LIVEMAP_PAUSE, -1);
+                sendBroadcast(intent);
             }
         });
     }
@@ -288,14 +334,26 @@ public class LivemapService extends Service {
         final RequestParams requestParams = new RequestParams();
         requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
         requestParams.put("k", tourKey);
+        requestParams.put("p", SettingsUtil.getLivemapPublish(this));
+        requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
+        requestParams.put("d", SettingsUtil.getLivemapPublicationDelay(this));
         HttpClient.post(LivemapApiURL + "/tour/resume", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                Log.d("", String.format("resumeLivemap() %d: %s", statusCode, response.toString()));
+                int error = -1;
+                try {
+                    error = response.getInt("error");
+                }
+                catch (JSONException e) { }
+                Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
+                        .putExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME, error);
+                sendBroadcast(intent);
             }
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e("", String.format("resumeLivemap() %d: %s", statusCode, errorResponse.toString()));
+                Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
+                        .putExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME, -1);
+                sendBroadcast(intent);
             }
         });
     }
@@ -311,5 +369,9 @@ public class LivemapService extends Service {
     private void showToast(int message_id, int duration) {
         Toast.makeText(this, message_id, duration).show();
     }
+
+    public long getWeatherAge() { return (weatherTimestamp - SystemClock.elapsedRealtime()); }
+    public double getWeatherTemperature() { return weatherTemperature; }
+    public double getWeatherTemperatureFeels() { return weatherTemperatureFeels; }
 
 }

@@ -44,29 +44,29 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 case Constants.ACTION_BLUETOOTH_CONNECTION_STATE:
                     int connectionState = intent.getIntExtra(Constants.INTENT_EXTRA_CONNECTION_STATE, BluetoothLeService.STATE_DISCONNECTED);
                     if (connectionState == BluetoothLeService.STATE_CONNECTED) {
-                        say("Connected.", "info");
+                        say(getString(R.string.speech_text_connected), "info");
                     }
                     else
                     if (connectionState == BluetoothLeService.STATE_CONNECTING) {
                         if (ttsLastWheelData > 0)
-                            say("Connection lost.", "warning1");
+                            say(getString(R.string.speech_text_connection_lost), "warning1");
                     }
                     break;
                 case Constants.ACTION_WHEEL_DATA_AVAILABLE:
                     if (WheelData.getInstance().isCurrentAlarmActive())
-                        sayNow("Current! Too high!", "alarm");
+                        sayNow(getString(R.string.speech_text_current_too_high), "alarm");
                     else
                     if (WheelData.getInstance().isTemperatureAlarmActive())
-                        sayNow("Temperature! Too high!", "alarm");
+                        sayNow(getString(R.string.speech_text_temp_too_high), "alarm");
                     else
                     if (WheelData.getInstance().isSpeedAlarm1Active())
-                        sayNow("Slow down!", "warning3");
+                        sayNow(getString(R.string.speech_text_slow_down_3), "warning3");
                     else
                     if (WheelData.getInstance().isSpeedAlarm2Active())
-                        sayNow("Slow down!", "warning2");
+                        sayNow(getString(R.string.speech_text_slow_down_2), "warning2");
                     else
                     if (WheelData.getInstance().isSpeedAlarm3Active())
-                        sayNow("Slow down!", "warning1");
+                        sayNow(getString(R.string.speech_text_slow_down_1), "warning1");
                     sayWheelData();
                     break;
                 case Constants.ACTION_SPEECH_SAY:
@@ -129,7 +129,8 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                     Log.d("", String.format(Locale.US, "UtteranceProgressListener: onDone(%s), sayCount = %d", utterance_id, sayCount));
                 }
             });
-            int result = tts.setLanguage(Locale.US);
+            //int result = tts.setLanguage(Locale.US);
+            int result = tts.setLanguage(Locale.getDefault());
             if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
                 tts.addEarcon("alarm", getPackageName(), R.raw.alarm);
                 tts.addEarcon("info", getPackageName(), R.raw.info);
@@ -139,7 +140,9 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 tts.addEarcon("warning3", getPackageName(), R.raw.warning_3);
                 ttsEnabled = true;
 
-                say("Welcome on board! " + WheelData.getInstance().getRidingTimeHumanReadable(), "info");
+                //say("Welcome on board! " + WheelData.getInstance().getRidingTimeHumanReadable(), "info");
+                say(getString(R.string.speech_text_welcome_on_board), "info");
+
             }
         }
     }
@@ -244,69 +247,83 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 // Speed
                 if (SettingsUtil.getSpeechMessagesSpeed(this)) {
                     if (WheelData.getInstance().getSpeedDouble() >= 3.0d) {
-                        text += String.format(Locale.US, "Speed - %s. ", formatSpeed(WheelData.getInstance().getSpeedDouble()));
+                        text += String.format(Locale.US, getString(R.string.speech_text_speed), formatSpeed(WheelData.getInstance().getSpeedDouble()));
                     }
                 }
 
                 // Average speed
                 if (SettingsUtil.getSpeechMessagesAvgSpeed(this)) {
                     if (WheelData.getInstance().getAverageSpeedDouble() >= 3.0d) {
-                        text += String.format(Locale.US, "Average speed - %s. ", formatSpeed(WheelData.getInstance().getAverageSpeedDouble()));
+                        text += String.format(Locale.US, getString(R.string.speech_text_avg_speed), formatSpeed(WheelData.getInstance().getAverageSpeedDouble()));
                     }
                 }
 
                 // Distance
                 if (SettingsUtil.getSpeechMessagesDistance(this)) {
-                    String distance = formatDistance(WheelData.getInstance().getDistanceDouble());
+                    double f = (WheelData.getInstance().isKS18L()) ? 0.82 : 1.0;
+                    String distance = formatDistance(WheelData.getInstance().getDistanceDouble() * f);
                     if (!distance.equals(""))
-                        text += String.format(Locale.US, "Distance - %s. ", distance);
+                        text += String.format(Locale.US, getString(R.string.speech_text_distance), distance);
                 }
 
                 // Battery level
                 if (SettingsUtil.getSpeechMessagesBattery(this))
-                    text += String.format(Locale.US, "Battery - %.0f%%. ", WheelData.getInstance().getAverageBatteryLevelDouble());
+                    text += String.format(Locale.US, getString(R.string.speech_text_battery), WheelData.getInstance().getAverageBatteryLevelDouble());
 
                 // Phone battery level
                 if (SettingsUtil.getSpeechMessagesPhoneBattery(this)) {
                     int bl = getPhoneBatteryLevel();
                     if (bl > 0)
-                        text += String.format(Locale.US, "Phone battery - %d%%. ", bl);
+                        text += String.format(Locale.US, getString(R.string.speech_phone_battery), bl);
                 }
                 // Voltage
                 if (SettingsUtil.getSpeechMessagesVoltage(this))
-                    text += String.format(Locale.US, "Voltage - %.1f volts. ", WheelData.getInstance().getVoltageDouble());
+                    text += String.format(Locale.US, getString(R.string.speech_text_voltage), WheelData.getInstance().getVoltageDouble());
 
                 // Current
                 if (SettingsUtil.getSpeechMessagesCurrent(this))
-                    text += String.format(Locale.US, "Current - %.0f amperes. ", WheelData.getInstance().getCurrentDouble());
+                    text += String.format(Locale.US, getString(R.string.speech_text_current), WheelData.getInstance().getCurrentDouble());
 
                 // Power
                 if (SettingsUtil.getSpeechMessagesPower(this))
-                    text += String.format(Locale.US, "Power - %.0f watts. ", WheelData.getInstance().getPowerDouble());
+                    text += String.format(Locale.US, getString(R.string.speech_text_power), WheelData.getInstance().getPowerDouble());
 
                 // Temperature
                 if (SettingsUtil.getSpeechMessagesTemperature(this))
-                    text += String.format(Locale.US, "Temperature - %s. ", formatTemperature(WheelData.getInstance().getTemperature()));
+                    text += String.format(Locale.US, getString(R.string.speech_text_temperature), formatTemperature(WheelData.getInstance().getTemperature()));
 
                 // Time
                 if (SettingsUtil.getSpeechMessagesTime(this)) {
                     SimpleDateFormat df = new SimpleDateFormat("HH:mm", Locale.US);
                     String time = df.format(new Date());
-                    text += String.format(Locale.US, "Time - %s. ", time);
+                    text += String.format(Locale.US, getString(R.string.speech_text_time), time);
                 }
 
                 // Time from start
                 if (SettingsUtil.getSpeechMessagesTimeFromStart(this)) {
                     String timefromstart = WheelData.getInstance().getRideTimeHumanReadable();
                     if (!timefromstart.equals(""))
-                        text += String.format(Locale.US, "%s from start. ", timefromstart);
+                        text += String.format(Locale.US, getString(R.string.speech_text_time_from_start), timefromstart);
                 }
 
                 // Time in motion
                 if (SettingsUtil.getSpeechMessagesTimeInMotion(this)) {
                     String timeinmotion = WheelData.getInstance().getRidingTimeHumanReadable();
                     if (!timeinmotion.equals(""))
-                        text += String.format(Locale.US, "%s in motion. ", timeinmotion);
+                        text += String.format(Locale.US, getString(R.string.speech_text_time_in_motion), timeinmotion);
+                }
+
+                // Weather
+                if (SettingsUtil.getSpeechMessagesWeather(this) && LivemapService.isInstanceCreated()) {
+                    if (LivemapService.getInstance().getWeatherAge() < 2000 * SettingsUtil.getLivemapUpdateInterval(this)) {
+                        String temp = formatTemperature(LivemapService.getInstance().getWeatherTemperature());
+                        String tempf = formatTemperature(LivemapService.getInstance().getWeatherTemperatureFeels());
+                        text += getString(R.string.speech_text_weather);
+                        if (temp.equals(tempf))
+                            text += String.format(Locale.US, getString(R.string.speech_text_weather_temp), temp);
+                        else
+                            text += String.format(Locale.US, getString(R.string.speech_text_weather_temp_feels), temp, tempf);
+                    }
                 }
 
             }
@@ -315,10 +332,10 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 say(text, "info");
 
             if (SettingsUtil.getSpeechMessagesBatteryLowLevel(this) > 0 && WheelData.getInstance().getAverageBatteryLevelDouble() < SettingsUtil.getSpeechMessagesBatteryLowLevel(this))
-                say("Low battery!", "warning1");
+                say(getString(R.string.speech_text_low_battery), "warning1");
 
             if (SettingsUtil.getSpeechMessagesPhoneBatteryLowLevel(this) > 0 && getPhoneBatteryLevel() < SettingsUtil.getSpeechMessagesPhoneBatteryLowLevel(this))
-                say("Low phone battery!", "warning1");
+                say(getString(R.string.speech_text_low_phone_battery), "warning1");
 
         }
 
@@ -339,15 +356,15 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             if (miles > 0 || yds100 > 0) {
                 String res = "";
                 if (miles == 1)
-                    res = "1 mile";
+                    res = "1 mi";
                 else
                 if (miles > 1)
-                    res = String.format(Locale.US, "%d miles", miles);
+                    res = String.format(Locale.US, "%d mi", miles);
                 if (yds100 > 0) {
                     if (!res.equals(""))
-                        res += " and ";
+                        res += ", ";
                     int yds = 100 * yds100;
-                    res += String.format(Locale.US,"%d yards", yds);
+                    res += String.format(Locale.US,"%d yd", yds);
                 }
                 return res;
             }
@@ -360,14 +377,14 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             if (kms > 0 || mtrs100 > 0) {
                 String res = "";
                 if (kms == 1)
-                    res = "1 kilometer";
+                    res = "1 km";
                 else if (kms > 1)
-                    res = String.format(Locale.US, "%d kilometers", kms);
+                    res = String.format(Locale.US, "%d km", kms);
                 if (mtrs100 > 0) {
                     if (!res.equals(""))
-                        res += " and ";
+                        res += ", ";
                     int mtrs = 100 * mtrs100;
-                    res += String.format(Locale.US, "%d meters", mtrs);
+                    res += String.format(Locale.US, "%d m", mtrs);
                 }
                 return res;
             } else

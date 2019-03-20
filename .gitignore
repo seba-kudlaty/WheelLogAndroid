@@ -50,3 +50,4 @@ captures/
 # Build informative files
 app/debug/output.json
 app/release/output.json
+app/release/output.json

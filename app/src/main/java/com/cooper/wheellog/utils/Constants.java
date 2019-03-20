@@ -14,9 +14,9 @@ public class Constants {
     public static final String ACTION_LOGGING_SERVICE_TOGGLED = "com.cooper.wheellog.loggingServiceToggled";
     public static final String ACTION_SPEECH_SERVICE_TOGGLED = "com.cooper.wheellog.speechServiceToggled";
     public static final String ACTION_LIVEMAP_SERVICE_TOGGLED = "com.cooper.wheellog.livemapServiceToggled";
-    public static final String ACTION_LIVEMAP_PAUSE_TOGGLED = "com.cooper.wheellog.livemapPauseToggled";
-    public static final String ACTION_LIVEMAP_TIMER = "com.cooper.wheellog.livemapTimer";
     public static final String ACTION_LIVEMAP_STATUS = "com.cooper.wheellog.livemapStatus";
+    public static final String ACTION_LIVEMAP_PAUSE = "com.cooper.wheellog.livemapPause";
+    public static final String ACTION_LIVEMAP_RESUME = "com.cooper.wheellog.livemapResume";
     public static final String ACTION_REQUEST_CONNECTION_TOGGLE = "com.cooper.wheellog.requestConnectionToggle";
     public static final String ACTION_PREFERENCE_CHANGED = "com.cooper.wheellog.preferenceChanged";
     public static final String ACTION_PEBBLE_AFFECTING_PREFERENCE_CHANGED = "com.cooper.wheellog.pebblePreferenceChanged";
@@ -84,6 +84,7 @@ public class Constants {
     public static final String INTENT_EXTRA_LIVEMAP_PAUSE = "livemap_pause";
     public static final String INTENT_EXTRA_LIVEMAP_RESUME = "livemap_resume";
     public static final String INTENT_EXTRA_LIVEMAP_STOP = "livemap_stop";
+    public static final String INTENT_EXTRA_LIVEMAP_URL = "livemap_url";
 
     public static final String PREFERENCES_FRAGMENT_TAG = "tagPrefs";
 

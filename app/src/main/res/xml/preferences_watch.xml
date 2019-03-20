@@ -4,10 +4,10 @@
 
     <ListPreference
         android:key="@string/horn_mode"
-        android:title="Horn Mode"
+        android:title="@string/horn_mode_title"
         android:defaultValue="0"
         android:entries="@array/horn_modes"
         android:entryValues="@array/horn_mode_values"
-        android:summary="Executed when the select button on the Pebble watch is pressed" />
+        android:summary="@string/horn_mode_summary" />
 
 </PreferenceScreen>

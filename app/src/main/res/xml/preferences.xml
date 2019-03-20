@@ -4,57 +4,57 @@
 
     <Preference
         android:key="@string/general_preferences"
-        android:title="General settings"
+        android:title="@string/general_preferences_title"
         android:icon="@drawable/ic_settings_white_24dp"/>
 
     <Preference
         android:key="@string/log_preferences"
-        android:title="Log settings"
+        android:title="@string/log_preferences_title"
         android:icon="@drawable/ic_show_chart_white_24dp"/>
 
     <Preference
         android:key="@string/alarm_preferences"
-        android:title="Alarm settings"
+        android:title="@string/alarm_preferences_title"
         android:icon="@drawable/ic_vibration_white_24dp"/>
 
     <Preference
         android:key="@string/livemap_preferences"
-        android:title="Live map settings"
+        android:title="@string/livemap_preferences_title"
         android:icon="@drawable/ic_action_livemap_white"/>
 
     <Preference
         android:key="@string/speech_preferences"
-        android:title="Voice settings"
+        android:title="@string/speech_preferences_title"
         android:icon="@drawable/ic_action_speech_white"/>
 
     <Preference
         android:key="@string/watch_preferences"
-        android:title="Watch preferences"
+        android:title="@string/watch_preferences_title"
         android:icon="@drawable/ic_watch_white_24dp" />
 
     <Preference
         android:key="@string/wheel_settings"
 		android:enabled="false"
-        android:title="Wheel settings"
+        android:title="@string/wheel_settings_title"
         android:icon="@drawable/ic_action_wheel_white" />
 	
 	<Preference
         android:key="@string/reset_top_speed"
 		android:enabled="true"
-        android:title="Reset top speed" />
+        android:title="@string/reset_top_speed_title" />
 
 	<Preference
         android:key="@string/reset_user_distance"
 		android:enabled="true"
-        android:title="Reset user distance" />
+        android:title="@string/reset_user_distance_title" />
 
     <Preference
         android:key="@string/last_mac"
         android:enabled="true"
-        android:title="Edit MAC address" />
+        android:title="@string/last_mac_title" />
 
     <Preference
         android:key="@string/about"
         android:enabled="true"
-        android:title="About WheelLog" />
+        android:title="@string/about_title" />
 </PreferenceScreen>

@@ -195,6 +195,10 @@ public class SettingsUtil {
         return getSharedPreferences(context).getInt(context.getString(R.string.speech_messages_phone_battery_low_level), 20);
     }
 
+    public static boolean getSpeechMessagesWeather(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_messages_weather), false);
+    }
+
     public static String getLivemapApiKey(Context context) {
         return getSharedPreferences(context).getString(context.getString(R.string.livemap_api_key), "");
     }

@@ -133,6 +133,8 @@ public class WheelData {
         return mInstance;
     }
 
+    public boolean isKS18L() { return (mModel.compareTo("KS-18L") == 0); }
+
     int getSpeed() {
         return mSpeed / 10;
     }

@@ -1,0 +1,241 @@
+<resources>
+    <string-array name="modes">
+        <item>@string/mode_play</item>
+        <item>@string/mode_ride</item>
+        <item>@string/mode_learn</item>
+    </string-array>
+
+    <string-array name="horn_modes">
+        <item>Wyłączony</item>
+        <item>Wbudowany (King Song)</item>
+        <item>Przez Bluetooth</item>
+    </string-array>
+
+    <string-array name="horn_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+	
+	<string-array name="pedals_mode">
+        <item>Twarde</item>
+        <item>Średnie</item>
+        <item>Miękkie</item>
+    </string-array>
+	
+	<string-array name="pedals_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+	
+	<string-array name="light_mode_ks">
+        <item>Włączone</item>
+        <item>Wyłączone</item>
+        <item>Automatyczne</item>
+    </string-array>
+	
+	
+	<string-array name="light_mode_gw">
+        <item>Wyłączone</item>
+        <item>Włączone</item>
+        <item>Migające</item>
+    </string-array>
+	
+	<string-array name="alarm_mode_gw">
+        <item>Wyłącz alarm pierwszego poziomu</item>
+        <item>Wyłącz alarm drugiego poziomu</item>
+        <item>Włącz alarm</item>
+    </string-array>
+	
+	<string-array name="alarm_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>	
+	
+	<string-array name="light_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>	
+	
+	<string-array name="strobe_mode_ks">
+        <item>Wyłączone</item>
+        <item>Włączone</item>
+    </string-array>
+	
+	<string-array name="strobe_mode_values">
+        <item>0</item>
+        <item>1</item>        
+    </string-array>	
+	
+	<string-array name="led_mode">
+        <item>Wyłączone</item>
+        <item>Włączone</item>
+    </string-array>
+	
+	<string-array name="led_mode_values">
+        <item>1</item>
+        <item>0</item>        
+    </string-array>
+
+    <string-array name="gotway_voltage">
+        <item>67 V</item>
+        <item>84 V</item>
+        <item>100 V</item>
+    </string-array>
+
+    <string-array name="gotway_voltage_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_pitch">
+        <item>Niski</item>
+        <item>Normalny</item>
+        <item>Wysoki</item>
+    </string-array>
+
+    <string-array name="speech_pitch_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_rate">
+        <item>Wolne</item>
+        <item>Normalne</item>
+        <item>Szybkie</item>
+    </string-array>
+
+    <string-array name="speech_rate_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_mode">
+        <item>Czas</item>
+        <item>Dystans</item>
+    </string-array>
+
+    <string-array name="speech_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="speech_messages">
+        <item>Prędkość</item>
+        <item>Średnia prędkość</item>
+        <item>Poziom baterii</item>
+        <item>Napięcie</item>
+        <item>Prąd</item>
+        <item>Moc</item>
+        <item>Temperatura</item>
+        <item>Czas jazdy</item>
+        <item>Czas</item>
+        <item>Dystans przejechany</item>
+        <item>Poziom baterii telefonu</item>
+    </string-array>
+
+    <string-array name="speech_messages_values">
+        <item>speed</item>
+        <item>avgspeed</item>
+        <item>battery</item>
+        <item>voltage</item>
+        <item>current</item>
+        <item>power</item>
+        <item>temperature</item>
+        <item>ridetime</item>
+        <item>time</item>
+        <item>distance</item>
+        <item>phonebattery</item>
+    </string-array>
+
+    <string-array name="livemap_update_interval">
+        <item>5 sekund</item>
+        <item>10 sekund</item>
+        <item>15 sekund</item>
+        <item>30 sekund</item>
+        <item>1 minuta</item>
+        <item>2 minuty</item>
+        <item>5 minut</item>
+    </string-array>
+
+    <string-array name="livemap_update_interval_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>300</item>
+    </string-array>
+
+    <string-array name="livemap_publication_delay">
+        <item>Brak opóźnienia</item>
+        <item>5 minut</item>
+        <item>15 minut</item>
+        <item>30 minut</item>
+        <item>1 godzina</item>
+        <item>2 godziny</item>
+        <item>3 godziny</item>
+        <item>6 godzin</item>
+        <item>12 godzin</item>
+        <item>24 godzin</item>
+    </string-array>
+
+    <string-array name="livemap_publication_delay_values">
+        <item>0</item>
+        <item>5</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>360</item>
+        <item>720</item>
+        <item>1440</item>
+    </string-array>
+
+    <string-array name="livemap_publish">
+        <item>Widoczne dla mnie</item>
+        <item>Widoczne dla posiadaczy linku</item>
+        <item>Widoczne publicznie</item>
+    </string-array>
+
+    <string-array name="livemap_publish_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_interval">
+        <item>1 minuta lub km/mila</item>
+        <item>2 minuty lub km/mile</item>
+        <item>3 minuty lub km/mile</item>
+        <item>4 minuty lub km/mile</item>
+        <item>5 minut lub km/mil</item>
+        <item>6 minut lub km/mil</item>
+        <item>7 minut lub km/mil</item>
+        <item>8 minut lub km/mil</item>
+        <item>9 minut lub km/mil</item>
+        <item>10 minut lub km/mil</item>
+    </string-array>
+
+    <string-array name="speech_interval_values">
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>240</item>
+        <item>300</item>
+        <item>360</item>
+        <item>420</item>
+        <item>480</item>
+        <item>540</item>
+        <item>600</item>
+    </string-array>
+
+</resources>

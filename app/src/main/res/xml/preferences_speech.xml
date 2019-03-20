@@ -5,43 +5,43 @@
 
     <CheckBoxPreference
         android:key="@string/speech_enable_on_startup"
-        android:title="Turn on voice messages on startup" />
+        android:title="@string/speech_enable_on_startup_title" />
 
 	<ListPreference
 		android:key="@string/speech_rate"
-		android:title="Speech rate"
+		android:title="@string/speech_rate_title"
 		android:defaultValue="1"
 		android:entries="@array/speech_rate"
 		android:entryValues="@array/speech_rate_values" />
 
 	<ListPreference
 		android:key="@string/speech_pitch"
-		android:title="Speech pitch"
+		android:title="@string/speech_pitch_title"
 		android:defaultValue="1"
 		android:entries="@array/speech_pitch"
 		android:entryValues="@array/speech_pitch_values" />
 
 	<CheckBoxPreference
 		android:key="@string/speech_only_when_moving"
-		android:title="Pause messages when not in motion"
-		android:summary="Alarms and warnings are always active" />
+		android:title="@string/speech_only_when_moving_title"
+		android:summary="@string/speech_only_when_moving_summary" />
 
 	<ListPreference
 		android:key="@string/speech_msg_mode"
-		android:title="Triggering"
+		android:title="@string/speech_msg_mode_title"
 		android:defaultValue="0"
 		android:entries="@array/speech_mode"
 		android:entryValues="@array/speech_mode_values" />
 
     <ListPreference
         android:key="@string/speech_msg_interval"
-        android:title="Interval"
+        android:title="@string/speech_msg_interval_title"
         android:defaultValue="60"
         android:entries="@array/speech_interval"
         android:entryValues="@array/speech_interval_values" />
 
 	<Preference
 		android:key="@string/speech_messages_preferences"
-		android:title="Messages configuration" />
+		android:title="@string/speech_messages_preferences_title" />
 
 </PreferenceScreen>

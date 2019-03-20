@@ -7,40 +7,40 @@
 		android:selectAllOnFocus="true"
 		android:singleLine="true"
 		android:inputType="textPassword"
-		android:title="API key"
-		android:summary="Enter your API key to enable live map"/>
+		android:title="@string/livemap_api_key_title"
+		android:summary="@string/livemap_api_key_summary"/>
 
 	<ListPreference
 		android:key="@string/livemap_update_interval"
-		android:title="Update interval"
+		android:title="@string/livemap_update_interval_title"
 		android:dependency="@string/livemap_api_key"
 		android:defaultValue="15"
 		android:entries="@array/livemap_update_interval"
 		android:entryValues="@array/livemap_update_interval_values"
-		android:summary="Select how often your location and wheel data are sent to the server and updated on the live map" />
+		android:summary="@string/livemap_update_interval_summary" />
 
 	<CheckBoxPreference
 		android:key="@string/livemap_start_new_segment"
-		android:title="Start new segment instead of new tour"
+		android:title="@string/livemap_start_new_segment_title"
 		android:dependency="@string/livemap_api_key"
-		android:summary="Check if you want to continue latest tour instead of starting new one" />
+		android:summary="@string/livemap_start_new_segment_summary" />
 
 	<ListPreference
 		android:key="@string/livemap_publish"
-		android:title="Tour visibility"
+		android:title="@string/livemap_publish_title"
 		android:dependency="@string/livemap_api_key"
 		android:defaultValue="0"
 		android:entries="@array/livemap_publish"
 		android:entryValues="@array/livemap_publish_values"
-		android:summary="Define who can see your tour" />
+		android:summary="@string/livemap_publish_summary" />
 
 	<ListPreference
 		android:key="@string/livemap_publication_delay"
-		android:title="Publication delay"
+		android:title="@string/livemap_publication_delay_title"
 		android:dependency="@string/livemap_publish"
 		android:defaultValue="0"
 		android:entries="@array/livemap_publication_delay"
 		android:entryValues="@array/livemap_publication_delay_values"
-		android:summary="You can delay publication of your live data from 5 minutes to 24 hours or make them available immediately" />
+		android:summary="@string/livemap_publication_delay_summary" />
 
 </PreferenceScreen>

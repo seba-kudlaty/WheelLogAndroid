@@ -5,11 +5,11 @@
 	<Preference
         android:key="@string/reset_top_speed"
 		android:enabled="true"
-        android:title="Reset Top Speed" />
+        android:title="@string/reset_top_speed_title_2" />
 
 	<Preference
         android:key="@string/reset_user_distance"
 		android:enabled="true"
-        android:title="Reset User Distance" />
+        android:title="@string/reset_user_distance_title_2" />
 
 </PreferenceScreen>

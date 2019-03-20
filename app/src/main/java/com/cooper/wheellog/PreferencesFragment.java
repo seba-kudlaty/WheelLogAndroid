@@ -93,7 +93,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 } else
                     mDataWarningDisplayed = false;
                 break;
-            case "use_mph":
+            case "use_mi":
                 getActivity().sendBroadcast(new Intent(Constants.ACTION_PEBBLE_AFFECTING_PREFERENCE_CHANGED));
                 break;			
             case "max_speed":
