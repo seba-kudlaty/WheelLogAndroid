@@ -893,6 +893,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         chart1.setHighlightPerDragEnabled(false);
         chart1.getLegend().setTextColor(getResources().getColor(android.R.color.white));
         chart1.setNoDataTextColor(getResources().getColor(android.R.color.white));
+        chart1.setNoDataText(getResources().getString(R.string.waiting_for_wheel));
+        chart1.setNoDataTextTypeface(typefacePrime);
 
         YAxis leftAxis = chart1.getAxisLeft();
         YAxis rightAxis = chart1.getAxisRight();
@@ -1392,13 +1394,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private void shareLivemapUrl() {
         Intent share = new Intent(android.content.Intent.ACTION_SEND);
         share.setType("text/plain");
-        share.putExtra(Intent.EXTRA_SUBJECT, "Link to my tour map");
+        share.putExtra(Intent.EXTRA_SUBJECT, R.string.link_livemap_subject);
         share.putExtra(Intent.EXTRA_TEXT, livemapUrl);
 
         Intent view = new Intent(Intent.ACTION_VIEW);
         view.setData(Uri.parse(livemapUrl));
 
-        Intent chooserIntent = Intent.createChooser(share, "Share your tour");
+        Intent chooserIntent = Intent.createChooser(share, getString(R.string.share_livemap));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{view});
         startActivity(chooserIntent);
     }

@@ -335,5 +335,17 @@
     <string name="speech_text_slow_down_3">Slow down!</string>
     <string name="speech_text_slow_down_2">Slow down!</string>
     <string name="speech_text_slow_down_1">Slow down!</string>
+    <string name="about_wheellog_title">About WheelLog</string>
+    <string name="about_text"><![CDATA[Version %s built at %s<br>by Sebastian Łastowski <a href=\"sebastian@euc.world\">sebastian@euc.world</a><br><br><small>Hey, are you interested in using live map feature? Learn more and register for free at <a href=\"https://euc.world\">https://euc.world</a></small>]]></string>
+    <string name="mac_edit_type">MAC Edit</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="wheel_password">Wheel Password ( InMotion only )</string>
+    <string name="speed_settings">Speed Settings</string>
+    <string name="enable_auto_upload_title">Enable Auto Upload?</string>
+    <string name="enable_auto_upload_text">Automatic uploading while not connected to WiFi will use your mobile data.  This may result in charges from your network provider if you do not have a data plan.</string>
+    <string name="settings_title">Settings</string>
+    <string name="link_livemap_subject">Link to my tour map</string>
+    <string name="share_livemap">Share your tour</string>
 
 </resources>

@@ -71,8 +71,8 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 if (SettingsUtil.isAutoUploadEnabled(getActivity()) && !mDataWarningDisplayed) {
                     SettingsUtil.setAutoUploadEnabled(getActivity(), false);
                     new AlertDialog.Builder(getActivity())
-                            .setTitle("Enable Auto Upload?")
-                            .setMessage("Automatic uploading while not connected to WiFi will use your mobile data.  This may result in charges from your network provider if you do not have a data plan.")
+                            .setTitle(R.string.enable_auto_upload_title)
+                            .setMessage(R.string.enable_auto_upload_text)
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     mDataWarningDisplayed = true;
@@ -214,7 +214,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
 
         switch (currentScreen) {
             case Main:
-                tb.setTitle("Settings");
+                tb.setTitle(R.string.settings_title);
                 Preference speed_button = findPreference(getString(R.string.general_preferences));
                 Preference logs_button = findPreference(getString(R.string.log_preferences));
                 Preference livemap_button = findPreference(getString(R.string.livemap_preferences));
@@ -356,8 +356,8 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                             String versionName = BuildConfig.VERSION_NAME;
                             String buildTime = BuildConfig.BUILD_TIME;
                             new AlertDialog.Builder(getActivity())
-                                    .setTitle("About WheelLog")
-                                    .setMessage(Html.fromHtml(String.format("Version %s built at %s<br>by Sebastian Łastowski <a href=\"sebastian@euc.world\">sebastian@euc.world</a><br><br><small>Hey, are you interested in using live map feature? Learn more and register for free at <a href=\"https://euc.world\">https://euc.world</a></small>", versionName, buildTime)))
+                                    .setTitle(R.string.about_wheellog_title)
+                                    .setMessage(Html.fromHtml(String.format(getString(R.string.about_text), versionName, buildTime)))
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
 
@@ -377,24 +377,24 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                            builder.setTitle("MAC Edit");
+                            builder.setTitle(R.string.mac_edit_type);
 
                             final EditText input = new EditText(getActivity());
                             input.setInputType(InputType.TYPE_CLASS_TEXT);
                             input.setText(SettingsUtil.getLastAddress(getActivity()));
                             builder.setView(input);
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     final String deviceAddress = input.getText().toString();
                                     SettingsUtil.setLastAddress(getActivity(), deviceAddress);
                                     AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
-                                    builder1.setTitle("Wheel Password ( InMotion only )");
+                                    builder1.setTitle(R.string.wheel_password);
 
                                     final EditText input1 = new EditText(getActivity());
                                     input1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                                     builder1.setView(input1);
-                                    builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    builder1.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             String password = input1.getText().toString();
@@ -407,7 +407,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                                             //finish();
                                         }
                                     });
-                                    builder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    builder1.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.cancel();
@@ -422,7 +422,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                                     //finish();
                                 }
                             });
-                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.cancel();
@@ -440,20 +440,20 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
 
                 break;
             case Speed:
-                tb.setTitle("Speed Settings");
+                tb.setTitle(R.string.speed_settings);
                 break;
             case Logs:
-                tb.setTitle("Log Settings");
+                tb.setTitle(R.string.log_preferences_title);
                 break;
             case Livemap:
-                tb.setTitle("Live Map Settings");
+                tb.setTitle(R.string.livemap_preferences_title);
                 break;
             case Alarms:
-                tb.setTitle("Alarm Settings");
+                tb.setTitle(R.string.alarm_preferences_title);
                 hideShowSeekBars();
                 break;
             case Speech:
-                tb.setTitle("Voice Settings");
+                tb.setTitle(R.string.speech_preferences_title);
                 Preference speech_messages_button = findPreference(getString(R.string.speech_messages_preferences));
                 if (speech_messages_button != null) {
                     speech_messages_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -469,13 +469,13 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 }
                 break;
             case SpeechMessages:
-                tb.setTitle("Messages configuration");
+                tb.setTitle(R.string.speech_messages_preferences_title);
                 break;
             case Watch:
-                tb.setTitle("Watch Settings");
+                tb.setTitle(R.string.watch_preferences_title);
                 break;
 			case Wheel:
-                tb.setTitle("Wheel Settings");
+                tb.setTitle(R.string.wheel_settings_title);
 				//getActivity().sendBroadcast(new Intent(Constants.ACTION_WHEEL_SETTING_CHANGED).putExtra(Constants.INTENT_EXTRA_WHEEL_REFRESH, true));
                 break;
         }

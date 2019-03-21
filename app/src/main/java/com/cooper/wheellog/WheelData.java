@@ -64,16 +64,16 @@ public class WheelData {
     private int mFanStatus;
     private boolean mConnectionState = false;
 	private boolean mNewWheelSettings = false;
-    private String mName = "Unknown";
-    private String mModel = "Unknown";
-	private String mModeStr = "Unknown";
+    private String mName = "";
+    private String mModel = "";
+	private String mModeStr = "";
 	private String mBtName = "";
 
 	private String mAlert = "";
 
 //    private int mVersion; # sorry King, but INT not good for Inmo
 	private String mVersion = "";
-    private String mSerialNumber = "Unknown";
+    private String mSerialNumber = "";
     private WHEEL_TYPE mWheelType = WHEEL_TYPE.Unknown;
     private long rideStartTime;
     private long mStartTotalDistance;

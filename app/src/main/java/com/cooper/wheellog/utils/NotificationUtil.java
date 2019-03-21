@@ -6,7 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.cooper.wheellog.BluetoothLeService;
@@ -145,7 +145,7 @@ public class NotificationUtil {
         else
             notificationView.setImageViewResource(R.id.ib_speech, R.drawable.ic_action_speech_grey);
 
-        return new NotificationCompat.Builder(mContext)
+        return new NotificationCompat.Builder(mContext, "WH_CHAN_ID")
                 .setSmallIcon(R.drawable.ic_stat_wheel)
                 .setContentIntent(pendingIntent)
                 .setContent(notificationView)

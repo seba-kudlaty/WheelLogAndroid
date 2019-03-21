@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 import com.cooper.wheellog.utils.Constants;
 import com.google.android.gms.common.ConnectionResult;
@@ -84,7 +84,7 @@ public class GoogleDriveService extends Service implements GoogleApiClient.Conne
         String contentText = file == null ? "" : file.getName();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        return new NotificationCompat.Builder(this)
+        return new NotificationCompat.Builder(this, "WH_CHAN_ID")
                 .setSmallIcon(icon)
                 .setContentTitle(text)
                 .setContentText(contentText)

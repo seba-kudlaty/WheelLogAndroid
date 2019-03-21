@@ -19,9 +19,10 @@
             <TextView
                 android:id="@+id/tvWaitText"
                 android:text="@string/waiting_for_wheel"
+                android:textAlignment="center"
                 android:textSize="32sp"
-                app:layout_gravity="center_horizontal|center_vertical"
-                app:layout_columnSpan="2"/>
+                app:layout_columnSpan="2"
+                app:layout_gravity="center_horizontal|center_vertical" />
 
             <TextView
                 android:id="@+id/tvTitleSpeed"
