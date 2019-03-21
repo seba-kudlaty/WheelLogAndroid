@@ -9,14 +9,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 26
     lintOptions {
         abortOnError false
     }
     defaultConfig {
         applicationId "com.cooper.wheellog"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion 19
+        targetSdkVersion 26
         versionCode 36
         versionName '2.0.21'
         buildConfigField 'String', 'BUILD_TIME', 'new java.text.SimpleDateFormat("HH:mm dd.MM.yyyy", java.util.Locale.US).format(new java.util.Date(' + System.currentTimeMillis() + 'L))'
@@ -36,9 +36,9 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:support-compat:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:gridlayout-v7:28.0.0'
+    implementation 'com.android.support:support-compat:26.1.0'
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:gridlayout-v7:26.1.0'
     implementation 'com.google.android.gms:play-services-drive:16.0.0'
     implementation 'com.getpebble:pebblekit:3.1.0'
     implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'

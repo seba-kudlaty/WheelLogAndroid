@@ -347,5 +347,10 @@
     <string name="settings_title">Settings</string>
     <string name="link_livemap_subject">Link to my tour map</string>
     <string name="share_livemap">Share your tour</string>
+    <string name="fan_off">Off</string>
+    <string name="fan_on">On</string>
+    <string name="duration_fmt_min">%d min</string>
+    <string name="duration_fmt_hr">%d hr</string>
+    <string name="duration_fmt_hr_and_min">%d hr and %d min</string>
 
 </resources>

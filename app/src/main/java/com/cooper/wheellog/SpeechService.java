@@ -19,6 +19,7 @@ import com.cooper.wheellog.utils.SettingsUtil;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class SpeechService extends Service implements TextToSpeech.OnInitListener {
 
@@ -129,7 +130,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                     Log.d("", String.format(Locale.US, "UtteranceProgressListener: onDone(%s), sayCount = %d", utterance_id, sayCount));
                 }
             });
-            //int result = tts.setLanguage(Locale.US);
+            //int result = tts.setLanguage(Locale.UK);
             int result = tts.setLanguage(Locale.getDefault());
             if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
                 tts.addEarcon("alarm", getPackageName(), R.raw.alarm);
@@ -140,9 +141,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 tts.addEarcon("warning3", getPackageName(), R.raw.warning_3);
                 ttsEnabled = true;
 
-                //say("Welcome on board! " + WheelData.getInstance().getRidingTimeHumanReadable(), "info");
                 say(getString(R.string.speech_text_welcome_on_board), "info");
-
             }
         }
     }
@@ -247,14 +246,14 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 // Speed
                 if (SettingsUtil.getSpeechMessagesSpeed(this)) {
                     if (WheelData.getInstance().getSpeedDouble() >= 3.0d) {
-                        text += String.format(Locale.US, getString(R.string.speech_text_speed), formatSpeed(WheelData.getInstance().getSpeedDouble()));
+                        text += " " + String.format(Locale.US, getString(R.string.speech_text_speed), formatSpeed(WheelData.getInstance().getSpeedDouble()));
                     }
                 }
 
                 // Average speed
                 if (SettingsUtil.getSpeechMessagesAvgSpeed(this)) {
                     if (WheelData.getInstance().getAverageSpeedDouble() >= 3.0d) {
-                        text += String.format(Locale.US, getString(R.string.speech_text_avg_speed), formatSpeed(WheelData.getInstance().getAverageSpeedDouble()));
+                        text += " " + String.format(Locale.US, getString(R.string.speech_text_avg_speed), formatSpeed(WheelData.getInstance().getAverageSpeedDouble()));
                     }
                 }
 
@@ -263,54 +262,54 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                     double f = (WheelData.getInstance().isKS18L()) ? 0.82 : 1.0;
                     String distance = formatDistance(WheelData.getInstance().getDistanceDouble() * f);
                     if (!distance.equals(""))
-                        text += String.format(Locale.US, getString(R.string.speech_text_distance), distance);
+                        text += " " + String.format(Locale.US, getString(R.string.speech_text_distance), distance);
                 }
 
                 // Battery level
                 if (SettingsUtil.getSpeechMessagesBattery(this))
-                    text += String.format(Locale.US, getString(R.string.speech_text_battery), WheelData.getInstance().getAverageBatteryLevelDouble());
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_battery), WheelData.getInstance().getAverageBatteryLevelDouble());
 
                 // Phone battery level
                 if (SettingsUtil.getSpeechMessagesPhoneBattery(this)) {
                     int bl = getPhoneBatteryLevel();
                     if (bl > 0)
-                        text += String.format(Locale.US, getString(R.string.speech_phone_battery), bl);
+                        text += " " + String.format(Locale.US, getString(R.string.speech_phone_battery), bl);
                 }
                 // Voltage
                 if (SettingsUtil.getSpeechMessagesVoltage(this))
-                    text += String.format(Locale.US, getString(R.string.speech_text_voltage), WheelData.getInstance().getVoltageDouble());
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_voltage), WheelData.getInstance().getVoltageDouble());
 
                 // Current
                 if (SettingsUtil.getSpeechMessagesCurrent(this))
-                    text += String.format(Locale.US, getString(R.string.speech_text_current), WheelData.getInstance().getCurrentDouble());
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_current), WheelData.getInstance().getCurrentDouble());
 
                 // Power
                 if (SettingsUtil.getSpeechMessagesPower(this))
-                    text += String.format(Locale.US, getString(R.string.speech_text_power), WheelData.getInstance().getPowerDouble());
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_power), WheelData.getInstance().getPowerDouble());
 
                 // Temperature
                 if (SettingsUtil.getSpeechMessagesTemperature(this))
-                    text += String.format(Locale.US, getString(R.string.speech_text_temperature), formatTemperature(WheelData.getInstance().getTemperature()));
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_temperature), formatTemperature(WheelData.getInstance().getTemperature()));
 
                 // Time
                 if (SettingsUtil.getSpeechMessagesTime(this)) {
                     SimpleDateFormat df = new SimpleDateFormat("HH:mm", Locale.US);
                     String time = df.format(new Date());
-                    text += String.format(Locale.US, getString(R.string.speech_text_time), time);
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_time), time);
                 }
 
                 // Time from start
                 if (SettingsUtil.getSpeechMessagesTimeFromStart(this)) {
-                    String timefromstart = WheelData.getInstance().getRideTimeHumanReadable();
+                    String timefromstart = formatDuration(WheelData.getInstance().getRideTime());
                     if (!timefromstart.equals(""))
-                        text += String.format(Locale.US, getString(R.string.speech_text_time_from_start), timefromstart);
+                        text += " " + String.format(Locale.US, getString(R.string.speech_text_time_from_start), timefromstart);
                 }
 
                 // Time in motion
                 if (SettingsUtil.getSpeechMessagesTimeInMotion(this)) {
-                    String timeinmotion = WheelData.getInstance().getRidingTimeHumanReadable();
+                    String timeinmotion = formatDuration(WheelData.getInstance().getRidingTime());
                     if (!timeinmotion.equals(""))
-                        text += String.format(Locale.US, getString(R.string.speech_text_time_in_motion), timeinmotion);
+                        text += " " + String.format(Locale.US, getString(R.string.speech_text_time_in_motion), timeinmotion);
                 }
 
                 // Weather
@@ -318,11 +317,11 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                     if (LivemapService.getInstance().getWeatherAge() < 2000 * SettingsUtil.getLivemapUpdateInterval(this)) {
                         String temp = formatTemperature(LivemapService.getInstance().getWeatherTemperature());
                         String tempf = formatTemperature(LivemapService.getInstance().getWeatherTemperatureFeels());
-                        text += getString(R.string.speech_text_weather);
+                        text += " " + getString(R.string.speech_text_weather);
                         if (temp.equals(tempf))
-                            text += String.format(Locale.US, getString(R.string.speech_text_weather_temp), temp);
+                            text += " " + String.format(Locale.US, getString(R.string.speech_text_weather_temp), temp);
                         else
-                            text += String.format(Locale.US, getString(R.string.speech_text_weather_temp_feels), temp, tempf);
+                            text += " " + String.format(Locale.US, getString(R.string.speech_text_weather_temp_feels), temp, tempf);
                     }
                 }
 
@@ -390,6 +389,24 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             } else
                 return "";
         }
+    }
+
+    private String formatDuration(long duration) {
+        String text = "";
+        if (duration > 0) {
+            long hours = TimeUnit.SECONDS.toHours(duration);
+            long minutes = TimeUnit.SECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(duration));
+            if ((hours > 0) || (minutes > 0)) {
+                if (hours == 0)
+                    text = String.format(Locale.US, getString(R.string.duration_fmt_min), minutes);
+                else
+                if (minutes == 0)
+                    text = String.format(Locale.US, getString(R.string.duration_fmt_hr), hours);
+                else
+                    text = String.format(Locale.US, getString(R.string.duration_fmt_hr_and_min), hours, minutes);
+            }
+        }
+        return text;
     }
 
 }

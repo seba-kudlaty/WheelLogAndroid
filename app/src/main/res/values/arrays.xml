@@ -8,7 +8,7 @@
     <string-array name="horn_modes">
         <item>Disabled</item>
         <item>On-board (KingSong)</item>
-        <item>via bluetooth audio</item>
+        <item>Via bluetooth audio</item>
     </string-array>
 
     <string-array name="horn_mode_values">
@@ -222,7 +222,7 @@
         <item>7 minutes or kms/miles</item>
         <item>8 minutes or kms/miles</item>
         <item>9 minutes or kms/miles</item>
-        <item>10 minutes or km/mile</item>
+        <item>10 minutes or kms/miles</item>
     </string-array>
 
     <string-array name="speech_interval_values">

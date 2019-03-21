@@ -458,6 +458,8 @@ public class WheelData {
 
     int getRideTime() { return mRideTime; }
 
+    int getRidingTime() { return mRidingTime; }
+
     double getAverageSpeedDouble() {
 		if (mTotalDistance!=0 && mRideTime !=0) {
 			return (((mTotalDistance - mStartTotalDistance)*3.6)/(mRideTime + mLastRideTime));
@@ -489,47 +491,6 @@ public class WheelData {
         long seconds = TimeUnit.SECONDS.toSeconds(mRidingTime) -
                 TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(mRidingTime));
         return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
-    }
-
-    String getRideTimeHumanReadable() {
-        String text = "";
-        int currentTime = mRideTime + mLastRideTime;
-        if (currentTime > 0) {
-            long hours = TimeUnit.SECONDS.toHours(currentTime);
-            long minutes = TimeUnit.SECONDS.toMinutes(currentTime) -
-                    TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(currentTime));
-            if (hours > 0) {
-                if (hours == 1)
-                    text += "1 hour and";
-                else
-                    text += String.format(Locale.US, "%d hours and", hours);
-            }
-            if (minutes == 1)
-                text += "1 minute";
-            else
-                text += String.format(Locale.US, "%d minutes", minutes);
-        }
-        return text;
-    }
-
-    String getRidingTimeHumanReadable() {
-        String text = "";
-        if (mRidingTime > 0) {
-            long hours = TimeUnit.SECONDS.toHours(mRidingTime);
-            long minutes = TimeUnit.SECONDS.toMinutes(mRidingTime) -
-                    TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(mRidingTime));
-            if (hours > 0) {
-                if (hours == 1)
-                    text += "1 hour and";
-                else
-                    text += String.format(Locale.US, "%d hours and", hours);
-            }
-            if (minutes == 1)
-                text += "1 minute";
-            else
-                text += String.format(Locale.US, "%d minutes", minutes);
-        }
-        return text;
     }
 
     double getSpeedDouble() {

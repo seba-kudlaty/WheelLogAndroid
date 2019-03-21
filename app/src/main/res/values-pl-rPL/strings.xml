@@ -247,4 +247,11 @@
     <string name="enable_auto_upload_title">Włączyć przesyłanie rejestrów?</string>
     <string name="enable_auto_upload_text">Przesyłanie rejestrów z danymi przy braku połączenia WiFi odbędzie się przez sieć komórkową. To może spowodować naliczenie dodatkowych opłat.</string>
     <string name="settings_title">Ustawienia</string>
+    <string name="link_livemap_subject">Łącze do mapy z moją trasą</string>
+    <string name="share_livemap">Udostępnij trasę</string>
+    <string name="fan_off">Wyłączony</string>
+    <string name="fan_on">Włączony</string>
+    <string name="duration_fmt_min">%d min</string>
+    <string name="duration_fmt_hr">%d hr</string>
+    <string name="duration_fmt_hr_and_min">%d hr i %d min</string>
 </resources>
