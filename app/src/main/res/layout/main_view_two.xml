@@ -26,9 +26,9 @@
 
             <TextView
                 android:id="@+id/tvTitleSpeed"
-                android:visibility="gone"
                 style="@style/Stats.Title"
-                android:text="@string/speed"/>
+                android:text="@string/speed"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tvSpeed"

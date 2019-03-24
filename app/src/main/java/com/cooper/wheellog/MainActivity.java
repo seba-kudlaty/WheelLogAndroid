@@ -1392,17 +1392,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     private void shareLivemapUrl() {
-        Intent share = new Intent(android.content.Intent.ACTION_SEND);
-        share.setType("text/plain");
-        share.putExtra(Intent.EXTRA_SUBJECT, R.string.link_livemap_subject);
-        share.putExtra(Intent.EXTRA_TEXT, livemapUrl);
+        if (livemapUrl != null) {
+            Intent share = new Intent(android.content.Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_SUBJECT, R.string.link_livemap_subject);
+            share.putExtra(Intent.EXTRA_TEXT, livemapUrl);
 
-        Intent view = new Intent(Intent.ACTION_VIEW);
-        view.setData(Uri.parse(livemapUrl));
+            Intent view = new Intent(Intent.ACTION_VIEW);
+            view.setData(Uri.parse(livemapUrl));
 
-        Intent chooserIntent = Intent.createChooser(share, getString(R.string.share_livemap));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{view});
-        startActivity(chooserIntent);
+            Intent chooserIntent = Intent.createChooser(share, getString(R.string.share_livemap));
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{view});
+            startActivity(chooserIntent);
+        }
     }
 
 }

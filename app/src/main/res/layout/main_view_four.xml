@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:background="@color/common_google_signin_btn_text_light_default"
-            android:clickable="true"
+            android:clickable="false"
             android:padding="32dp"
             android:visibility="visible"
             app:layout_constraintStart_toEndOf="@+id/ibLivemapPause"
