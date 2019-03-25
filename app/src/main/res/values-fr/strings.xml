@@ -41,14 +41,14 @@
     <string name="waiting_for_wheel">En attente de roue…</string>
     <string name="speed">Vitesse</string>
 	<string name="average_speed">Vitesse moyenne</string>
-	<string name="average_riding_speed">Vitesse moyenne en roulant</string>
+	<string name="average_riding_speed">VitesseMoyenneEnRoulant</string>
     <string name="top_speed">Vitesse maximum</string>
     <string name="battery">Batterie</string>
     <string name="distance">Distance</string>
 	<string name="wheel_distance">Distance roue</string>
 	<string name="user_distance">Distance utilisateur</string>
     <string name="ride_time">Durée du trajet</string>
-	<string name="riding_time">Durée de roulage</string>
+	<string name="riding_time">Durée en mouvement</string>
     <string name="voltage">Voltage</string>
     <string name="current">Courant</string>
     <string name="power">Puissance</string>
@@ -86,7 +86,7 @@
     <string name="livemap_error_no_location_permission">Le service Live map requiert l\'activation de la localisation.</string>
     <string name="livemap_error_no_gps_provider">Le service live map requiert le GPS qui est indisponible.</string>
     <string name="livemap_offline">Vous êtes déconnectés</string>
-    <string name="livemap_gps_wait">En attente du GPS...</string>
+    <string name="livemap_gps_wait">En attente du GPS…</string>
     <string name="livemap_live">Vous êtes désormais en ligne!</string>
     <string name="livemap_last_update">Dernière mise à jour à  %1$s</string>
 
@@ -190,7 +190,7 @@
     <string name="livemap_api_error_forbidden">Accès serveur non autorisé.</string>
     <string name="livemap_api_error_unknown">Erreur inconnue, veuillez essayer ultérieurement.</string>
     <string name="livemap_api_error_no_connection">Connexion impossible. Vérifiez votre connexion internet et recommencez.</string>
-    <string name="livemap_connecting">En cours de connexion...</string>
+    <string name="livemap_connecting">En cours de connexion…</string>
     <string name="speech_messages_weather_title">Conditions météorologiques</string>
     <string name="speech_messages_weather_summary">Disponible si live map est actif</string>
     <string name="speech_messages_time_in_motion_title">Durée en mouvement</string>
@@ -343,14 +343,14 @@
     <string name="wheel_password">Mot de passe de la roue ( InMotion uniquement )</string>
     <string name="speed_settings">Paramètres de vitesse</string>
     <string name="enable_auto_upload_title">Activer le téléchargement automatique?</string>
-    <string name="enable_auto_upload_text">Le téléchargement automatique hors connection WiFi va utiliser le réseau mobile. Ceci peut occasionner des frais supplémentaire auprès de votre fournisseur d\'accès internet si ce n\'est pas prévu dans votre forfait de données mobiles.</string>
+    <string name="enable_auto_upload_text">Le téléchargement automatique hors connexion WiFi va utiliser le réseau mobile. Ceci peut occasionner des frais supplémentaire auprès de votre fournisseur d\'accès internet si ce n\'est pas prévu dans votre forfait de données mobiles.</string>
     <string name="settings_title">Paramètres</string>
-    <string name="link_livemap_subject">Link to my tour map</string>
-    <string name="share_livemap">Share your tour</string>
-    <string name="fan_off">Off</string>
-    <string name="fan_on">On</string>
-    <string name="duration_fmt_min">%d min</string>
-    <string name="duration_fmt_hr">%d hr</string>
-    <string name="duration_fmt_hr_and_min">%d hr and %d min</string>
+    <string name="link_livemap_subject">Lien vers mon trajet</string>
+    <string name="share_livemap">Partager votre trajet</string>
+    <string name="fan_off">Arrêté</string>
+    <string name="fan_on">En fonctionnement</string>
+    <string name="duration_fmt_min">%d minutes</string>
+    <string name="duration_fmt_hr">%d heures</string>
+    <string name="duration_fmt_hr_and_min">%d heures et %d minutes</string>
 
 </resources>

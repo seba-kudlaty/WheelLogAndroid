@@ -16,6 +16,8 @@ import android.util.Log;
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.SettingsUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
