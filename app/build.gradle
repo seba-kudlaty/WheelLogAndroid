@@ -15,7 +15,7 @@ android {
     }
     defaultConfig {
         applicationId "com.cooper.wheellog"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 36
         versionName '2.0.23'

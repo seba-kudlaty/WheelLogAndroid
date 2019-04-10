@@ -343,11 +343,11 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     }
 
     private String formatSpeed(double speed) {
-        return (SettingsUtil.isUseMiles(this)) ? String.format(Locale.US, "%.0fmi/h", speed / 1.609) : String.format(Locale.US, "%.0fkm/h", speed);
+        return (SettingsUtil.isUseMiles(this)) ? String.format(Locale.US, "%.0f mi/h", speed / 1.609) : String.format(Locale.US, "%.0f km/h", speed);
     }
 
     private String formatTemperature(double temperature) {
-        return (SettingsUtil.isUseF(this)) ? String.format(Locale.US, "%.0f°F", temperature * 1.8 + 32) : String.format(Locale.US, "%.0f°C", temperature);
+        return (SettingsUtil.isUseF(this)) ? String.format(Locale.US, "%.0f °F", temperature * 1.8 + 32) : String.format(Locale.US, "%.0f °C", temperature);
     }
 
     private String formatDistance(double distance) {
