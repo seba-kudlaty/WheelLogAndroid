@@ -11,6 +11,14 @@
 		android:summary="@string/livemap_api_key_summary"/>
 
 	<ListPreference
+		android:defaultValue="0"
+		android:dependency="@string/livemap_api_key"
+		android:entries="@array/livemap_publish"
+		android:entryValues="@array/livemap_publish_values"
+		android:key="@string/livemap_publish"
+		android:summary="@string/livemap_publish_summary"
+		android:title="@string/livemap_publish_title" />
+	<ListPreference
 		android:key="@string/livemap_update_interval"
 		android:title="@string/livemap_update_interval_title"
 		android:dependency="@string/livemap_api_key"
@@ -24,23 +32,5 @@
 		android:title="@string/livemap_start_new_segment_title"
 		android:dependency="@string/livemap_api_key"
 		android:summary="@string/livemap_start_new_segment_summary" />
-
-	<ListPreference
-		android:key="@string/livemap_publish"
-		android:title="@string/livemap_publish_title"
-		android:dependency="@string/livemap_api_key"
-		android:defaultValue="0"
-		android:entries="@array/livemap_publish"
-		android:entryValues="@array/livemap_publish_values"
-		android:summary="@string/livemap_publish_summary" />
-
-	<ListPreference
-		android:key="@string/livemap_publication_delay"
-		android:title="@string/livemap_publication_delay_title"
-		android:dependency="@string/livemap_publish"
-		android:defaultValue="0"
-		android:entries="@array/livemap_publication_delay"
-		android:entryValues="@array/livemap_publication_delay_values"
-		android:summary="@string/livemap_publication_delay_summary" />
 
 </PreferenceScreen>

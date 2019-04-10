@@ -207,10 +207,6 @@ public class SettingsUtil {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_publish), "0"));
     }
 
-    public static int getLivemapPublicationDelay(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_publication_delay), "0"));
-    }
-
     public static int getLivemapUpdateInterval(Context context) {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_update_interval), "15"));
     }

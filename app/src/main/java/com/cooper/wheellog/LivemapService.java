@@ -164,7 +164,6 @@ public class LivemapService extends Service {
             requestParams.put("k", tourKey);
             requestParams.put("p", SettingsUtil.getLivemapPublish(this));
             requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-            requestParams.put("d", SettingsUtil.getLivemapPublicationDelay(this));
             requestParams.put("dt", df.format(new Date()));
             // Location data
             requestParams.put("ldt", df.format(new Date(currentLocation.getTime())));
@@ -228,7 +227,6 @@ public class LivemapService extends Service {
         requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
         requestParams.put("p", SettingsUtil.getLivemapPublish(this));
         requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-        requestParams.put("d", SettingsUtil.getLivemapPublicationDelay(this));
         requestParams.put("m", SettingsUtil.getLivemapStartNewSegment(this));
         HttpClient.post(LivemapApiURL + "/tour/start", requestParams, new JsonHttpResponseHandler() {
             @Override
@@ -286,7 +284,6 @@ public class LivemapService extends Service {
             requestParams.put("k", tourKey);
             requestParams.put("p", SettingsUtil.getLivemapPublish(this));
             requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-            requestParams.put("d", SettingsUtil.getLivemapPublicationDelay(this));
             HttpClient.post(LivemapApiURL + "/tour/finish", requestParams, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
@@ -308,7 +305,6 @@ public class LivemapService extends Service {
         requestParams.put("k", tourKey);
         requestParams.put("p", SettingsUtil.getLivemapPublish(this));
         requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-        requestParams.put("d", SettingsUtil.getLivemapPublicationDelay(this));
         HttpClient.post(LivemapApiURL + "/tour/pause", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
@@ -336,7 +332,6 @@ public class LivemapService extends Service {
         requestParams.put("k", tourKey);
         requestParams.put("p", SettingsUtil.getLivemapPublish(this));
         requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-        requestParams.put("d", SettingsUtil.getLivemapPublicationDelay(this));
         HttpClient.post(LivemapApiURL + "/tour/resume", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
