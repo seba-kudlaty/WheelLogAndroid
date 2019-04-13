@@ -40,22 +40,22 @@
     <string name="mode_ride">Normal</string>
     <string name="waiting_for_wheel">En attente de roue…</string>
     <string name="speed">Vitesse</string>
-	<string name="average_speed">Vitesse moyenne</string>
-	<string name="average_riding_speed">VitesseMoyenneEnRoulant</string>
-    <string name="top_speed">Vitesse maximum</string>
+    <string name="average_speed">Vitesse moyenne</string>
+    <string name="average_riding_speed">Vitesse Moy Mvt</string>
+    <string name="top_speed">Vitesse max</string>
     <string name="battery">Batterie</string>
     <string name="distance">Distance</string>
-	<string name="wheel_distance">Distance roue</string>
-	<string name="user_distance">Distance utilisateur</string>
+    <string name="wheel_distance">Distance roue</string>
+    <string name="user_distance">Distance utilisateur</string>
     <string name="ride_time">Durée du trajet</string>
-	<string name="riding_time">Durée en mouvement</string>
-    <string name="voltage">Voltage</string>
+    <string name="riding_time">Durée en mvt</string>
+    <string name="voltage">Tension</string>
     <string name="current">Courant</string>
     <string name="power">Puissance</string>
     <string name="temperature">Température système</string>
-	<string name="temperature2">Température CPU(?)</string>
-	<string name="angle">Inclinaison</string>
-	<string name="roll">Rouler</string>
+    <string name="temperature2">Température CPU(?)</string>
+    <string name="angle">Inclinaison</string>
+    <string name="roll">Rouler</string>
     <string name="fan_status">Etat du ventilateur</string>
     <string name="mode">Mode</string>
     <string name="total_distance">Distance Totale</string>
@@ -79,14 +79,14 @@
     <string name="logging_error_all_location_providers_disabled">La localisation est désactivée dans android. Aucune donnée de localisation ne sera enregistrée.</string>
     <string name="raw_distance">Distance Brute</string>
 
-	<string name="alarm_text_speed">Alarme de vitesse signalée</string>
-	<string name="alarm_text_current">Alarme de courant signalée</string>
-	<string name="alarm_text_temperature">Alarme de température signalée</string>
+    <string name="alarm_text_speed">Alarme de vitesse signalée</string>
+    <string name="alarm_text_current">Alarme de courant signalée</string>
+    <string name="alarm_text_temperature">Alarme de température signalée</string>
 
     <string name="livemap_error_no_location_permission">Le service Live map requiert l\'activation de la localisation.</string>
     <string name="livemap_error_no_gps_provider">Le service live map requiert le GPS qui est indisponible.</string>
     <string name="livemap_offline">Vous êtes déconnectés</string>
-    <string name="livemap_gps_wait">En attente du GPS…</string>
+    <string name="livemap_gps_wait">En attente du GPS...</string>
     <string name="livemap_live">Vous êtes désormais en ligne!</string>
     <string name="livemap_last_update">Dernière mise à jour à  %1$s</string>
 
@@ -95,8 +95,8 @@
     <string name="log_preferences" translatable="false">log_preferences</string>
     <string name="alarm_preferences" translatable="false">alarm_preferences</string>
     <string name="watch_preferences" translatable="false">watch_preferences</string>
-    <string name="wheel_settings" translatable="false">wheel_settings</string> 
-	<string name="trip_settings" translatable="false">trip_settings</string>
+    <string name="wheel_settings" translatable="false">wheel_settings</string>
+    <string name="trip_settings" translatable="false">trip_settings</string>
     <string name="speech_preferences" translatable="false">speech_preferences</string>
     <string name="speech_messages_preferences" translatable="false">speech_messages_preferences</string>
     <string name="livemap_preferences" translatable="false">livemap_preferences</string>
@@ -111,25 +111,25 @@
     <string name="alarm_3_speed" translatable="false">alarm_3_speed</string>
     <string name="alarm_3_battery" translatable="false">alarm_3_battery</string>
     <string name="alarm_current" translatable="false">alarm_current</string>
-	<string name="alarm_temperature" translatable="false">alarm_temperature</string>
-	
+    <string name="alarm_temperature" translatable="false">alarm_temperature</string>
+
     // WHEEL SETTINGS
     <string name="light_enabled" translatable="false">light_enabled</string>
     <string name="led_enabled" translatable="false">led_enabled</string>
     <string name="handle_button_disabled" translatable="false">handle_button_disabled</string>
     <string name="wheel_max_speed" translatable="false">wheel_max_speed</string>
     <string name="speaker_volume" translatable="false">speaker_volume</string>
-	<string name="pedals_adjustment" translatable="false">pedals_adjustment</string>
-	<string name="pedals_mode" translatable="false">pedals_mode</string>
-	<string name="light_mode" translatable="false">light_mode</string>
-	<string name="strobe_mode" translatable="false">strobe_mode</string>
-	<string name="led_mode" translatable="false">led_mode</string>
-	<string name="start_calibration" translatable="false">start_calibration</string>
-	<string name="alarm_mode" translatable="false">alarm_mode</string>
-	<string name="gotway_84v" translatable="false">gotway_84v</string>
+    <string name="pedals_adjustment" translatable="false">pedals_adjustment</string>
+    <string name="pedals_mode" translatable="false">pedals_mode</string>
+    <string name="light_mode" translatable="false">light_mode</string>
+    <string name="strobe_mode" translatable="false">strobe_mode</string>
+    <string name="led_mode" translatable="false">led_mode</string>
+    <string name="start_calibration" translatable="false">start_calibration</string>
+    <string name="alarm_mode" translatable="false">alarm_mode</string>
+    <string name="gotway_84v" translatable="false">gotway_84v</string>
     <string name="gotway_voltage" translatable="false">gotway_voltage</string>
     <string name="no_settings" translatable="false">no_settings</string>
-	
+
     // LOG PREFERENCES
     <string name="auto_log" translatable="false">auto_log</string>
     <string name="auto_upload" translatable="false">auto_upload</string>
@@ -140,14 +140,14 @@
     <string name="use_mi" translatable="false">use_mi</string>
     <string name="use_f" translatable="false">use_f</string>
     <string name="max_speed" translatable="false">max_speed</string>
-	<string name="use_ratio" translatable="false">use_ratio</string>
+    <string name="use_ratio" translatable="false">use_ratio</string>
 
     // WATCH PREFERENCES
     <string name="horn_mode" translatable="false">horn_mode</string>
 
-	// TRIP PREFERENCES
-	<string name="reset_top_speed" translatable="false">reset_top_speed</string>
-	<string name="reset_user_distance" translatable="false">reset_user_distance</string>
+    // TRIP PREFERENCES
+    <string name="reset_top_speed" translatable="false">reset_top_speed</string>
+    <string name="reset_user_distance" translatable="false">reset_user_distance</string>
     <string name="last_mac" translatable="false">last_mac</string>
     <string name="about" translatable="false">about</string>
 
@@ -190,7 +190,7 @@
     <string name="livemap_api_error_forbidden">Accès serveur non autorisé.</string>
     <string name="livemap_api_error_unknown">Erreur inconnue, veuillez essayer ultérieurement.</string>
     <string name="livemap_api_error_no_connection">Connexion impossible. Vérifiez votre connexion internet et recommencez.</string>
-    <string name="livemap_connecting">En cours de connexion…</string>
+    <string name="livemap_connecting">En cours de connexion...</string>
     <string name="speech_messages_weather_title">Conditions météorologiques</string>
     <string name="speech_messages_weather_summary">Disponible si live map est actif</string>
     <string name="speech_messages_time_in_motion_title">Durée en mouvement</string>
@@ -202,7 +202,7 @@
     <string name="speech_messages_distance_title">Distance</string>
     <string name="speech_messages_battery_title">Niveau de batterie</string>
     <string name="speech_messages_phone_battery_title">Niveau de batterie du mobile</string>
-    <string name="speech_messages_voltage_title">Voltage</string>
+    <string name="speech_messages_voltage_title">Tension</string>
     <string name="speech_messages_current_title">Courant</string>
     <string name="speech_messages_power_title">Puissance</string>
     <string name="speech_messages_warning_messages_title">Messages de warning</string>
@@ -302,7 +302,7 @@
     <string name="auto_upload_title">Téléchargement automatique du journal</string>
     <string name="auto_upload_summary">Téléchargement automatique du journal sur Google Drive</string>
     <string name="log_location_data_title">Journaliser les informations de localisation</string>
-    <string name="log_location_data_summary">Include location data within the logs</string>
+    <string name="log_location_data_summary">Ajout des données de localisation dans le journal</string>
     <string name="use_gps_title">Utilisation du GPS pour la localisation</string>
     <string name="use_gps_summary">Utiliser plutôt le GPS que les informations de localisation de l\'opérateur mobile. Le GPS est plus précis mais peut consommer plus la batterie du téléphone</string>
     <string name="no_settings_title">Les paramètres de la roue pour la Ninebot Z ne sont pas encore disponibles</string>
@@ -352,5 +352,4 @@
     <string name="duration_fmt_min">%d minutes</string>
     <string name="duration_fmt_hr">%d heures</string>
     <string name="duration_fmt_hr_and_min">%d heures et %d minutes</string>
-
 </resources>

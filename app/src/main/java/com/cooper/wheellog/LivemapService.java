@@ -12,7 +12,6 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.cooper.wheellog.utils.Constants;
@@ -28,8 +27,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.TimeZone;
 
 public class LivemapService extends Service {
     private static LivemapService instance = null;
@@ -38,10 +36,9 @@ public class LivemapService extends Service {
     private int status = 0;
     private String tourKey;
     private long lastUpdated;
-    private int wheelConnected;
     private Location lastLocation;
     private Location currentLocation;
-    private long wheelTime;
+    private long wheelUpdated = 0;
     private double currentDistance;
     private LocationManager locationManager;
     private BatteryManager batteryManager;
@@ -67,7 +64,7 @@ public class LivemapService extends Service {
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
             currentLocation = location;
-            if (lastLocation != null) {
+            if ((lastLocation != null) && (status != 2)) {
                 currentDistance += lastLocation.distanceTo(currentLocation);
             }
             updateLivemap();
@@ -84,18 +81,8 @@ public class LivemapService extends Service {
         {
             String action = intent.getAction();
             switch (action) {
-                case Constants.ACTION_BLUETOOTH_CONNECTION_STATE:
-                    int connectionState = intent.getIntExtra(Constants.INTENT_EXTRA_CONNECTION_STATE, BluetoothLeService.STATE_DISCONNECTED);
-                    if (connectionState == BluetoothLeService.STATE_CONNECTED) {
-                        wheelConnected = 1;
-                    }
-                    else {
-                        wheelConnected = 0;
-                    }
-                    break;
                 case Constants.ACTION_WHEEL_DATA_AVAILABLE:
-                    wheelTime = System.currentTimeMillis();
-                    updateLivemap();
+                    wheelUpdated = SystemClock.elapsedRealtime();
                     break;
                 case Constants.ACTION_LIVEMAP_PAUSE:
                     pauseLivemap();
@@ -178,9 +165,7 @@ public class LivemapService extends Service {
             int deviceBattery = getDeviceBattery();
             if (deviceBattery > -1) requestParams.put("dbl", String.format(Locale.US, "%d", deviceBattery));
             // Wheel data
-            requestParams.put("wcd", String.format(Locale.US, "%d", wheelConnected));
-            if (wheelTime > 0) {
-                requestParams.put("wdt", df.format(new Date(wheelTime)));
+            if (wheelUpdated + 2000 > now) {
                 requestParams.put("was", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageSpeedDouble()));
                 requestParams.put("wbl", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageBatteryLevelDouble()));
                 requestParams.put("wcu", String.format(Locale.US, "%.1f", WheelData.getInstance().getCurrentDouble()));
@@ -228,6 +213,8 @@ public class LivemapService extends Service {
         requestParams.put("p", SettingsUtil.getLivemapPublish(this));
         requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
         requestParams.put("m", SettingsUtil.getLivemapStartNewSegment(this));
+        requestParams.put("t", TimeZone.getDefault().getID());
+        requestParams.put("l", String.valueOf(Locale.getDefault()));
         HttpClient.post(LivemapApiURL + "/tour/start", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
@@ -311,6 +298,7 @@ public class LivemapService extends Service {
                 int error = -1;
                 try {
                     error = response.getInt("error");
+                    if (error == 0) status = 2;
                 }
                 catch (JSONException e) { }
                 Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
@@ -338,6 +326,7 @@ public class LivemapService extends Service {
                 int error = -1;
                 try {
                     error = response.getInt("error");
+                    if (error == 0) status = 1;
                 }
                 catch (JSONException e) { }
                 Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
