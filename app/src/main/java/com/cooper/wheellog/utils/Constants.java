@@ -83,7 +83,7 @@ public class Constants {
     public static final String INTENT_EXTRA_LIVEMAP_UPDATE = "livemap_update";
     public static final String INTENT_EXTRA_LIVEMAP_PAUSE = "livemap_pause";
     public static final String INTENT_EXTRA_LIVEMAP_RESUME = "livemap_resume";
-    public static final String INTENT_EXTRA_LIVEMAP_STOP = "livemap_stop";
+    public static final String INTENT_EXTRA_LIVEMAP_FINISH = "livemap_finish";
     public static final String INTENT_EXTRA_LIVEMAP_URL = "livemap_url";
 
     public static final String PREFERENCES_FRAGMENT_TAG = "tagPrefs";

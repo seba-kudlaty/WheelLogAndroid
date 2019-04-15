@@ -1021,21 +1021,18 @@ public class WheelData {
             } else if (status instanceof NinebotZAdapter.versionStatus){
                 mVersion = ((NinebotZAdapter.versionStatus) status).getVersion();
             } else {
-                mSpeed = (int) (status.getSpeed());
-                mVoltage = (int) (status.getVoltage());
-                mBattery = (int) (status.getBatt());
-                mCurrent = (int) (status.getCurrent());
+                mSpeed = status.getSpeed();
+                mVoltage = status.getVoltage();
+                mCurrent = status.getCurrent();
                 mTotalDistance = (long) (status.getDistance());
-                mTemperature = (int) (status.getTemperature()*10);
+                mTemperature = status.getTemperature() * 10;
 
-
+                setBatteryPercent(status.getBatt());
                 setDistance((long) status.getDistance());
                 int currentTime = (int) (Calendar.getInstance().getTimeInMillis() - rideStartTime) / 1000;
                 setCurrentTime(currentTime);
                 setTopSpeed(mSpeed);
             }
-
-
         }
         return true;
     }

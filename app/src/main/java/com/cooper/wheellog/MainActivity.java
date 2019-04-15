@@ -108,7 +108,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     TextView tvLivemapStatus;
     TextView tvLivemapLastUpdated;
 
-    ImageButton ibLivemapStartStop;
+    ImageButton ibEucWorld;
+    ImageButton ibLivemapStartFinish;
     ImageButton ibLivemapPause;
     ImageButton ibLivemapShare;
 
@@ -226,12 +227,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 case Constants.ACTION_LIVEMAP_STATUS:
                     if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_START)) {
                         int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_START, -1);
-                        ibLivemapStartStop.setClickable(true);
+                        ibLivemapStartFinish.setClickable(true);
                         switch (error) {
                             case 0:
                                 tourStatus = 0;
                                 tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
-                                ibLivemapStartStop.setImageResource(R.drawable.ic_action_livemap_play_orange);
+                                ibLivemapStartFinish.setImageResource(R.drawable.ic_action_livemap_play_orange);
                                 break;
                             default:
                                 tvLivemapStatus.setText(getString(R.string.livemap_offline));
@@ -286,11 +287,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         }
                     }
                     else
-                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_STOP)) {
+                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_FINISH)) {
                         tvLivemapStatus.setText(getString(R.string.livemap_offline));
                         tvLivemapLastUpdated.setText("");
-                        ibLivemapStartStop.setImageResource(R.drawable.ic_action_livemap_play_white);
-                        ibLivemapStartStop.setClickable(true);
+                        ibLivemapStartFinish.setImageResource(R.drawable.ic_action_livemap_play_white);
+                        ibLivemapStartFinish.setClickable(true);
                         ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_grey);
                         ibLivemapPause.setClickable(false);
                     }
@@ -831,7 +832,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         tvLivemapStatus = (TextView) findViewById(R.id.tvLivemapStatus);
         tvLivemapLastUpdated = (TextView) findViewById(R.id.tvLivemapLastUpdated);
-        ibLivemapStartStop = (ImageButton) findViewById(R.id.ibLivemapStartStop);
+        ibEucWorld = (ImageButton) findViewById(R.id.ibEucWorld);
+        ibLivemapStartFinish = (ImageButton) findViewById(R.id.ibLivemapStartFinish);
         ibLivemapPause = (ImageButton) findViewById(R.id.ibLivemapPause);
         ibLivemapShare = (ImageButton) findViewById(R.id.ibLivemapShare);
 
@@ -854,10 +856,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
-        ibLivemapStartStop.setOnClickListener(new ImageButton.OnClickListener() {
+        ibEucWorld.setOnClickListener(new ImageButton.OnClickListener() {
+            public void onClick(View v)  {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://euc.world")));
+            }
+        });
+
+        ibLivemapStartFinish.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v)  {
                 tvLivemapStatus.setText(getString(R.string.livemap_connecting));
-                ibLivemapStartStop.setClickable(false);
+                ibLivemapStartFinish.setClickable(false);
                 MainActivityPermissionsDispatcher.toggleLivemapServiceWithCheck(MainActivity.this);
             }
         });

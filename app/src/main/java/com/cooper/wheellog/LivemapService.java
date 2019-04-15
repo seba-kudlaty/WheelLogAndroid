@@ -281,7 +281,7 @@ public class LivemapService extends Service {
                 public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) { }
             });
             Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
-                    .putExtra(Constants.INTENT_EXTRA_LIVEMAP_STOP, 0);
+                    .putExtra(Constants.INTENT_EXTRA_LIVEMAP_FINISH, 0);
             sendBroadcast(intent);
         }
     }

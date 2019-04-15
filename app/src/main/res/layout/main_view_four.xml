@@ -11,9 +11,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         android:text="@string/livemap_offline"
-        android:textSize="24sp"
+        android:textSize="20sp"
         app:layout_columnSpan="2"
         app:layout_constraintBottom_toTopOf="@+id/tvLivemapLastUpdated"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="8dp"
         android:textSize="12sp"
         app:layout_columnSpan="2"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
@@ -39,47 +39,72 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/ibLivemapStartStop"
+            android:id="@+id/ibLivemapStartFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/common_google_signin_btn_text_light_default"
-            android:padding="32dp"
+            android:padding="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_action_livemap_play_white" />
+            app:srcCompat="@drawable/ic_btn_start" />
 
         <ImageButton
             android:id="@+id/ibLivemapPause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:background="@color/common_google_signin_btn_text_light_default"
+            android:background="@color/vpi__bright_foreground_disabled_holo_dark"
             android:clickable="false"
-            android:padding="32dp"
-            app:layout_constraintStart_toEndOf="@+id/ibLivemapStartStop"
+            android:padding="16dp"
+            app:layout_constraintStart_toEndOf="@+id/ibLivemapStartFinish"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_action_livemap_pause_grey" />
+            app:srcCompat="@drawable/ic_btn_pause" />
+
+        <ImageButton
+            android:id="@+id/ibLivemapPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@color/vpi__bright_foreground_disabled_holo_dark"
+            android:clickable="false"
+            android:padding="16dp"
+            app:layout_constraintStart_toEndOf="@+id/ibLivemapPause"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_btn_photo" />
 
         <ImageButton
             android:id="@+id/ibLivemapShare"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:background="@color/common_google_signin_btn_text_light_default"
+            android:background="@color/vpi__bright_foreground_disabled_holo_dark"
             android:clickable="false"
-            android:padding="32dp"
+            android:padding="16dp"
             android:visibility="visible"
-            app:layout_constraintStart_toEndOf="@+id/ibLivemapPause"
+            app:layout_constraintStart_toEndOf="@+id/ibLivemapPhoto"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_action_share_grey" />
+            app:srcCompat="@drawable/ic_btn_share" />
 
     </android.support.constraint.ConstraintLayout>
+
+    <ImageButton
+        android:id="@+id/ibEucWorld"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/eucworld_logo" />
 
 
 </android.support.constraint.ConstraintLayout>
