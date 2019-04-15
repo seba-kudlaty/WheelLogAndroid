@@ -1,5 +1,6 @@
 package com.cooper.wheellog;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,9 +35,12 @@ public class LivemapService extends Service {
 
     private String LivemapApiURL = "https://euc.world/api";
     private int status = 0;
+    private String updateDateTime = "";
     private String tourKey;
     private long lastUpdated;
     private Location lastLocation;
+    private double lastLatitude;
+    private double lastLongitude;
     private Location currentLocation;
     private long wheelUpdated = 0;
     private double currentDistance;
@@ -65,6 +69,8 @@ public class LivemapService extends Service {
         public void onLocationChanged(Location location) {
             currentLocation = location;
             if ((lastLocation != null) && (status != 2)) {
+                lastLatitude = location.getLatitude();
+                lastLongitude = location.getLongitude();
                 currentDistance += lastLocation.distanceTo(currentLocation);
             }
             updateLivemap();
@@ -117,7 +123,7 @@ public class LivemapService extends Service {
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 250, 0, locationListener);
         batteryManager = (BatteryManager)getSystemService(BATTERY_SERVICE);
-        df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
         Intent serviceStartedIntent = new Intent(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, true);
         sendBroadcast(serviceStartedIntent);
         startLivemap();
@@ -193,6 +199,7 @@ public class LivemapService extends Service {
                             weatherCloudCoverage = response.getJSONObject("data").getDouble("xcl");
                             weatherCondition = response.getJSONObject("data").getInt("xco");
                         }
+                        updateDateTime = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date());
                         Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
                                 .putExtra(Constants.INTENT_EXTRA_LIVEMAP_UPDATE, error);
                         sendBroadcast(intent);
@@ -327,14 +334,15 @@ public class LivemapService extends Service {
                 try {
                     error = response.getInt("error");
                     if (error == 0) status = 1;
+                } catch (JSONException e) {
                 }
-                catch (JSONException e) { }
                 Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
                         .putExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME, error);
                 sendBroadcast(intent);
             }
+
             @Override
-            public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)
                         .putExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME, -1);
                 sendBroadcast(intent);
@@ -342,6 +350,7 @@ public class LivemapService extends Service {
         });
     }
 
+    @TargetApi(21)
     private int getDeviceBattery() {
         if (batteryManager != null) {
             return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
@@ -357,5 +366,9 @@ public class LivemapService extends Service {
     public long getWeatherAge() { return (weatherTimestamp - SystemClock.elapsedRealtime()); }
     public double getWeatherTemperature() { return weatherTemperature; }
     public double getWeatherTemperatureFeels() { return weatherTemperatureFeels; }
+    public int getStatus() { return status; }
+    public String getUpdateDateTime() { return updateDateTime; }
+    public double getLatitude() {return lastLatitude; }
+    public double getLongitude() {return lastLongitude; }
 
 }

@@ -176,11 +176,11 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 if (privileged) sayCount = 0;
                 if (earcon != "") {
-                    res = tts.playEarcon(earcon, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null, "");
-                    res += tts.speak(text, TextToSpeech.QUEUE_ADD, null, "");
+                    res = tts.playEarcon(earcon, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null);
+                    res += tts.speak(text, TextToSpeech.QUEUE_ADD, null);
                 }
                 else
-                    res = tts.speak(text, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null, "");
+                    res = tts.speak(text, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null);
 
                 if (res == TextToSpeech.SUCCESS) {
                     sayPrivileged = privileged;

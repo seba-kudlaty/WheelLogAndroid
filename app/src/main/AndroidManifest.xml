@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.VIBRATE" /> <!-- Permissions needed for Samsung Gear watches -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" /> <!-- Desde API21 es necesario -->
     <uses-permission android:name="com.samsung.wmanager.APP" />
     <uses-permission android:name="com.samsung.wmanager.ENABLE_NOTIFICATION" />
@@ -96,6 +97,15 @@
         <meta-data
             android:name="GearAppType"
             android:value="wgt" />
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.cooper.wheellog.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths"></meta-data>
+        </provider>
     </application>
 
 </manifest>

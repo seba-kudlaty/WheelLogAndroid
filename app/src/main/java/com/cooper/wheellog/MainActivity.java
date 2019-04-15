@@ -17,11 +17,14 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -58,6 +61,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
 import com.viewpagerindicator.LinePageIndicator;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -112,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     ImageButton ibLivemapStartFinish;
     ImageButton ibLivemapPause;
     ImageButton ibLivemapShare;
+    ImageButton ibLivemapPhoto;
 
     LineChart chart1;
 
@@ -130,10 +136,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private boolean use_mph = false;
     private GoogleApiClient mGoogleApiClient;
     private DrawerLayout mDrawer;
+    private String mImagePath;
 
     protected static final int RESULT_DEVICE_SCAN_REQUEST = 20;
     protected static final int RESULT_REQUEST_ENABLE_BT = 30;
     protected static final int REQUEST_CODE_RESOLUTION = 40;
+    protected static final int REQUEST_IMAGE_CAPTURE = 50;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -227,15 +235,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 case Constants.ACTION_LIVEMAP_STATUS:
                     if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_START)) {
                         int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_START, -1);
-                        ibLivemapStartFinish.setClickable(true);
                         switch (error) {
                             case 0:
                                 tourStatus = 0;
                                 tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
-                                ibLivemapStartFinish.setImageResource(R.drawable.ic_action_livemap_play_orange);
+                                setBtnState(ibLivemapStartFinish, true, true);
                                 break;
                             default:
                                 tvLivemapStatus.setText(getString(R.string.livemap_offline));
+                                setBtnState(ibLivemapStartFinish, false, true);
                                 break;
                         }
                     }
@@ -246,12 +254,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             case 0:
                                 if (tourStatus == 0) {
                                     tourStatus = 1;
-                                    ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_white);
-                                    ibLivemapPause.setClickable(true);
+                                    setBtnState(ibLivemapPause, false, true);
+                                    setBtnState(ibLivemapPhoto, false, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
                                     tvLivemapStatus.setText(getString(R.string.livemap_live));
+                                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
                                 }
-                                SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss", Locale.US);
-                                tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, df.format(new Date())));
                                 break;
                             default:
                                 tvLivemapLastUpdated.setText("");
@@ -260,29 +267,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     }
                     else
                     if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_PAUSE)) {
-                        ibLivemapPause.setClickable(true);
                         int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_PAUSE, -1);
                         switch (error) {
                             case 0:
                                 tourStatus = 2;
-                                ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_orange);
+                                setBtnState(ibLivemapPause, true, true);
                                 break;
                             default:
-                                ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_white);
+                                setBtnState(ibLivemapPause, false, true);
                                 break;
                         }
                     }
                     else
                     if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME)) {
-                        ibLivemapPause.setClickable(true);
                         int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME, -1);
                         switch (error) {
                             case 0:
                                 tourStatus = 1;
-                                ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_white);
+                                setBtnState(ibLivemapPause, false, true);
                                 break;
                             default:
-                                ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_orange);
+                                setBtnState(ibLivemapPause, true, true);
                                 break;
                         }
                     }
@@ -290,10 +295,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_FINISH)) {
                         tvLivemapStatus.setText(getString(R.string.livemap_offline));
                         tvLivemapLastUpdated.setText("");
-                        ibLivemapStartFinish.setImageResource(R.drawable.ic_action_livemap_play_white);
-                        ibLivemapStartFinish.setClickable(true);
-                        ibLivemapPause.setImageResource(R.drawable.ic_action_livemap_pause_grey);
-                        ibLivemapPause.setClickable(false);
+                        setBtnState(ibLivemapStartFinish, false, true);
+                        setBtnState(ibLivemapPause, false, false);
+                        setBtnState(ibLivemapPhoto, false, false);
                     }
                     if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_URL)) {
                         setLivemapUrl(intent.getStringExtra(Constants.INTENT_EXTRA_LIVEMAP_URL));
@@ -830,12 +834,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         tvMode = (TextView) findViewById(R.id.tvMode);
         wheelView = (WheelView) findViewById(R.id.wheelView);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        tvLivemapStatus = (TextView) findViewById(R.id.tvLivemapStatus);
-        tvLivemapLastUpdated = (TextView) findViewById(R.id.tvLivemapLastUpdated);
-        ibEucWorld = (ImageButton) findViewById(R.id.ibEucWorld);
-        ibLivemapStartFinish = (ImageButton) findViewById(R.id.ibLivemapStartFinish);
-        ibLivemapPause = (ImageButton) findViewById(R.id.ibLivemapPause);
-        ibLivemapShare = (ImageButton) findViewById(R.id.ibLivemapShare);
+        tvLivemapStatus = findViewById(R.id.tvLivemapStatus);
+        tvLivemapLastUpdated = findViewById(R.id.tvLivemapLastUpdated);
+        ibEucWorld = findViewById(R.id.ibEucWorld);
+        ibLivemapStartFinish = findViewById(R.id.ibLivemapStartFinish);
+        ibLivemapPause = findViewById(R.id.ibLivemapPause);
+        ibLivemapPhoto = findViewById(R.id.ibLivemapPhoto);
+        ibLivemapShare = findViewById(R.id.ibLivemapShare);
 
         mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -858,25 +863,49 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         ibEucWorld.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v)  {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://euc.world")));
+                if (livemapUrl.equals(""))
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://euc.world")));
+                else
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(livemapUrl)));
             }
         });
 
         ibLivemapStartFinish.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v)  {
                 tvLivemapStatus.setText(getString(R.string.livemap_connecting));
-                ibLivemapStartFinish.setClickable(false);
+                setBtnState(ibLivemapStartFinish, false, false);
                 MainActivityPermissionsDispatcher.toggleLivemapServiceWithCheck(MainActivity.this);
             }
         });
 
         ibLivemapPause.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v)  {
-                ibLivemapPause.setClickable(false);
+                setBtnState(ibLivemapPause, false, false);
                 if (tourStatus == 1)
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_PAUSE));
                 else
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_RESUME));
+            }
+        });
+
+        ibLivemapPhoto.setOnClickListener(new ImageButton.OnClickListener() {
+            public void onClick(View v)  {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    File imageFile = null;
+                    try {
+                        imageFile = createImageFile();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    if (imageFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),
+                            "com.cooper.wheellog.fileprovider",
+                            imageFile);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    }
+                }
             }
         });
 
@@ -975,6 +1004,36 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         registerReceiver(mBluetoothUpdateReceiver, makeIntentFilter());
         updateScreen(true);
+
+        if (LivemapService.isInstanceCreated()) {
+            switch (LivemapService.getInstance().getStatus()) {
+                case 0:
+                    tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
+                    tvLivemapLastUpdated.setText("");
+                    break;
+                case 1:
+                    tvLivemapStatus.setText(getString(R.string.livemap_live));
+                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
+                    setBtnState(ibLivemapPause, false, true);
+                    setBtnState(ibLivemapPhoto, false, this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
+                    break;
+                case 2:
+                    tvLivemapStatus.setText(getString(R.string.livemap_live));
+                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
+                    break;
+                case 3:
+                    tvLivemapStatus.setText(getString(R.string.livemap_offline));
+                    tvLivemapLastUpdated.setText("");
+            }
+        }
+        else {
+            tvLivemapStatus.setText(getString(R.string.livemap_offline));
+            tvLivemapLastUpdated.setText("");
+            setBtnState(ibLivemapStartFinish, false, true);
+            setBtnState(ibLivemapPause, false, false);
+            setBtnState(ibLivemapPhoto, false, false);
+            setBtnState(ibLivemapShare, false, false);
+        }
     }
 
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -1317,6 +1376,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     ((PreferencesFragment) getPreferencesFragment()).refreshVolatileSettings();
                 }
                 break;
+            case REQUEST_IMAGE_CAPTURE:
+                if (resultCode == RESULT_OK) {
+                    //Bundle extras = data.getExtras();
+                    //Bitmap imageBitmap = (Bitmap) extras.get("data");
+                }
+                break;
         }
     }
 
@@ -1389,14 +1454,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void setLivemapUrl(String url) {
         livemapUrl = url;
-        if (url.equals("")) {
-            ibLivemapShare.setImageResource(R.drawable.ic_action_share_grey);
-            ibLivemapShare.setClickable(false);
-        }
-        else {
-            ibLivemapShare.setImageResource(R.drawable.ic_action_share_white);
-            ibLivemapShare.setClickable(true);
-        }
+        if (url.equals(""))
+            setBtnState(ibLivemapShare,false, false);
+        else
+            setBtnState(ibLivemapShare,false, true);
     }
 
     private void shareLivemapUrl() {
@@ -1415,4 +1476,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+    private void setBtnState(ImageButton btn, boolean down, boolean enabled) {
+        btn.setClickable(enabled);
+        if (btn == ibLivemapStartFinish)
+            ibLivemapStartFinish.setImageResource(down ? R.drawable.ic_btn_finish : R.drawable.ic_btn_start);
+        if (enabled)
+            btn.setBackgroundColor(down ? getResources().getColor(R.color.accent) : getResources().getColor(R.color.wheelview_arc_dim));
+        else
+            btn.setBackgroundColor(getResources().getColor(R.color.disabled));
+    }
+
+    private File createImageFile() throws IOException {
+        String imageFileName = "WheelLog_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        File image = File.createTempFile(imageFileName,".jpg", getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+        mImagePath = image.getAbsolutePath();
+        return image;
+    }
 }

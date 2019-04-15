@@ -131,6 +131,8 @@ public class Constants {
 
     }
 
+    public static final int ACTION_IMAGE_CAPTURE_REQUEST = -1;
+
     public static final int MAIN_NOTIFICATION_ID = 10;
 
     public static final String LOG_FOLDER_NAME = "WheelLog Logs";

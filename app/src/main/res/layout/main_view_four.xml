@@ -48,7 +48,7 @@
             android:id="@+id/ibLivemapStartFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/common_google_signin_btn_text_light_default"
+            android:background="@color/wheelview_arc_dim"
             android:padding="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:background="@color/vpi__bright_foreground_disabled_holo_dark"
+            android:background="@color/disabled"
             android:clickable="false"
             android:padding="16dp"
             app:layout_constraintStart_toEndOf="@+id/ibLivemapStartFinish"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:background="@color/vpi__bright_foreground_disabled_holo_dark"
+            android:background="@color/disabled"
             android:clickable="false"
             android:padding="16dp"
             app:layout_constraintStart_toEndOf="@+id/ibLivemapPause"
@@ -83,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:background="@color/vpi__bright_foreground_disabled_holo_dark"
+            android:background="@color/disabled"
             android:clickable="false"
             android:padding="16dp"
             android:visibility="visible"
@@ -105,6 +105,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/eucworld_logo" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ibEucWorld"
+        app:srcCompat="@color/common_google_signin_btn_text_dark_focused" />
 
 
 </android.support.constraint.ConstraintLayout>

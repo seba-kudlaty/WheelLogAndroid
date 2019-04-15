@@ -24,14 +24,14 @@
 
             <android.widget.TextClock
                 android:id="@+id/textClock"
-                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:format24Hour="HH:mm:ss"
+                android:layout_height="wrap_content"
                 android:format12Hour="HH:mm:ss"
-                android:textSize="30sp"
-                android:textStyle="bold"
+                android:format24Hour="HH:mm:ss"
+                android:gravity="start"
                 android:textColor="@color/wheelview_text"
-                android:gravity="start"/>
+                android:textSize="24sp"
+                android:textStyle="bold" />
         </android.support.v7.widget.Toolbar>
 
         <android.support.v4.view.ViewPager
