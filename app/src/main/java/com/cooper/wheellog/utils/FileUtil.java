@@ -14,8 +14,7 @@ public class FileUtil {
 
     public static File getFile(String filename) {
         // Get the directory for the user's public pictures directory.
-        File dir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS), Constants.LOG_FOLDER_NAME);
+        File dir = new File(Environment.getExternalStorageDirectory(), Constants.LOG_FOLDER_NAME);
 
         if (!dir.mkdirs())
             Timber.i("Directory not created");

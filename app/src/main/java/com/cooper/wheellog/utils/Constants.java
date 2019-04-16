@@ -135,5 +135,7 @@ public class Constants {
 
     public static final int MAIN_NOTIFICATION_ID = 10;
 
-    public static final String LOG_FOLDER_NAME = "WheelLog Logs";
+    public static final String LOG_FOLDER_NAME = "WheelLog/Logs";
+    public static final String PICTURE_FOLDER_NAME = "WheelLog/Pictures";
+    public static final String EUCWORLD_URL = "https://euc.world";
 }

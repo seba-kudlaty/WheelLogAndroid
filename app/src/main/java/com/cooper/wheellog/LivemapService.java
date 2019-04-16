@@ -41,6 +41,7 @@ public class LivemapService extends Service {
     private Location lastLocation;
     private double lastLatitude;
     private double lastLongitude;
+    private long lastLocationTime;
     private Location currentLocation;
     private long wheelUpdated = 0;
     private double currentDistance;
@@ -71,6 +72,7 @@ public class LivemapService extends Service {
             if ((lastLocation != null) && (status != 2)) {
                 lastLatitude = location.getLatitude();
                 lastLongitude = location.getLongitude();
+                lastLocationTime = location.getTime();
                 currentDistance += lastLocation.distanceTo(currentLocation);
             }
             updateLivemap();
@@ -368,7 +370,9 @@ public class LivemapService extends Service {
     public double getWeatherTemperatureFeels() { return weatherTemperatureFeels; }
     public int getStatus() { return status; }
     public String getUpdateDateTime() { return updateDateTime; }
-    public double getLatitude() {return lastLatitude; }
-    public double getLongitude() {return lastLongitude; }
+    public String getTourKey() { return tourKey; }
+    public double getLatitude() { return lastLatitude; }
+    public double getLongitude() { return lastLongitude; }
+    public long getLocationTime() { return lastLocationTime; }
 
 }

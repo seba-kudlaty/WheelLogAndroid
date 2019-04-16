@@ -24,13 +24,13 @@ import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +44,7 @@ import android.widget.Toast;
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 import com.cooper.wheellog.utils.Constants.ALARM_TYPE;
+import com.cooper.wheellog.utils.HttpClient;
 import com.cooper.wheellog.utils.SettingsUtil;
 import com.cooper.wheellog.utils.Typefaces;
 import com.cooper.wheellog.views.WheelView;
@@ -59,9 +60,15 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.viewpagerindicator.LinePageIndicator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -136,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private boolean use_mph = false;
     private GoogleApiClient mGoogleApiClient;
     private DrawerLayout mDrawer;
-    private String mImagePath;
+    private String mImagePath = "";
 
     protected static final int RESULT_DEVICE_SCAN_REQUEST = 20;
     protected static final int RESULT_REQUEST_ENABLE_BT = 30;
@@ -890,22 +897,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         ibLivemapPhoto.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v)  {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    File imageFile = null;
-                    try {
-                        imageFile = createImageFile();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                    if (imageFile != null) {
-                        Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),
-                            "com.cooper.wheellog.fileprovider",
-                            imageFile);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                    }
-                }
+                MainActivityPermissionsDispatcher.imageCaptureWithCheck(MainActivity.this);
             }
         });
 
@@ -1377,9 +1369,43 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
                 break;
             case REQUEST_IMAGE_CAPTURE:
-                if (resultCode == RESULT_OK) {
-                    //Bundle extras = data.getExtras();
-                    //Bitmap imageBitmap = (Bitmap) extras.get("data");
+                if ((resultCode == RESULT_OK) && (!mImagePath.isEmpty()) && (LivemapService.isInstanceCreated())) {
+                    final RequestParams requestParams = new RequestParams();
+                    try {
+                        requestParams.put("image", new File(mImagePath));
+                        requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
+                        requestParams.put("k", LivemapService.getInstance().getTourKey());
+                        requestParams.put("dt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date()));
+                        requestParams.put("ldt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date(LivemapService.getInstance().getLocationTime())));
+                        requestParams.put("llt", String.format(Locale.US, "%.7f", LivemapService.getInstance().getLatitude()));
+                        requestParams.put("lln", String.format(Locale.US, "%.7f", LivemapService.getInstance().getLongitude()));
+                        HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/upload", requestParams, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
+                                int error = -1;
+                                try {
+                                    error = response.getInt("error");
+                                    switch (error) {
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            break;
+                                        default:
+                                    }
+                                }
+                                catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            @Override
+                            public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                Log.d("upload", "onFailure: " + statusCode);
+                            }
+                        });
+                    }
+                    catch(FileNotFoundException e) {
+
+                    }
                 }
                 break;
         }
@@ -1487,9 +1513,29 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     private File createImageFile() throws IOException {
-        String imageFileName = "WheelLog_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        File image = File.createTempFile(imageFileName,".jpg", getExternalFilesDir(Environment.DIRECTORY_PICTURES));
+        String filename = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".jpg";
+        File path = new File(Environment.getExternalStorageDirectory(), Constants.PICTURE_FOLDER_NAME);
+        path.mkdirs();
+        File image = new File(path, filename);
         mImagePath = image.getAbsolutePath();
         return image;
+    }
+
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    public void imageCapture() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            File imageFile = null;
+            try {
+                imageFile = createImageFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            if (imageFile != null) {
+                Uri photoURI = Uri.fromFile(imageFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
     }
 }
