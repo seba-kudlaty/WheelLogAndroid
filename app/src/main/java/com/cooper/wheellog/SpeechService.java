@@ -1,5 +1,6 @@
 package com.cooper.wheellog;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +35,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     private boolean ttsEnabled = false;
     private long ttsLastWheelData = 0;
     private BatteryManager bm;
+    private HashMap<String, String> ttsMap;
 
     public static boolean isInstanceCreated() {
         return instance != null;
@@ -88,10 +91,13 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     };
 
     @Override
+    @TargetApi(21)
     public void onCreate() {
-        tts = new TextToSpeech(this, this);
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+        tts = new TextToSpeech(this, this);
+        ttsMap = new HashMap<>();
+        ttsMap.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "WheelLogSpeech");
     }
 
     @Override
@@ -125,14 +131,14 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 @Override
                 public void onDone(String utterance_id) {
                     --sayCount;
-                    if (sayCount == 0) {
+                    if (sayCount <= 0) {
+                        sayCount = 0;
                         sayPrivileged = false;
                         am.abandonAudioFocus(afl);
                     }
                     Log.d("", String.format(Locale.US, "UtteranceProgressListener: onDone(%s), sayCount = %d", utterance_id, sayCount));
                 }
             });
-            //int result = tts.setLanguage(Locale.UK);
             int result = tts.setLanguage(Locale.getDefault());
             if (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED) {
                 tts.addEarcon("alarm", getPackageName(), R.raw.alarm);
@@ -175,17 +181,16 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             int res = am.requestAudioFocus(afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 if (privileged) sayCount = 0;
-                if (earcon != "") {
-                    res = tts.playEarcon(earcon, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null);
-                    res += tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                if (!earcon.isEmpty()) {
+                    sayCount += 2;
+                    tts.playEarcon(earcon, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, ttsMap);
+                    tts.speak(text, TextToSpeech.QUEUE_ADD, ttsMap);
                 }
-                else
-                    res = tts.speak(text, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null);
-
-                if (res == TextToSpeech.SUCCESS) {
-                    sayPrivileged = privileged;
-                    sayCount++;
+                else {
+                    sayCount += 1;
+                    tts.speak(text, (privileged) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, ttsMap);
                 }
+                sayPrivileged = privileged;
             }
         }
     }
@@ -228,6 +233,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         }
     }
 
+    @TargetApi(21)
     private int getPhoneBatteryLevel() {
         if (bm != null) {
             return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
@@ -274,7 +280,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 // Phone battery level
                 if (SettingsUtil.getSpeechMessagesPhoneBattery(this)) {
                     int bl = getPhoneBatteryLevel();
-                    if (bl > 0)
+                    if (bl >= 0)
                         text += " " + String.format(Locale.US, getString(R.string.speech_phone_battery), bl);
                 }
                 // Voltage
