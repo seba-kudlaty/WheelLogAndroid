@@ -97,6 +97,15 @@
         <meta-data
             android:name="GearAppType"
             android:value="wgt" />
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.cooper.wheellog.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths"></meta-data>
+        </provider>
     </application>
 
 </manifest>

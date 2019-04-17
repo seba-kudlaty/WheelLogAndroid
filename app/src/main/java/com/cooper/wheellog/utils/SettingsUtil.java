@@ -215,4 +215,8 @@ public class SettingsUtil {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.livemap_start_new_segment), false);
     }
 
+    public static boolean getShowWhenLocked(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.show_when_locked), false);
+    }
+
 }

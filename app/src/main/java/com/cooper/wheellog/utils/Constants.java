@@ -77,7 +77,7 @@ public class Constants {
 
     public static final String INTENT_EXTRA_SPEECH_TEXT = "speech_text";
     public static final String INTENT_EXTRA_SPEECH_EARCON = "speech_earcon";
-    public static final String INTENT_EXTRA_SPEECH_NOW = "speech_now";
+    public static final String INTENT_EXTRA_SPEECH_PRIORITY = "speech_now";
 
     public static final String INTENT_EXTRA_LIVEMAP_START = "livemap_start";
     public static final String INTENT_EXTRA_LIVEMAP_UPDATE = "livemap_update";

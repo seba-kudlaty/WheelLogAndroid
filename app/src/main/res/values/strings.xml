@@ -352,5 +352,8 @@
     <string name="duration_fmt_min">%d min</string>
     <string name="duration_fmt_hr">%d hr</string>
     <string name="duration_fmt_hr_and_min">%d hr and %d min</string>
+    <string name="show_when_locked" translatable="false">show_when_locked</string>
+    <string name="show_when_locked_title">Show when locked</string>
+    <string name="show_when_locked_summary">Show main window even if the screen is locked</string>
 
 </resources>

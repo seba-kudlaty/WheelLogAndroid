@@ -352,4 +352,7 @@
     <string name="duration_fmt_min">%d minutes</string>
     <string name="duration_fmt_hr">%d heures</string>
     <string name="duration_fmt_hr_and_min">%d heures et %d minutes</string>
+    <string name="show_when_locked" />
+    <string name="show_when_locked_title">Afficher lorsqu\'il est verrouillé</string>
+    <string name="show_when_locked_summary">Afficher la fenêtre principale même si l\'écran est verrouillé</string>
 </resources>

@@ -254,4 +254,6 @@
     <string name="duration_fmt_min">%d min</string>
     <string name="duration_fmt_hr">%d hr</string>
     <string name="duration_fmt_hr_and_min">%d hr i %d min</string>
+    <string name="show_when_locked_title">Pokaż mimo blokady</string>
+    <string name="show_when_locked_summary">Pokaż okno główne nawet jeśli ekran jest zablokowany</string>
 </resources>

@@ -2,9 +2,11 @@ package com.cooper.wheellog;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.app.KeyguardManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +19,7 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Bundle;
@@ -24,6 +27,7 @@ import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -36,6 +40,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Handler;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextClock;
 import android.widget.TextView;
@@ -135,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private String mDeviceAddress;
     private int mConnectionState = BluetoothLeService.STATE_DISCONNECTED;
     int tourStatus = 0;
-    private String livemapUrl;
+    private String livemapUrl = "";
     private boolean doubleBackToExitPressedOnce = false;
     private Snackbar snackbar;
     int viewPagerPage = 0;
@@ -264,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                     setBtnState(ibLivemapPause, false, true);
                                     setBtnState(ibLivemapPhoto, false, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
                                     tvLivemapStatus.setText(getString(R.string.livemap_live));
-                                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
                                 }
+                                tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
                                 break;
                             default:
                                 tvLivemapLastUpdated.setText("");
@@ -1159,6 +1164,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void loadPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        setMainActivityLockBehaviour();
         use_mph = sharedPreferences.getBoolean(getString(R.string.use_mi), false);
         int max_speed = sharedPreferences.getInt(getString(R.string.max_speed), 30) * 10;
         wheelView.setMaxSpeed(max_speed);
@@ -1435,7 +1441,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             else
                 return "";
         }
-
         // we don't draw numbers, so no decimal digits needed
         @Override
         public int getDecimalDigits() {  return 0; }
@@ -1532,10 +1537,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 ex.printStackTrace();
             }
             if (imageFile != null) {
-                Uri photoURI = Uri.fromFile(imageFile);
+                Uri photoURI = FileProvider.getUriForFile(this,
+                    "com.cooper.wheellog.fileprovider",
+                    imageFile);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+                    intent.setClipData(ClipData.newRawUri("", photoURI));
+                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
             }
         }
+    }
+
+    private void setMainActivityLockBehaviour() {
+        if (SettingsUtil.getShowWhenLocked(this))
+            this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        else
+            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
     }
 }

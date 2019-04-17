@@ -4,6 +4,11 @@
     xmlns:sample="http://schemas.android.com/apk/res-auto">
 
     <CheckBoxPreference
+        android:key="@string/show_when_locked"
+        android:title="@string/show_when_locked_title"
+        android:summary="@string/show_when_locked_summary" />
+
+    <CheckBoxPreference
         android:key="@string/use_mi"
         android:title="@string/use_mi_title"
         android:summary="@string/use_mi_summary" />
