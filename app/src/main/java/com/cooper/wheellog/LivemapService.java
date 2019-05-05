@@ -1,6 +1,9 @@
 package com.cooper.wheellog;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,9 +13,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import com.cooper.wheellog.utils.Constants;
@@ -33,6 +38,9 @@ import java.util.TimeZone;
 public class LivemapService extends Service {
     private static LivemapService instance = null;
 
+    private static final int NOTIFY_ID = 36901;
+    private static final String CHANNEL_ID = "chan_wl_livemap";
+    private NotificationManager mNotificationManager;
     private String LivemapApiURL = "https://euc.world/api";
     private int status = 0;
     private String updateDateTime = "";
@@ -128,12 +136,27 @@ public class LivemapService extends Service {
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
         Intent serviceStartedIntent = new Intent(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, true);
         sendBroadcast(serviceStartedIntent);
+
+        startForeground(NOTIFY_ID, getNotification(getString(R.string.notification_livemap_title), getString(R.string.livemap_connecting)));
+
         startLivemap();
         return START_STICKY;
     }
 
     @Override
+    public void onCreate() {
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.app_name);
+            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW);
+            mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            mNotificationManager.createNotificationChannel(mChannel);
+        }
+    }
+
+    @Override
     public void onDestroy() {
+        stopForeground(true);
         stopLivemap();
         instance = null;
         unregisterReceiver(receiver);
@@ -141,12 +164,24 @@ public class LivemapService extends Service {
             locationManager.removeUpdates(locationListener);
         Intent serviceStartedIntent = new Intent(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, false);
         sendBroadcast(serviceStartedIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mNotificationManager.deleteNotificationChannel(CHANNEL_ID);
+        }
         super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
+    }
+
+    private Notification getNotification(String title, String description) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_action_wheel_orange)
+                .setContentTitle(title)
+                .setContentText(description)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        return builder.build();
     }
 
     private void updateLivemap() {
@@ -189,6 +224,7 @@ public class LivemapService extends Service {
                     try {
                         int error = response.getInt("error");
                         if ((error == 0) && (response.getJSONObject("data").has("xtm"))) {
+                            mNotificationManager.notify(NOTIFY_ID, getNotification(getString(R.string.notification_livemap_title), getString(R.string.livemap_live)));
                             weatherTimestamp = SystemClock.elapsedRealtime();
                             weatherTemperature = response.getJSONObject("data").getDouble("xtm");
                             weatherTemperatureFeels = response.getJSONObject("data").getDouble("xtf");
@@ -233,6 +269,7 @@ public class LivemapService extends Service {
                     switch (error) {
                         case 0:
                             status = 1;
+                            mNotificationManager.notify(NOTIFY_ID, getNotification(getString(R.string.notification_livemap_title), getString(R.string.livemap_gps_wait)));
                             showToast(R.string.livemap_api_connected, Toast.LENGTH_LONG);
                             tourKey = response.getJSONObject("data").getString("k");
                             sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS).putExtra(Constants.INTENT_EXTRA_LIVEMAP_URL, "https://euc.world/tour/" + tourKey));
@@ -335,7 +372,9 @@ public class LivemapService extends Service {
                 int error = -1;
                 try {
                     error = response.getInt("error");
-                    if (error == 0) status = 1;
+                    if (error == 0) {
+                        status = 1;
+                    }
                 } catch (JSONException e) {
                 }
                 Intent intent = new Intent(Constants.ACTION_LIVEMAP_STATUS)

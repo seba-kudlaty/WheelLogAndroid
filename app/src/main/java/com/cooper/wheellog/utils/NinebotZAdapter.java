@@ -7,11 +7,6 @@ import java.io.IOException;
 import java.util.*;
 import timber.log.Timber;
 
-//import static com.cooper.wheellog.utils.InMotionAdapter.Model.*;
-
-/**
- * Created by cedric on 29/12/2016.
- */
 public class NinebotZAdapter {
     private static NinebotZAdapter INSTANCE;
     private Timer keepAliveTimer;
@@ -20,9 +15,13 @@ public class NinebotZAdapter {
 	private byte[] settingCommand;
 	private static byte[] gamma = new byte[16];
     private static int stateCon = 0;
+    private static int protocolVersion = 0;
+    private static boolean protocolFound = false;
 
+    NinebotUnpacker unpacker = new NinebotUnpacker();
+    NinebotZUnpacker unpackerZ = new NinebotZUnpacker();
 
-    NinebotZUnpacker unpacker = new NinebotZUnpacker();
+    public int getProtocolVersion() { return protocolVersion; }
 
     public void startKeepAliveTimer(final BluetoothLeService mBluetoothLeService, final String ninebotPassword) {
         Timber.i("Ninebot timer starting");
@@ -31,31 +30,46 @@ public class NinebotZAdapter {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
+                boolean res;
                 if (updateStep == 0) {
+                    if (!protocolFound) {
+                        protocolVersion += 1;
+                        protocolVersion %= 2;
+                    }
                     if (stateCon == 0) {
-                        if (mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.startCommunication().writeBuffer())) {
-                            //stateCon +=1;
-                            Timber.i("Sent start message");
-                        } else updateStep = 39;
-
+                        if (protocolVersion == 0)
+                            // Ninebot Z
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.startCommunication().writeBuffer());
+                        else
+                            // Ninebot One S2: Serial No.
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(new byte[] {(byte)0x55, (byte)0xaa, (byte)0x03, (byte)0x11, (byte)0x01, (byte)0x10, (byte)0x0e, (byte)0xcc, (byte)0xff});
+                        if (!res) updateStep = 39;
                     } else if (stateCon == 1) {
-                        if (mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getKey().writeBuffer())) {
-                            //stateCon +=1;
-                            Timber.i("Sent getkey message");
-                        } else updateStep = 39;
-
+                        if (protocolVersion == 0)
+                            // Ninebot Z
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getKey().writeBuffer());
+                        else
+                            // Ninebot One S2: Controller Version
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(new byte[] {(byte)0x55, (byte)0xaa, (byte)0x03, (byte)0x11, (byte)0x01, (byte)0x1a, (byte)0x02, (byte)0xce, (byte)0xff});
+                        if (!res) updateStep = 39;
                     } else if (stateCon == 2) {
-                        if (mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getSerialNumber().writeBuffer())) {
-                            //stateCon +=1;
-                            Timber.i("Sent serial number message");
-                        } else updateStep = 39;
-
+                        if (protocolVersion == 0)
+                            // Ninebot Z: BMS Versions
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getSerialNumber().writeBuffer());
+                        else
+                            // Ninebot One S2
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(new byte[] {(byte)0x55, (byte)0xaa, (byte)0x03, (byte)0x11, (byte)0x01, (byte)0x66, (byte)0x06, (byte)0x7e, (byte)0xff});
+                        if (!res) updateStep = 39;
                     } else if (stateCon == 3) {
-                        if (mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getVersion().writeBuffer())) {
-                            //stateCon +=1;
-                            Timber.i("Sent serial version message");
-                        } else updateStep = 39;
-
+                        if (protocolVersion == 0)
+                            // Ninebot Z
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getVersion().writeBuffer());
+                        else
+                            // Ninebot One S2: PIN code
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(new byte[]{(byte) 0x55, (byte) 0xaa, (byte) 0x03, (byte) 0x11, (byte) 0x01, (byte) 0x17, (byte) 0x06, (byte) 0xcd, (byte) 0xff});
+                        if (!res) updateStep = 39;
+                    }
+                    /*
                     } else if (settingCommandReady) {
     					if (mBluetoothLeService.writeBluetoothGattCharacteristic(settingCommand)) {
                             //needSlowData = true;
@@ -63,15 +77,16 @@ public class NinebotZAdapter {
                             Timber.i("Sent command message");
                         } else updateStep = 39; // after +1 and %10 = 0
     				}
+    				*/
     				else {
-                        if (!mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getLiveData().writeBuffer())) {
-                            Timber.i("Unable to send keep-alive message");
-                            updateStep = 39;
-    					} else {
-                            Timber.i("Sent keep-alive message");
-    					}
+                        if (protocolVersion == 0)
+                            // Ninebot Z
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(NinebotZAdapter.CANMessage.getLiveData().writeBuffer());
+                        else
+                            // Ninebot One S2: PIN code
+                            res = mBluetoothLeService.writeBluetoothGattCharacteristic(new byte[] {(byte)0x55, (byte)0xaa, (byte)0x03, (byte)0x11, (byte)0x01, (byte)0xb0, (byte)0x20, (byte)0x1a, (byte)0xff});
+                        if (!res) updateStep = 39;
                     }
-
 				}
                 updateStep += 1;
                 updateStep %= 40;
@@ -85,20 +100,21 @@ public class NinebotZAdapter {
 
 
 	public void resetConnection() {
+        protocolFound = false;
+        protocolVersion = 0;
         stateCon = 0;
         updateStep = 0;
         gamma = new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
         stopTimer();
 	}
-	
 
+    public String getModel() {
+        if (protocolVersion == 0)
+            return "Ninebot Z";
+        else
+            return "Ninebot";
+    }
 
-
-
-
-
-
-	
     public static class Status {
 
         private final int speed;
@@ -182,23 +198,20 @@ public class NinebotZAdapter {
 
     public static class serialNumberStatus extends Status {
         private final String serialNumber;
-
         serialNumberStatus(String serialNumber) {
             super();
             this.serialNumber = serialNumber;
-      }
-
-      public String getSerialNumber() {
+        }
+        public String getSerialNumber() {
             return serialNumber;
-      }
-
-
+        }
+        public String getModel() {
+            return "Ninebot";
+        }
         @Override
         public String toString() {
             return "Infos{" +
-                    "serialNumber='" + serialNumber + '\'' +
-
-                    '}';
+                    "serialNumber='" + serialNumber + '\'' + '}';
         }
     }
 
@@ -322,15 +335,28 @@ public class NinebotZAdapter {
 
 
         CANMessage(byte[] bArr) {
-            if (bArr.length < 7) return;
-            len = bArr[0] & 0xff;
-            source = bArr[1] & 0xff;
-            destination = bArr[2] & 0xff;
-            command = bArr[3] & 0xff;
-            parameter = bArr[4] & 0xff;
-            data = Arrays.copyOfRange(bArr, 5, bArr.length-2);
-            crc = bArr[bArr.length-1] << 8 + bArr[bArr.length-2];
-
+            if (protocolVersion == 0) {
+                // Ninebot Z
+                if (bArr.length < 7) return;
+                len = bArr[0] & 0xff;
+                source = bArr[1] & 0xff;
+                destination = bArr[2] & 0xff;
+                command = bArr[3] & 0xff;
+                parameter = bArr[4] & 0xff;
+                data = Arrays.copyOfRange(bArr, 5, bArr.length-2);
+                crc = bArr[bArr.length-1] << 8 + bArr[bArr.length-2];
+            }
+            else {
+                // Ninebot One S2
+                if (bArr.length < 6) return;
+                len = bArr[0] & 0xff;
+                source = bArr[1] & 0xff;
+                destination = bArr[1] & 0xff;
+                command = bArr[2] & 0xff;
+                parameter = bArr[3] & 0xff;
+                data = Arrays.copyOfRange(bArr, 4, bArr.length-2);
+                crc = bArr[bArr.length-1] << 8 + bArr[bArr.length-2];
+            }
         }
 
         private CANMessage() {
@@ -344,7 +370,6 @@ public class NinebotZAdapter {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             out.write(0x5A);
             out.write(0xA5);
-
             try {
                 out.write(canBuffer);
             } catch (IOException e) {
@@ -544,11 +569,8 @@ public class NinebotZAdapter {
         }
 
         serialNumberStatus parseSerialNumber() {
-            String serialNumber = new String (data);//"";
-            /*
-            for (int j = 0; j < data.length; j++) {
-                serialNumber += String.format("%02X", data[j]);
-            }*/
+            String serialNumber;
+            serialNumber = new String(data);
             return new serialNumberStatus(serialNumber);
         }
 
@@ -557,6 +579,11 @@ public class NinebotZAdapter {
             for (int j = 0; j < data.length; j++) {
                 versionNumber += String.format("%02X", data[j]);
             }
+            return new versionStatus(versionNumber);
+        }
+
+        versionStatus parseVersionNumberOneS2() {
+            String versionNumber = String.format(Locale.US, "%d.%d.%d", data[1] >> 4, data[0] >> 4, data[0] & 0xf);
             return new versionStatus(versionNumber);
         }
 
@@ -581,6 +608,17 @@ public class NinebotZAdapter {
 
 
            return new Status(speed, voltage, batt, current, power, distance, temperature);
+        }
+
+        Status parseLiveDataOneS2() {
+            int batt = this.shortFromBytes(data, 8);
+            int speed = this.shortFromBytes(data, 10) / 10;
+            int distance = this.intFromBytes(data,14);
+            int temperature = this.shortFromBytes(data,22);
+            int voltage = this.shortFromBytes(data, 24);
+            int current = this.signedShortFromBytes(data, 26);
+            int power = voltage*current;
+            return new Status(speed, voltage, batt, current, power, distance, temperature);
         }
 
         public byte[] getData() {
@@ -612,54 +650,136 @@ public class NinebotZAdapter {
     public ArrayList<Status> charUpdated(byte[] data) {
         ArrayList<Status> outValues = new ArrayList<>();
 
-        for (byte c : data) {
-            if (unpacker.addChar(c)) {
-                Timber.i("Starting verification");
-				CANMessage result = CANMessage.verify(unpacker.getBuffer());
-				
-                if (result != null) { // data OK
-                    Timber.i("Verification successful, command %02X", result.parameter);
-                    if (result.parameter == CANMessage.Param.Start.getValue()) {
-						Timber.i("Get start answer");
-						stateCon = 1;
-						
-					} else if (result.parameter == CANMessage.Param.GetKey.getValue()){
-                        Timber.i("Get encryption key");
-                        gamma = result.parseKey();
-                        stateCon = 2;
-						//Alert alert = result.parseAlertInfoMessage();
-						//if (alert != null)
-						//	outValues.add(alert);
-						
-					} else if (result.parameter == CANMessage.Param.SerialNumber.getValue()){
-                        Timber.i("Get serial number");
-                        serialNumberStatus infos = result.parseSerialNumber();
-                        stateCon = 3;
-                        //Alert alert = result.parseAlertInfoMessage();
-                        if (infos != null)
-                        	outValues.add(infos);
+        if (protocolVersion == 0) {
+            for (byte c : data) {
+                if (unpackerZ.addChar(c)) {
+                    Timber.i("Starting verification");
+                    CANMessage result = CANMessage.verify(unpackerZ.getBuffer());
+                    if (result != null) { // data OK
+                        Timber.i("Verification successful, command %02X", result.parameter);
+                        if (result.parameter == CANMessage.Param.Start.getValue()) {
+                            Timber.i("Get start answer");
+                            stateCon = 1;
 
-                    } else if (result.parameter == CANMessage.Param.Firmware.getValue()){
-                        Timber.i("Get version number");
-                        versionStatus infos = result.parseVersionNumber();
-                        stateCon = 4;
-                        //Alert alert = result.parseAlertInfoMessage();
-                        if (infos != null)
-                            outValues.add(infos);
+                        } else if (result.parameter == CANMessage.Param.GetKey.getValue()) {
+                            Timber.i("Get encryption key");
+                            gamma = result.parseKey();
+                            stateCon = 2;
+                            //Alert alert = result.parseAlertInfoMessage();
+                            //if (alert != null)
+                            //	outValues.add(alert);
 
-                    } else if (result.parameter == CANMessage.Param.LiveData.getValue()){
-                        Timber.i("Get life data");
-                        Status status = result.parseLiveData();
-                        if (status != null) {
-                            outValues.add(status);
+                        } else if (result.parameter == CANMessage.Param.SerialNumber.getValue()) {
+                            Timber.i("Get serial number");
+                            serialNumberStatus infos = result.parseSerialNumber();
+                            stateCon = 3;
+                            //Alert alert = result.parseAlertInfoMessage();
+                            if (infos != null)
+                                outValues.add(infos);
+
+                        } else if (result.parameter == CANMessage.Param.Firmware.getValue()) {
+                            Timber.i("Get version number");
+                            versionStatus infos = result.parseVersionNumber();
+                            stateCon = 4;
+                            //Alert alert = result.parseAlertInfoMessage();
+                            if (infos != null)
+                                outValues.add(infos);
+
+                        } else if (result.parameter == CANMessage.Param.LiveData.getValue()) {
+                            Timber.i("Get life data");
+                            Status status = result.parseLiveData();
+                            if (status != null) {
+                                outValues.add(status);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        else
+        if (protocolVersion == 1) {
+            for (byte c : data) {
+                if (unpacker.addChar(c)) {
+                    Timber.i("Starting verification");
+                    byte [] d = unpacker.getBuffer();
+                    CANMessage result = CANMessage.verify(d);
+                    if (result != null) { // data OK
+                        switch (d[5]) {
+                            case (byte)0x10:    // Serial No.
+                                stateCon = 1;
+                                serialNumberStatus sns = result.parseSerialNumber();
+                                if (sns != null) outValues.add(sns);
+                                break;
+                            case (byte)0x1a:    // Controller firmware version
+                                stateCon = 2;
+                                versionStatus vs = result.parseVersionNumberOneS2();
+                                if (vs != null) outValues.add(vs);
+                                break;
+                            case (byte)0x66:    // BMS firmware versions
+                                stateCon = 3;
+                                break;
+                            case (byte)0x17:    // PIN number
+                                stateCon = 4;
+                                break;
+                            case (byte)0xb0:    // Live data
+                                Status s = result.parseLiveDataOneS2();
+                                if (s != null) outValues.add(s);
+                                break;
                         }
                     }
-
-                } 
+                }
             }
         }
         return outValues;
     }
+
+    static class NinebotUnpacker {
+        enum UnpackerState {
+            unknown,
+            started,
+            collecting,
+            done
+        }
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int oldc = 0;
+        int len = 0;
+        UnpackerState state = UnpackerState.unknown;
+        byte[] getBuffer() {
+            return buffer.toByteArray();
+        }
+        boolean addChar(int c) {
+            switch (state) {
+                case collecting:
+                    buffer.write(c);
+                    if (buffer.size() == len+6) {
+                        protocolFound = true;
+                        state = UnpackerState.done;
+                        updateStep = 0;
+                        Timber.i("Len %d", len);
+                        Timber.i("Step reset");
+                        return true;
+                    }
+                    break;
+                case started:
+                    buffer.write(c);
+                    len = c & 0xff;
+                    state = UnpackerState.collecting;
+                    break;
+                default:
+                    if (c == (byte) 0xAA && oldc == (byte) 0x55) {
+                        Timber.i("Find start");
+                        buffer = new ByteArrayOutputStream();
+                        buffer.write(0x55);
+                        buffer.write(0xAA);
+                        state = UnpackerState.started;
+                    }
+                    oldc = c;
+            }
+            return false;
+        }
+    }
+
 
     static class NinebotZUnpacker {
 
@@ -688,6 +808,7 @@ public class NinebotZAdapter {
 
                     buffer.write(c);
                     if (buffer.size() == len+9) {
+                        protocolFound = true;
                         state = UnpackerState.done;
                         updateStep = 0;
                         Timber.i("Len %d", len);

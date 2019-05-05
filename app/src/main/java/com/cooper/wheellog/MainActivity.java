@@ -599,10 +599,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 tvTemperature2.setVisibility(View.GONE);
                 tvTitleMode.setVisibility(View.GONE);
                 tvMode.setVisibility(View.GONE);
-                tvTitleAngle.setVisibility(View.VISIBLE);
-                tvAngle.setVisibility(View.VISIBLE);
-                tvTitleRoll.setVisibility(View.VISIBLE);
-                tvRoll.setVisibility(View.VISIBLE);
+                tvTitleAngle.setVisibility(View.GONE);
+                tvAngle.setVisibility(View.GONE);
+                tvTitleRoll.setVisibility(View.GONE);
+                tvRoll.setVisibility(View.GONE);
                 tvTitleTotalDistance.setVisibility(View.VISIBLE);
                 tvTotalDistance.setVisibility(View.VISIBLE);
                 tvTitleModel.setVisibility(View.VISIBLE);
@@ -728,8 +728,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         LineDataSet dataSetCurrent;
 
                         if (chart1.getData() == null) {
-                            dataSetSpeed = new LineDataSet(null, "speed");
-                            dataSetCurrent = new LineDataSet(null, "current");
+                            dataSetSpeed = new LineDataSet(null, getString(R.string.speed));
+                            dataSetCurrent = new LineDataSet(null, getString(R.string.current));
                             dataSetSpeed.setLineWidth(2);
                             dataSetCurrent.setLineWidth(2);
                             dataSetSpeed.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -749,8 +749,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             findViewById(R.id.leftAxisLabel).setVisibility(View.VISIBLE);
                             findViewById(R.id.rightAxisLabel).setVisibility(View.VISIBLE);
                         } else {
-                            dataSetSpeed = (LineDataSet) chart1.getData().getDataSetByLabel("speed", true);
-                            dataSetCurrent = (LineDataSet) chart1.getData().getDataSetByLabel("current", true);
+                            dataSetSpeed = (LineDataSet) chart1.getData().getDataSetByLabel(getString(R.string.speed), true);
+                            dataSetCurrent = (LineDataSet) chart1.getData().getDataSetByLabel(getString(R.string.current), true);
                         }
 
                         dataSetSpeed.clear();
@@ -912,12 +912,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
-        Typeface typefacePrime = Typefaces.get(this, "fonts/prime.otf");
+        //Typeface typefacePrime = Typefaces.get(this, "fonts/prime.otf");
+        Typeface tf = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
         TextClock textClock = (TextClock) findViewById(R.id.textClock);
         TextView tvWaitText = (TextView) findViewById(R.id.tvWaitText);
-        textClock.setTypeface(typefacePrime);
-        tvWaitText.setTypeface(typefacePrime);
-        tvLivemapStatus.setTypeface(typefacePrime);
+        textClock.setTypeface(tf);
+        tvWaitText.setTypeface(tf);
+        tvLivemapStatus.setTypeface(tf);
 
         chart1 = (LineChart) findViewById(R.id.chart);
         chart1.setDrawGridBackground(false);
@@ -928,7 +929,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         chart1.getLegend().setTextColor(getResources().getColor(android.R.color.white));
         chart1.setNoDataTextColor(getResources().getColor(android.R.color.white));
         chart1.setNoDataText(getResources().getString(R.string.waiting_for_wheel));
-        chart1.setNoDataTextTypeface(typefacePrime);
+        chart1.setNoDataTextTypeface(tf);
 
         YAxis leftAxis = chart1.getAxisLeft();
         YAxis rightAxis = chart1.getAxisRight();
@@ -956,10 +957,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
+        /*
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
         }
+        */
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
@@ -970,7 +973,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
+            //finish();
         } else if (!mBluetoothAdapter.isEnabled()) {
             // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
             // fire an intent to display a dialog asking the user to grant permission to enable it.
@@ -1313,8 +1316,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         Intent livemapServiceIntent = new Intent(getApplicationContext(), LivemapService.class);
         if (LivemapService.isInstanceCreated())
             stopService(livemapServiceIntent);
-        else
-            startService(livemapServiceIntent);
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(livemapServiceIntent);
+            }
+            else {
+                startService(livemapServiceIntent);
+            }
+        }
     }
 
     private void startBluetoothService() {

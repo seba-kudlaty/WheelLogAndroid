@@ -1,0 +1,241 @@
+<resources>
+    <string-array name="modes">
+        <item>@string/mode_play</item>
+        <item>@string/mode_ride</item>
+        <item>@string/mode_learn</item>
+    </string-array>
+
+    <string-array name="horn_modes">
+        <item>Ανενεργό</item>
+        <item>Ενσωματωμένο (KingSong)</item>
+        <item>Μέσω bluetooth ήχου</item>
+    </string-array>
+
+    <string-array name="horn_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+	
+	<string-array name="pedals_mode">
+        <item>Σκληρό</item>
+        <item>Μεσαίο</item>
+        <item>Μαλακί</item>
+    </string-array>
+	
+	<string-array name="pedals_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+	
+	<string-array name="light_mode_ks">
+        <item>Ενεργό</item>
+        <item>Ανενεργό</item>
+        <item>Αυτόματο</item>
+    </string-array>
+	
+	
+	<string-array name="light_mode_gw">
+        <item>Ανενεργό</item>
+        <item>Ενεργό</item>
+        <item>Ενάλλαξη</item>
+    </string-array>
+	
+	<string-array name="alarm_mode_gw">
+        <item>Απενεργοίηση level 1 συναγερμού</item>
+        <item>Απενεργοίηση level 2 συναγερμού</item>
+        <item>Ενεργοποίηση συναγερμού</item>
+    </string-array>
+	
+	<string-array name="alarm_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>	
+	
+	<string-array name="light_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>	
+	
+	<string-array name="strobe_mode_ks">
+        <item>Ανενεργό</item>
+        <item>Ενεργό</item>        
+    </string-array>
+	
+	<string-array name="strobe_mode_values">
+        <item>0</item>
+        <item>1</item>        
+    </string-array>	
+	
+	<string-array name="led_mode">
+        <item>Ανενεργό</item>
+        <item>Ενεργό</item>        
+    </string-array>
+	
+	<string-array name="led_mode_values">
+        <item>1</item>
+        <item>0</item>        
+    </string-array>
+
+    <string-array name="gotway_voltage">
+        <item>67 V</item>
+        <item>84 V</item>
+        <item>100 V</item>
+    </string-array>
+
+    <string-array name="gotway_voltage_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_pitch">
+        <item>Χαμηλό</item>
+        <item>Κανονικό</item>
+        <item>Υψηλό</item>
+    </string-array>
+
+    <string-array name="speech_pitch_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_rate">
+        <item>Αργά</item>
+        <item>Κανονικά</item>
+        <item>Γρήγορα</item>
+    </string-array>
+
+    <string-array name="speech_rate_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_mode">
+        <item>Ώρα</item>
+        <item>Απόσταση</item>
+    </string-array>
+
+    <string-array name="speech_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="speech_messages">
+        <item>Ταχύτητα</item>
+        <item>Μέση ταχύτητα</item>
+        <item>Μπαταρία</item>
+        <item>Ρεύμα (V)</item>
+        <item>Φορτίο</item>
+        <item>Ισχύ</item>
+        <item>Θερμοκρασία</item>
+        <item>Χρόνος ανάβασης</item>
+        <item>Ώρα</item>
+        <item>Απόσταση κατά την ανάβαση</item>
+        <item>Μπαταρία κινητού</item>
+    </string-array>
+
+    <string-array name="speech_messages_values">
+        <item>speed</item>
+        <item>avgspeed</item>
+        <item>battery</item>
+        <item>voltage</item>
+        <item>current</item>
+        <item>power</item>
+        <item>temperature</item>
+        <item>ridetime</item>
+        <item>time</item>
+        <item>distance</item>
+        <item>phonebattery</item>
+    </string-array>
+
+    <string-array name="livemap_update_interval">
+        <item>5 δευτερόλεπτα</item>
+        <item>10 δευτερόλεπτα</item>
+        <item>15 δευτερόλεπτα</item>
+        <item>30 δευτερόλεπτα</item>
+        <item>1 λεπτό</item>
+        <item>2 λεπτά</item>
+        <item>5 λεπτά</item>
+    </string-array>
+
+    <string-array name="livemap_update_interval_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>300</item>
+    </string-array>
+
+    <string-array name="livemap_publication_delay">
+        <item>Χωρίς καθυστέρηση</item>
+        <item>5 λεπτά</item>
+        <item>15 λεπτά</item>
+        <item>30 λεπτά</item>
+        <item>1 ώρα</item>
+        <item>2 ώρες</item>
+        <item>3 ώρες</item>
+        <item>6 ώρες</item>
+        <item>12 ώρες</item>
+        <item>24 ώρες</item>
+    </string-array>
+
+    <string-array name="livemap_publication_delay_values">
+        <item>0</item>
+        <item>5</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>360</item>
+        <item>720</item>
+        <item>1440</item>
+    </string-array>
+
+    <string-array name="livemap_publish">
+        <item>Εμφανές σε μένα</item>
+        <item>Εμφανές μόνο με τον σύνδεσμο</item>
+        <item>Εμφανές σε όλους</item>
+    </string-array>
+
+    <string-array name="livemap_publish_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_interval">
+        <item>1 λεπτό ή χλμ/μίλι</item>
+        <item>2 λεπτά ή χλμ/μίλια</item>
+        <item>3 λεπτά ή χλμ/μίλια</item>
+        <item>4 λεπτά ή χλμ/μίλια</item>
+        <item>5 λεπτά ή χλμ/μίλια</item>
+        <item>6 λεπτά ή χλμ/μίλια</item>
+        <item>7 λεπτά ή χλμ/μίλια</item>
+        <item>8 λεπτά ή χλμ/μίλια</item>
+        <item>9 λεπτά ή χλμ/μίλια</item>
+        <item>10 λεπτά ή χλμ/μίλια</item>
+    </string-array>
+
+    <string-array name="speech_interval_values">
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>240</item>
+        <item>300</item>
+        <item>360</item>
+        <item>420</item>
+        <item>480</item>
+        <item>540</item>
+        <item>600</item>
+    </string-array>
+
+</resources>

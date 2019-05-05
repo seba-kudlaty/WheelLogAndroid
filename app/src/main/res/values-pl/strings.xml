@@ -213,30 +213,30 @@
     <string name="horn_mode_title">Tryb klaksonu</string>
     <string name="horn_mode_summary">Włącz klakson po naciśnięciu przycisku na zegarku Pebble</string>
     <string name="speech_text_welcome_on_board">Witaj na pokładzie!</string>
-    <string name="speech_phone_battery">Bateria telefonu - %d%%.</string>
-    <string name="speech_text_avg_speed">Średnia prędkość - %s.</string>
+    <string name="speech_phone_battery">Bateria telefonu: %d%%.</string>
+    <string name="speech_text_avg_speed">Średnia prędkość: %s.</string>
     <string name="speech_text_battery">Bateria - %.0f%%.</string>
     <string name="speech_text_connected">Połączony.</string>
     <string name="speech_text_connection_lost">Utracono połączenie.</string>
-    <string name="speech_text_current">Prąd - %.0f amper.</string>
+    <string name="speech_text_current">Prąd: %.0f amper.</string>
     <string name="speech_text_current_too_high">Prąd! Za wysoki!</string>
-    <string name="speech_text_distance">Dystans - %s.</string>
+    <string name="speech_text_distance">Dystans: %s.</string>
     <string name="speech_text_low_battery">Słaba bateria!</string>
     <string name="speech_text_low_phone_battery">Słaba bateria telefonu!</string>
-    <string name="speech_text_power">Moc - %.0f wat.</string>
+    <string name="speech_text_power">Moc: %.0f wat.</string>
     <string name="speech_text_slow_down_1">Zwolnij!</string>
     <string name="speech_text_slow_down_2">Zwolnij!</string>
     <string name="speech_text_slow_down_3">Zwolnij!</string>
-    <string name="speech_text_speed">Prędkość - %s.</string>
+    <string name="speech_text_speed">Prędkość: %s.</string>
     <string name="speech_text_temp_too_high">Temperatura! Za wysoka!</string>
-    <string name="speech_text_temperature">Temperatura - %s.</string>
+    <string name="speech_text_temperature">Temperatura: %s.</string>
     <string name="speech_text_time">Godzina %s.</string>
     <string name="speech_text_time_from_start">%s od startu.</string>
     <string name="speech_text_time_in_motion">%s w ruchu.</string>
-    <string name="speech_text_voltage">Napięcie - %.1f wolt.</string>
+    <string name="speech_text_voltage">Napięcie: %.1f wolt.</string>
     <string name="speech_text_weather">Pogoda.</string>
-    <string name="speech_text_weather_temp">Temperatura - %s.</string>
-    <string name="speech_text_weather_temp_feels">Temperatura - %s, odczuwalna %s.</string>
+    <string name="speech_text_weather_temp">Temperatura: %s.</string>
+    <string name="speech_text_weather_temp_feels">Temperatura: %s, odczuwalna %s.</string>
     <string name="about_wheellog_title">O programie</string>
     <string name="about_text"><![CDATA[Wersja %s skompilowana o %s<br>przez Sebastiana Łastowskiego <a href=\"sebastian@euc.world\">sebastian@euc.world</a><br><br><small>Hej, chcesz skorzystać z funkcji mapy na żywo? Dowiedz się więcej i zarejestruj za darmo w <a href=\"https://euc.world\">https://euc.world</a></small>]]></string>
     <string name="mac_edit_type">Edytuj adres MAC</string>
@@ -256,4 +256,5 @@
     <string name="duration_fmt_hr_and_min">%d hr i %d min</string>
     <string name="show_when_locked_title">Pokaż mimo blokady</string>
     <string name="show_when_locked_summary">Pokaż okno główne nawet jeśli ekran jest zablokowany</string>
+    <string name="notification_livemap_title">Mapa na żywo</string>
 </resources>

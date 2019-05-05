@@ -1,0 +1,241 @@
+<resources>
+    <string-array name="modes">
+        <item>@string/mode_play</item>
+        <item>@string/mode_ride</item>
+        <item>@string/mode_learn</item>
+    </string-array>
+
+    <string-array name="horn_modes">
+        <item>Vypnuto</item>
+        <item>Bzučák (KingSong)</item>
+        <item>Přes bluetooth reproduktory</item>
+    </string-array>
+
+    <string-array name="horn_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="pedals_mode">
+        <item>Tvrdé</item>
+        <item>Normální</item>
+        <item>Měkké</item>
+    </string-array>
+
+    <string-array name="pedals_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="light_mode_ks">
+        <item>On</item>
+        <item>Off</item>
+        <item>Automaticky</item>
+    </string-array>
+
+
+    <string-array name="light_mode_gw">
+        <item>Off</item>
+        <item>On</item>
+        <item>Blikání</item>
+    </string-array>
+
+    <string-array name="alarm_mode_gw">
+        <item>Vypnout upozornění 1. úrovně</item>
+        <item>Vypnout upozornění 2. úrovně</item>
+        <item>Vypnout upozornění</item>
+    </string-array>
+
+    <string-array name="alarm_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="light_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="strobe_mode_ks">
+        <item>Off</item>
+        <item>On</item>
+    </string-array>
+
+    <string-array name="strobe_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="led_mode">
+        <item>Off</item>
+        <item>On</item>
+    </string-array>
+
+    <string-array name="led_mode_values">
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
+    <string-array name="gotway_voltage">
+        <item>67 V</item>
+        <item>84 V</item>
+        <item>100 V</item>
+    </string-array>
+
+    <string-array name="gotway_voltage_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_pitch">
+        <item>Hluboká</item>
+        <item>Normální</item>
+        <item>Vysoká</item>
+    </string-array>
+
+    <string-array name="speech_pitch_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_rate">
+        <item>Pomalu</item>
+        <item>Normálně</item>
+        <item>Rychle</item>
+    </string-array>
+
+    <string-array name="speech_rate_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_mode">
+        <item>Čas</item>
+        <item>Vzdálenost</item>
+    </string-array>
+
+    <string-array name="speech_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="speech_messages">
+        <item>Rychlost</item>
+        <item>Průměrná rychlost</item>
+        <item>Baterie</item>
+        <item>Napětí</item>
+        <item>Proud</item>
+        <item>Výkon</item>
+        <item>Teplota</item>
+        <item>Čas jizdy</item>
+        <item>Čas</item>
+        <item>Ujetá vzdálenost</item>
+        <item>Baterie telefonu</item>
+    </string-array>
+
+    <string-array name="speech_messages_values">
+        <item>speed</item>
+        <item>avgspeed</item>
+        <item>battery</item>
+        <item>voltage</item>
+        <item>current</item>
+        <item>power</item>
+        <item>temperature</item>
+        <item>ridetime</item>
+        <item>time</item>
+        <item>distance</item>
+        <item>phonebattery</item>
+    </string-array>
+
+    <string-array name="livemap_update_interval">
+        <item>5 vteřin</item>
+        <item>10 vteřin</item>
+        <item>15 vteřin</item>
+        <item>30 vteřin</item>
+        <item>1 minuta</item>
+        <item>2 minuty</item>
+        <item>5 minut</item>
+    </string-array>
+
+    <string-array name="livemap_update_interval_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>300</item>
+    </string-array>
+
+    <string-array name="livemap_publication_delay">
+        <item>Bez zpoždění</item>
+        <item>5 minut</item>
+        <item>15 minut</item>
+        <item>30 minut</item>
+        <item>1 hodina</item>
+        <item>2 hodiny</item>
+        <item>3 hodiny</item>
+        <item>6 hodin</item>
+        <item>12 hodin</item>
+        <item>24 hodin</item>
+    </string-array>
+
+    <string-array name="livemap_publication_delay_values">
+        <item>0</item>
+        <item>5</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>360</item>
+        <item>720</item>
+        <item>1440</item>
+    </string-array>
+
+    <string-array name="livemap_publish">
+        <item>Jen já</item>
+        <item>Kdokoliv s odkazem</item>
+        <item>Všichni</item>
+    </string-array>
+
+    <string-array name="livemap_publish_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="speech_interval">
+        <item>1 minuta or km/míle</item>
+        <item>2 minuty or km/míle</item>
+        <item>3 minuty or km/míle</item>
+        <item>4 minuty or km/míle</item>
+        <item>5 minut or km/mil</item>
+        <item>6 minut or km/mil</item>
+        <item>7 minut or km/mil</item>
+        <item>8 minut or km/mil</item>
+        <item>9 minut or km/mil</item>
+        <item>10 minut or km/mil</item>
+    </string-array>
+
+    <string-array name="speech_interval_values">
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>240</item>
+        <item>300</item>
+        <item>360</item>
+        <item>420</item>
+        <item>480</item>
+        <item>540</item>
+        <item>600</item>
+    </string-array>
+
+</resources>

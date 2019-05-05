@@ -776,12 +776,8 @@ public class WheelData {
             new_data = decodeGotway(data);
         else if (mWheelType == WHEEL_TYPE.INMOTION)
             new_data = decodeInmotion(data);
-        else if (mWheelType == WHEEL_TYPE.NINEBOT_Z) {
-            Timber.i("Ninebot_z decoding");
+        else if (mWheelType == WHEEL_TYPE.NINEBOT_Z)
             new_data = decodeNinebot(data);
-
-        }
-
 
         if (!new_data)
 			return;
@@ -1017,7 +1013,7 @@ public class WheelData {
             Timber.i(status.toString());
             if (status instanceof NinebotZAdapter.serialNumberStatus) {
                 mSerialNumber = ((NinebotZAdapter.serialNumberStatus) status).getSerialNumber();
-                mModel = "Ninebot Z";
+                mModel = ((NinebotZAdapter.serialNumberStatus) status).getModel();
             } else if (status instanceof NinebotZAdapter.versionStatus){
                 mVersion = ((NinebotZAdapter.versionStatus) status).getVersion();
             } else {
@@ -1232,6 +1228,11 @@ public class WheelData {
                         InMotionAdapter.getInstance().startKeepAliveTimer(mBluetoothLeService, inmotionPassword);
                         return true;
                     }
+                    return false;
+                } else if (mContext.getResources().getString(R.string.ninebot).equals(wheel_Type)) {
+                    /*
+                        TODO: Need to buy or rent a 9B wheel to add & test support for Ninebot protocol
+                    */
                     return false;
                 } else if (mContext.getResources().getString(R.string.ninebot_z).equals(wheel_Type)) {
                     Timber.i("Trying to start Ninebot");

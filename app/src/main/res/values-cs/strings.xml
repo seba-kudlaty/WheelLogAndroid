@@ -1,0 +1,359 @@
+<resources>
+    <string name="app_name" translatable="false">WheelLog</string>
+
+    <string name="unknown_device">Neznámé zařízení</string>
+    <string name="ble_not_supported">Bluetooth LE není podporován</string>
+    <string name="error_bluetooth_not_supported">Bluetooth není na Vašem zařízení podporován</string>
+    <string name="error_bluetooth_not_initialised">Problém s inicilizací bluetooth, ukončuji</string>
+    <string name="bluetooth_required">Nepodařilo se aktivovat bluetooth, který je k nutný.</string>
+    <string name="bluetooth_direct_connect_failed">Příme spojení selhalo. Hledám jednokolku.</string>
+    <string name="back_to_exit">Stiskni zpět pro ukončení</string>
+    <string name="scan">Skenovat</string>
+    <string name="stop">Stop</string>
+    <string name="connect">Připojit</string>
+    <string name="connecting">Připojování</string>
+    <string name="searching">Hledání</string>
+    <string name="disconnected">Odpojeno</string>
+    <string name="connected">Připojeno</string>
+    <string name="connection_failed">Připojení selhalo</string>
+    <string name="disconnect">Odpojit</string>
+    <string name="connect_to_wheel">Připojit k jednokolce</string>
+    <string name="disconnect_from_wheel">Odpojit od jednokolky</string>
+    <string name="wheel_disconnected">Jednokolka odpojena</string>
+    <string name="wheel_connecting">Připojuji k jednokolce…</string>
+    <string name="wheel_searching">Hledám jednokolku…</string>
+    <string name="wheel_connected">Jednokolka připojena</string>
+    <string name="waiting_for_device">Čekám na zařízení</string>
+    <string name="start_pebble_service">Zapnout Pebble Dash</string>
+    <string name="stop_pebble_service">Vypnout Pebble Dash</string>
+    <string name="start_data_service">Zapnout záznam</string>
+    <string name="stop_data_service">Zastavit záznam</string>
+    <string name="start_speech_service">Zapnout hlasové zprávy</string>
+    <string name="stop_speech_service">Vypnout hlasové zprávy</string>
+    <string name="started_logging">Zaznamenávám do %1$s</string>
+    <string name="wheel_type_recognized">Detekován EUC protokol %1$s</string>
+    <string name="search_for_wheel">Hledat jednokolku</string>
+    <string name="scanning">Hledám…</string>
+    <string name="devices">Zařízení</string>
+    <string name="mode_learn">Začátečník</string>
+    <string name="mode_play">Expert</string>
+    <string name="mode_ride">Normální</string>
+    <string name="waiting_for_wheel">Čekám na jednokolku…</string>
+    <string name="speed">Rychlost</string>
+    <string name="average_speed">Prům. rychlost</string>
+    <string name="average_riding_speed">Čistá prům. rychlost</string>
+    <string name="top_speed">Max. rychlost</string>
+    <string name="battery">Baterie</string>
+    <string name="distance">Najeto</string>
+    <string name="wheel_distance">Najeto (jednokolka)</string>
+    <string name="user_distance">Najeto (uživatel)</string>
+    <string name="ride_time">Celková doba</string>
+    <string name="riding_time">Doba jízdy</string>
+    <string name="voltage">Napětí</string>
+    <string name="current">Proud</string>
+    <string name="power">Výkon</string>
+    <string name="temperature">Teplota desky</string>
+    <string name="temperature2">Teplota baterie</string>
+    <string name="angle">Angle</string>
+    <string name="roll">Roll</string>
+    <string name="fan_status">Větrání</string>
+    <string name="mode">Mód</string>
+    <string name="total_distance">Najeto celkem</string>
+    <string name="total">Celkem</string>
+    <string name="name">Jméno</string>
+    <string name="model">Model</string>
+    <string name="version">Verze</string>
+    <string name="serial_number">Sériové číslo</string>
+    <string name="notification_text">%1$d%% • %2$d°C • %3$.1f km</string>
+    <string name="icon_watch">Ikona hodinek</string>
+    <string name="icon_logging">Ikona záznamu</string>
+    <string name="icon_connection">Ikona připojení</string>
+    <string name="icon_speech">Ikona hlásek</string>
+    <string name="connection_lost_at">Spojení ztraceno v %1s</string>
+
+    <string name="logging_error_no_storage_permission">Přístup k uložišti zamítnut. Záznam vypnut.</string>
+    <string name="logging_error_storage_unavailable">Uložiště není dostupné. Záznam vypnut.</string>
+    <string name="logging_error_no_location_permission">Záznam polohy byl nastaven, ale povolení k přistupu k poloze nebylo uděleno. Poloha nebude zaznamenávána.</string>
+    <string name="logging_error_gps_disabled">Záznam polohy pomocí GPS byl nastaven, ale GPS je vypnutá. Poloha pro záznam bude určena pomocí mobilní sítě.</string>
+    <string name="logging_error_network_disabled">Záznam polohy pomocí GSM byl nastaven, ale v nastavení systému zařízení není povolen. Poloha nebude zaznamenávána.</string>
+    <string name="logging_error_all_location_providers_disabled">Určení polohy je vypnuté v systému Android. Poloha nebude zaznamenávána.</string>
+    <string name="raw_distance">Najeto (bez filtrů)</string>
+
+    <string name="alarm_text_speed">Rychlost byla překročena!</string>
+    <string name="alarm_text_current">Proud byl překročen!</string>
+    <string name="alarm_text_temperature">Teplota byla překročena!</string>
+
+    <string name="livemap_error_no_location_permission">Live mapa vyžaduje povolení k přístupu k poloze.</string>
+    <string name="livemap_error_no_gps_provider">GPS je nutná k použití Live mapy, ale není k dispozici.</string>
+    <string name="livemap_offline">Live mapa vypnuta</string>
+    <string name="livemap_gps_wait">Čekám na GPS...</string>
+    <string name="livemap_live">Live mapa vysílá!</string>
+    <string name="livemap_last_update">Poslední update v  %1$s</string>
+
+    // PREFERENCES
+    <string name="general_preferences" translatable="false">speed_preferences</string>
+    <string name="log_preferences" translatable="false">log_preferences</string>
+    <string name="alarm_preferences" translatable="false">alarm_preferences</string>
+    <string name="watch_preferences" translatable="false">watch_preferences</string>
+    <string name="wheel_settings" translatable="false">wheel_settings</string>
+    <string name="trip_settings" translatable="false">trip_settings</string>
+    <string name="speech_preferences" translatable="false">speech_preferences</string>
+    <string name="speech_messages_preferences" translatable="false">speech_messages_preferences</string>
+    <string name="livemap_preferences" translatable="false">livemap_preferences</string>
+
+    // ALARM PREFERENCES
+    <string name="alarms_enabled" translatable="false">alarms_enabled</string>
+    <string name="disable_phone_vibrate" translatable="false">disable_phone_vibrate</string>
+    <string name="alarm_1_speed" translatable="false">alarm_1_speed</string>
+    <string name="alarm_1_battery" translatable="false">alarm_1_battery</string>
+    <string name="alarm_2_speed" translatable="false">alarm_2_speed</string>
+    <string name="alarm_2_battery" translatable="false">alarm_2_battery</string>
+    <string name="alarm_3_speed" translatable="false">alarm_3_speed</string>
+    <string name="alarm_3_battery" translatable="false">alarm_3_battery</string>
+    <string name="alarm_current" translatable="false">alarm_current</string>
+    <string name="alarm_temperature" translatable="false">alarm_temperature</string>
+
+    // WHEEL SETTINGS
+    <string name="light_enabled" translatable="false">light_enabled</string>
+    <string name="led_enabled" translatable="false">led_enabled</string>
+    <string name="handle_button_disabled" translatable="false">handle_button_disabled</string>
+    <string name="wheel_max_speed" translatable="false">wheel_max_speed</string>
+    <string name="speaker_volume" translatable="false">speaker_volume</string>
+    <string name="pedals_adjustment" translatable="false">pedals_adjustment</string>
+    <string name="pedals_mode" translatable="false">pedals_mode</string>
+    <string name="light_mode" translatable="false">light_mode</string>
+    <string name="strobe_mode" translatable="false">strobe_mode</string>
+    <string name="led_mode" translatable="false">led_mode</string>
+    <string name="start_calibration" translatable="false">start_calibration</string>
+    <string name="alarm_mode" translatable="false">alarm_mode</string>
+    <string name="gotway_84v" translatable="false">gotway_84v</string>
+    <string name="gotway_voltage" translatable="false">gotway_voltage</string>
+    <string name="no_settings" translatable="false">no_settings</string>
+
+    // LOG PREFERENCES
+    <string name="auto_log" translatable="false">auto_log</string>
+    <string name="auto_upload" translatable="false">auto_upload</string>
+    <string name="log_location_data" translatable="false">log_location_data</string>
+    <string name="use_gps" translatable="false">use_gps</string>
+
+    // GENERAL PREFERENCES
+    <string name="use_mi" translatable="false">use_mi</string>
+    <string name="use_f" translatable="false">use_f</string>
+    <string name="max_speed" translatable="false">max_speed</string>
+    <string name="use_ratio" translatable="false">use_ratio</string>
+
+    // WATCH PREFERENCES
+    <string name="horn_mode" translatable="false">horn_mode</string>
+
+    // TRIP PREFERENCES
+    <string name="reset_top_speed" translatable="false">reset_top_speed</string>
+    <string name="reset_user_distance" translatable="false">reset_user_distance</string>
+    <string name="last_mac" translatable="false">last_mac</string>
+    <string name="about" translatable="false">about</string>
+
+    // LIVEMAP PREFERENCES
+    <string name="livemap_api_key" translatable="false">livemap_api_key</string>
+    <string name="livemap_update_interval" translatable="false">livemap_update_interval</string>
+    <string name="livemap_publish" translatable="false">livemap_publish</string>
+    <string name="livemap_publication_delay" translatable="false">livemap_publication_delay</string>
+    <string name="livemap_start_new_segment" translatable="false">livemap_start_new_segment</string>
+
+    // SPEECH PREFERENCES
+    <string name="speech_messages" translatable="false">speech_messages</string>
+    <string name="speech_msg_interval" translatable="false">speech_msg_rate</string>
+    <string name="speech_enable" translatable="false">speech_enable</string>
+    <string name="speech_rate" translatable="false">speech_rate</string>
+    <string name="speech_pitch" translatable="false">speech_pitch</string>
+    <string name="speech_only_when_moving" translatable="false">speech_only_when_moving</string>
+    <string name="speech_msg_mode" translatable="false">speech_msg_mode</string>
+    <string name="speech_enable_on_startup" translatable="false">speech_enable_on_startup</string>
+    <string name="speech_messages_speed" translatable="false">speech_messages_speed</string>
+    <string name="speech_messages_avg_speed" translatable="false">speech_messages_avg_speed</string>
+    <string name="speech_messages_distance" translatable="false">speech_messages_distance</string>
+    <string name="speech_messages_battery" translatable="false">speech_messages_battery</string>
+    <string name="speech_messages_phone_battery" translatable="false">speech_messages_phone_battery</string>
+    <string name="speech_messages_voltage" translatable="false">speech_messages_voltage</string>
+    <string name="speech_messages_current" translatable="false">speech_messages_current</string>
+    <string name="speech_messages_power" translatable="false">speech_messages_power</string>
+    <string name="speech_messages_temperature" translatable="false">speech_messages_temperature</string>
+    <string name="speech_messages_time" translatable="false">speech_messages_time</string>
+    <string name="speech_messages_time_from_start" translatable="false">speech_messages_time_from_start</string>
+    <string name="speech_messages_time_in_motion" translatable="false">speech_messages_time_in_motion</string>
+    <string name="speech_messages_battery_low_level" translatable="false">speech_messages_battery_low_level</string>
+    <string name="speech_messages_phone_battery_low_level" translatable="false">speech_messages_phone_battery_low_level</string>
+    <string name="speech_messages_distance_use_location" translatable="false">speech_messages_distance_use_location</string>
+    <string name="speech_messages_weather" translatable="false">speech_messages_weather</string>
+    <string name="livemap_api_connected">Připojeno!</string>
+    <string name="livemap_api_error_general">Chyba serveru. Zkuste to později.</string>
+    <string name="livemap_api_error_invalid_api_key">Přihlášení selhalo. Zkontrolujte klíč API.</string>
+    <string name="livemap_api_error_accound_needs_activation">Před použitím je třeba aktivovat účet.</string>
+    <string name="livemap_api_error_forbidden">Přístup k serveru odepřen.</string>
+    <string name="livemap_api_error_unknown">Neznámá chyba. Zkuste to později.</string>
+    <string name="livemap_api_error_no_connection">Bez připojení. Zkontrolujte dostupnost internetu.</string>
+    <string name="livemap_connecting">Připojování…</string>
+    <string name="speech_messages_weather_title">Počasí</string>
+    <string name="speech_messages_weather_summary">Dostupné pokud Live mapa vysílá</string>
+    <string name="speech_messages_time_in_motion_title">Doba v pohybu</string>
+    <string name="speech_messages_time_from_start_title">Doba od startu</string>
+    <string name="speech_messages_temperature_title">Teplota</string>
+    <string name="speech_messages_time_title">Aktuální čas</string>
+    <string name="speech_messages_speed_title">Aktuální rychlost</string>
+    <string name="speech_messages_avg_speed_title">Průměrná rychlost</string>
+    <string name="speech_messages_distance_title">Najeto</string>
+    <string name="speech_messages_battery_title">Úroveň baterie</string>
+    <string name="speech_messages_phone_battery_title">Úroveň baterie telefonu</string>
+    <string name="speech_messages_voltage_title">Napětí</string>
+    <string name="speech_messages_current_title">Proud</string>
+    <string name="speech_messages_power_title">Výkon</string>
+    <string name="speech_messages_warning_messages_title">Upozornění</string>
+    <string name="speech_messages_battery_low_level_title">Slabá baterie</string>
+    <string name="speech_messages_phone_battery_low_level_title">Slabá baterie telefonu</string>
+    <string name="speech_enable_on_startup_title">Zapnout hl. zprávy při spuštění</string>
+    <string name="speech_rate_title">Rychlost řeči</string>
+    <string name="speech_pitch_title">Výška hlasu</string>
+    <string name="speech_only_when_moving_title">Vypnout hlas při stání</string>
+    <string name="speech_only_when_moving_summary">Pozastavit hlasové zprávy, když jednokolka stojí.</string>
+    <string name="speech_msg_mode_title">Interval čas/km</string>
+    <string name="speech_msg_interval_title">Délka intervalu</string>
+    <string name="speech_messages_preferences_title">Nastavení zpráv</string>
+    <string name="last_mac_title">Upravit MAC adresu</string>
+    <string name="about_title">O WheelLogu</string>
+    <string name="reset_user_distance_title">Vynulovat uživatelskou vzdálenost</string>
+    <string name="reset_top_speed_title">Vynulovat maximální rychlost</string>
+    <string name="wheel_settings_title">Nastavení jednokolky</string>
+    <string name="watch_preferences_title">Nastavení hodinek</string>
+    <string name="speech_preferences_title">Nastavení hlasu</string>
+    <string name="livemap_preferences_title">Nastavení Live mapy</string>
+    <string name="alarm_preferences_title">Nastavení upozornění</string>
+    <string name="log_preferences_title">Nastavení záznamu</string>
+    <string name="general_preferences_title">Obecná nastavení</string>
+    <string name="alarms_enabled_title">Zapnout upozornění</string>
+    <string name="alarms_enabled_summary">Zapnout vibrace nebo hlasové zprávy jako upozornění.</string>
+    <string name="disable_phone_vibrate_title">Vypnout vybrace telefonu</string>
+    <string name="disable_phone_vibrate_summary">Místo vybrací telefonu vybrovat pomocí Pebble.</string>
+    <string name="speed_alarm_1_title">Upozornění na rychlost - nejvyšší prio.</string>
+    <string name="alarm_1_speed_title">Rychlost</string>
+    <string name="alarm_1_speed_summary">Rychlost spouštící upozornění</string>
+    <string name="alarm_1_battery_title">Úroveň baterie</string>
+    <string name="alarm_1_battery_summary">Při této nebo menší úrovni baterie spusť upozornění</string>
+    <string name="speed_alarm_2_title">Upozornění na rychlost - střední prio.</string>
+    <string name="alarm_2_speed_title">Rychlost</string>
+    <string name="alarm_2_speed_summary">Rychlost spouštící upozornění</string>
+    <string name="alarm_2_battery_title">Úroveň baterie</string>
+    <string name="alarm_2_battery_summary">Při této nebo menší úrovni baterie spusť upozornění</string>
+    <string name="speed_alarm_3_title">Upozornění na rychlost - malá prio.</string>
+    <string name="alarm_3_speed_title">Rychlost</string>
+    <string name="alarm_3_speed_summary">Rychlost spouštící upozornění</string>
+    <string name="alarm_3_battery_title">Úroveň baterie</string>
+    <string name="alarm_3_battery_summary">Při této nebo menší úrovni baterie spusť upozornění</string>
+    <string name="current_alarm_title">Proudová upozornění</string>
+    <string name="alarm_current_title">Proud</string>
+    <string name="alarm_current_summary">Proud spouštící upozornění</string>
+    <string name="temperature_alarm_title">Teplotní upozornění</string>
+    <string name="alarm_temperature_title">Teplota</string>
+    <string name="alarm_temperature_summary">Teplota spouštící upozornění</string>
+    <string name="use_mi_title">Rychlost a vzdálenost v mílích</string>
+    <string name="use_mi_summary">Zobrazit míle místo kilometrů.</string>
+    <string name="use_f_title">Teplota ve stupních Fahrenheita</string>
+    <string name="use_f_summary">Pužít pro teplotu stupně Fahrenheita místo stupňů Celsia</string>
+    <string name="max_speed_title">Maximální rychlost</string>
+    <string name="max_speed_summary">Maximální rychlost zobrazená ciferníku</string>
+    <string name="light_mode_title">Mód světla</string>
+    <string name="alarm_mode_title">Mód upozornění</string>
+    <string name="alarm_mode_summary">Nastavení upozornění</string>
+    <string name="pedals_mode_title">Nastavení pedálů</string>
+    <string name="pedals_mode_summary">Měkké/Normální/Tvrdé</string>
+    <string name="wheel_max_speed_title">Omezovač rychlosti</string>
+    <string name="wheel_max_speed_summary">Upozornění náklonem, 0=vypnuto</string>
+    <string name="start_calibration_title">Kalibrace</string>
+    <string name="use_ratio_title">Moje jednokolka je Gotway MCM</string>
+    <string name="use_ratio_summary">Pokud je Vaše jednokolka Gotway ACM a ukazuje špatnou rychlost, vzdálenost a další parametry, tohle by mělo pomoct</string>
+    <string name="gotway_voltage_title">Napětí baterie</string>
+    <string name="gotway_voltage_summary">67V/84V/100V</string>
+    <string name="light_enabled_title">Zapínání LED</string>
+    <string name="light_enabled_summary">Zapnout přední světlo</string>
+    <string name="led_enabled_title">Zapnout LEDky</string>
+    <string name="led_enabled_summary">Zapnout LEDky na stranách</string>
+    <string name="handle_button_disabled_title">Vypnout senzor zvednutí</string>
+    <string name="handle_button_disabled_summary">Jednokolka se nevypne při stisku tlačítka v rukojeti.</string>
+    <string name="wheel_max_speed_summary_inmotion">Rychlost, při které je aktivován tilt-back</string>
+    <string name="speaker_volume_title">Hlasitost</string>
+    <string name="speaker_volume_summary">Upravit hlasitost vestavěného reproduktoru</string>
+    <string name="pedals_adjustment_title">Pedály</string>
+    <string name="pedals_adjustment_summary">Úprava náklonu pedálů</string>
+    <string name="light_mode_summary">On/Off/Auto</string>
+    <string name="strobe_mode_title">Blikání</string>
+    <string name="strobe_mode_summary">On/Off</string>
+    <string name="led_mode_title">Mód LED</string>
+    <string name="led_mode_summary">On/Off</string>
+    <string name="wheel_max_speed_summary_kingsong">Rychlost upozornění náklonem</string>
+    <string name="livemap_api_key_title">Klíč API</string>
+    <string name="livemap_api_key_summary">Zadej svůj klíč API pro aktivaci Live mapy</string>
+    <string name="livemap_update_interval_title">Interval obnovení</string>
+    <string name="livemap_update_interval_summary">Vyber jak často jsou poloha a data jednokolky zasílány na server a zobrazeny v Live mapě</string>
+    <string name="livemap_start_new_segment_title">Pokračovat v předešlé jizdě nebo založit novou</string>
+    <string name="livemap_start_new_segment_summary">Zaškrtni pokud si přeješ pokračovat v předchozí jízdě místo založení nové</string>
+    <string name="livemap_publish_title">Soukromí</string>
+    <string name="livemap_publish_summary">Nastav si kdo uvidí tvou Live mapu</string>
+    <string name="livemap_publication_delay_title">Zpoždění aktualizace Live mapy</string>
+    <string name="livemap_publication_delay_summary">Zde můžeš nastavit zpoždění aktualizace Live mapy od 5 minut po 24 hodin</string>
+    <string name="auto_log_title">Automatické zaznamenávání</string>
+    <string name="auto_log_summary">Záznam započne automaticky po připojení jednokolky</string>
+    <string name="auto_upload_title">Auto upload záznamů</string>
+    <string name="auto_upload_summary">Automaticky nahrávat záznamy na Google Drive</string>
+    <string name="log_location_data_title">Záznam polohy</string>
+    <string name="log_location_data_summary">V rámci záznamu zahrň i polohu</string>
+    <string name="use_gps_title">Použití GPS pro určení polohy</string>
+    <string name="use_gps_summary">Použij GPS místo určení polohy pomocí mobilní sítě. Je to přesnější, ale náročnější na baterii.</string>
+    <string name="no_settings_title">Nastavení Ninebotu Z ještě není dostupné</string>
+    <string name="reset_top_speed_title_2">Vynulovat max. rychlost</string>
+    <string name="reset_user_distance_title_2">Vynulovat uživatelsou rychlost</string>
+    <string name="horn_mode_title">Mód zvonku</string>
+    <string name="horn_mode_summary">Zvonit při stisku tlačítka SELECT na Pebble</string>
+    <string name="speech_text_welcome_on_board">Šťastnou cestu!</string>
+    <string name="speech_text_speed">Rychlost: %s.</string>
+    <string name="speech_text_avg_speed">Průměrná rychlost: %s.</string>
+    <string name="speech_text_distance">Najeto: %s.</string>
+    <string name="speech_text_battery">Baterie: %.0f%%.</string>
+    <string name="speech_phone_battery">Baterie telefonu: %d%%.</string>
+    <string name="speech_text_voltage">Napětí: %.1f voltů.</string>
+    <string name="speech_text_current">Proud: %.0f ampérů.</string>
+    <string name="speech_text_power">Výkon: %.0f watů.</string>
+    <string name="speech_text_temperature">Teplota: %s.</string>
+    <string name="speech_text_time">Čas %s.</string>
+    <string name="speech_text_time_from_start">%s od startu.</string>
+    <string name="speech_text_time_in_motion">%s jízdy.</string>
+    <string name="speech_text_weather">Počasí.</string>
+    <string name="speech_text_weather_temp">Teplota: %s.</string>
+    <string name="speech_text_weather_temp_feels">Teplota: %s, pocitově %s.</string>
+    <string name="speech_text_low_battery">Slabá batrie!</string>
+    <string name="speech_text_low_phone_battery">Slabá baterie telefonu!</string>
+    <string name="speech_text_connected">Připojeno.</string>
+    <string name="speech_text_connection_lost">Připojení přerušeno.</string>
+    <string name="speech_text_current_too_high">Příliš vysoký proud!</string>
+    <string name="speech_text_temp_too_high">Příliš vysoká teplota</string>
+    <string name="speech_text_slow_down_3">Zpomal!</string>
+    <string name="speech_text_slow_down_2">Zpomal!</string>
+    <string name="speech_text_slow_down_1">Zpomal!</string>
+    <string name="about_wheellog_title">O WheelLogu</string>
+    <string name="about_text"><![CDATA[Verze %s z %s<br>od Sebastiána Łastowského <a href=\"sebastian@euc.world\">sebastian@euc.world</a><br><br><small>Pokud se chceš dozvědět více o Live mapě a používat jí zaregistruj se na <a href=\"https://euc.world\">https://euc.world</a></small>]]></string>
+    <string name="mac_edit_type">Úprava MAC</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Zruš</string>
+    <string name="wheel_password">Heslo jednokolky ( jen InMotion )</string>
+    <string name="speed_settings">Nastavení rychlosti</string>
+    <string name="enable_auto_upload_title">Zapnout automatické nahrávání?</string>
+    <string name="enable_auto_upload_text">Automatické nahrávání během přopojení přes mobilní data (mimo WiFi) může být zpoplatněno tvým operátorem.</string>
+    <string name="settings_title">Nastavení</string>
+    <string name="link_livemap_subject">Odkaz na mou projížďku</string>
+    <string name="share_livemap">Sdílet projížďku</string>
+    <string name="fan_off">Off</string>
+    <string name="fan_on">On</string>
+    <string name="duration_fmt_min">%d min</string>
+    <string name="duration_fmt_hr">%d hr</string>
+    <string name="duration_fmt_hr_and_min">%d hr a %d min</string>
+    <string name="show_when_locked_title">Zobrazit při zamčení</string>
+    <string name="show_when_locked_summary">Zobra﻿zit hlavní údaje i﻿ při zamčené obr﻿azovc﻿e</string>
+    <string name="notification_livemap_title">Live mapa</string>
+
+</resources>

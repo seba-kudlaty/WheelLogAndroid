@@ -22,7 +22,7 @@
 		android:key="@string/livemap_update_interval"
 		android:title="@string/livemap_update_interval_title"
 		android:dependency="@string/livemap_api_key"
-		android:defaultValue="15"
+		android:defaultValue="5"
 		android:entries="@array/livemap_update_interval"
 		android:entryValues="@array/livemap_update_interval_values"
 		android:summary="@string/livemap_update_interval_summary" />
