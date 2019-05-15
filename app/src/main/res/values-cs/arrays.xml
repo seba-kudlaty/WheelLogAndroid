@@ -155,23 +155,23 @@
     </string-array>
 
     <string-array name="livemap_update_interval">
+        <item>1 vteřina</item>
+        <item>2 vteřiny</item>
         <item>5 vteřin</item>
         <item>10 vteřin</item>
         <item>15 vteřin</item>
         <item>30 vteřin</item>
         <item>1 minuta</item>
-        <item>2 minuty</item>
-        <item>5 minut</item>
     </string-array>
 
     <string-array name="livemap_update_interval_values">
+        <item>1</item>
+        <item>2</item>
         <item>5</item>
         <item>10</item>
         <item>15</item>
         <item>30</item>
         <item>60</item>
-        <item>120</item>
-        <item>300</item>
     </string-array>
 
     <string-array name="livemap_publication_delay">

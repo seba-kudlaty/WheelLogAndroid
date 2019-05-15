@@ -2,7 +2,6 @@ package com.cooper.wheellog;
 
 import android.Manifest;
 import android.app.Fragment;
-import android.app.KeyguardManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
@@ -51,7 +50,6 @@ import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 import com.cooper.wheellog.utils.Constants.ALARM_TYPE;
 import com.cooper.wheellog.utils.HttpClient;
 import com.cooper.wheellog.utils.SettingsUtil;
-import com.cooper.wheellog.utils.Typefaces;
 import com.cooper.wheellog.views.WheelView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -270,7 +268,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                     setBtnState(ibLivemapPhoto, false, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
                                     tvLivemapStatus.setText(getString(R.string.livemap_live));
                                 }
-                                tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
+                                if (LivemapService.isInstanceCreated())
+                                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
                                 break;
                             default:
                                 tvLivemapLastUpdated.setText("");

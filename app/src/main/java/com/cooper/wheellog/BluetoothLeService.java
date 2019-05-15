@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.cooper.wheellog.utils.*;
 import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 
-import java.io.IOException;
 import java.util.*;
 
 import timber.log.Timber;

@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.cooper.wheellog.R;
-import com.cooper.wheellog.utils.Typefaces;
 
 import java.util.Locale;
 

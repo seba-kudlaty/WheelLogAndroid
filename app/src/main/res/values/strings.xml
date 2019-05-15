@@ -356,5 +356,6 @@
     <string name="show_when_locked" translatable="false">show_when_locked</string>
     <string name="show_when_locked_title">Show when locked</string>
     <string name="show_when_locked_summary">Show main window even if the screen is locked</string>
+    <string name="livemap_api_error_server">Temporary server error. Please try again later.</string>
 
 </resources>

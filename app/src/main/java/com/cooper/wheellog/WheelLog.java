@@ -1,8 +1,6 @@
 package com.cooper.wheellog;
 
 import android.app.Application;
-import timber.log.Timber;
-import com.cooper.wheellog.FileLoggingTree;
 
 
 public class WheelLog extends Application {

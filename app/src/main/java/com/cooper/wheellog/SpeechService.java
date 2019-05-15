@@ -1,6 +1,5 @@
 package com.cooper.wheellog;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
