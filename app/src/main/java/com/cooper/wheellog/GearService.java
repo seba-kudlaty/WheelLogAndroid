@@ -132,16 +132,16 @@ LocationListener locationListener = new LocationListener() {
                 if (WheelData.getInstance()!=null) {
                     message = String.format(Locale.ROOT, "{ \"speed\":%.2f," +
                                     "\"voltage\":%.2f,\"current\":%.2f,\"power\":%.2f," +
-                                    "\"batteryLevel\":%d,\"distance\":%d,\"totalDistance\":%d,\"temperature\":%d," +
+                                    "\"batteryLevel\":%d,\"distance\":\"%s\",\"totalDistance\":%d,\"temperature\":%d," +
                                     "\"temperature2\":%d," +
                                     "\"angle\":%.2f,\"roll\":%.2f",
 //                        "\"mode\":%s,\"alert\":%s"+
-                            WheelData.getInstance().getSpeedDouble(),
+                            WheelData.getInstance().getSpeedForTizen(),
                             WheelData.getInstance().getVoltageDouble(),
                             WheelData.getInstance().getCurrentDouble(),
                             WheelData.getInstance().getPowerDouble(),
                             WheelData.getInstance().getBatteryLevel(),
-                            WheelData.getInstance().getDistance(),
+                            WheelData.getInstance().getDistanceForTizen(),
                             WheelData.getInstance().getTotalDistance(),
                             WheelData.getInstance().getTemperature(),
                             WheelData.getInstance().getTemperature2(),

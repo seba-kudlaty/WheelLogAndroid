@@ -1,5 +1,6 @@
 package com.cooper.wheellog;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class SpeechService extends Service implements TextToSpeech.OnInitListener {
@@ -30,13 +33,39 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     private static SpeechService instance = null;
     private TextToSpeech tts;
     private AudioManager am;
+    private BatteryManager bm;
+    private boolean ttsWheelConnected = false;
     private boolean ttsEnabled = false;
     private long ttsLastWheelData = 0;
-    private BatteryManager bm;
+    private long ttsLastDisconnected = 0;
+    private long ttsWheelDataAge = 0;
     private HashMap<String, String> ttsMap;
+    private Timer timer;
 
     public static boolean isInstanceCreated() {
         return instance != null;
+    }
+
+    private void timerStart() {
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                long now = SystemClock.elapsedRealtime();
+                // Wheel connection lost/stale warning
+                if (BluetoothLeService.getConnectionState() > BluetoothLeService.STATE_DISCONNECTED &&  (now - ttsLastDisconnected) >= 5000 && (now - ttsWheelDataAge) >= 2000) {
+                    if (ttsWheelConnected) {
+                        ttsWheelConnected = false;
+                        say(getString(R.string.speech_text_connection_lost), "warning1");
+                    }
+                    else {
+                        ttsLastDisconnected = now;
+                        say("", "warning1", 0);
+                    }
+                }
+            }
+        };
+        timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 0, 100);
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -47,36 +76,45 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             switch (action) {
                 case Constants.ACTION_BLUETOOTH_CONNECTION_STATE:
                     int connectionState = intent.getIntExtra(Constants.INTENT_EXTRA_CONNECTION_STATE, BluetoothLeService.STATE_DISCONNECTED);
-                    if (connectionState == BluetoothLeService.STATE_CONNECTED) {
-                        say(getString(R.string.speech_text_connected), "info");
-                    }
-                    else
-                    if (connectionState == BluetoothLeService.STATE_CONNECTING) {
-                        if (ttsLastWheelData > 0)
-                            say(getString(R.string.speech_text_connection_lost), "warning1");
+                    switch (connectionState) {
+                        case BluetoothLeService.STATE_CONNECTED:
+                            break;
+                        case BluetoothLeService.STATE_DISCONNECTED:
+                            ttsLastDisconnected = 0;
+                            ttsLastWheelData = 0;
+                            ttsWheelDataAge = 0;
+                            ttsWheelConnected = false;
+                            break;
+                        case BluetoothLeService.STATE_CONNECTING:
+                            break;
                     }
                     break;
                 case Constants.ACTION_WHEEL_DATA_AVAILABLE:
+                    ttsWheelDataAge = SystemClock.elapsedRealtime();
+                    if (!ttsWheelConnected) {
+                        ttsWheelConnected = true;
+                        say(getString(R.string.speech_text_connected), "info");
+                    }
                     if (WheelData.getInstance().isCurrentAlarmActive())
-                        say(getString(R.string.speech_text_current_too_high), "alarm", 4);
+                        say(getString(R.string.speech_text_current_too_high), "alarm", 5);
                     else
                     if (WheelData.getInstance().isTemperatureAlarmActive())
-                        say(getString(R.string.speech_text_temp_too_high), "alarm", 4);
+                        say(getString(R.string.speech_text_temp_too_high), "alarm", 5);
                     else
                     if (WheelData.getInstance().isSpeedAlarm1Active())
-                        say(getString(R.string.speech_text_slow_down_3), "warning3", 3);
+                        say(getString(R.string.speech_text_slow_down_3), "warning3", 4);
                     else
                     if (WheelData.getInstance().isSpeedAlarm2Active())
-                        say(getString(R.string.speech_text_slow_down_2), "warning2", 2);
+                        say(getString(R.string.speech_text_slow_down_2), "warning2", 3);
                     else
                     if (WheelData.getInstance().isSpeedAlarm3Active())
-                        say(getString(R.string.speech_text_slow_down_1), "warning1", 1);
+                        say(getString(R.string.speech_text_slow_down_1), "warning1", 2);
                     sayWheelData();
                     break;
                 case Constants.ACTION_SPEECH_SAY:
                     String text = intent.getStringExtra(Constants.INTENT_EXTRA_SPEECH_TEXT);
                     String earcon = intent.getStringExtra(Constants.INTENT_EXTRA_SPEECH_EARCON);
-                    int priority = intent.getIntExtra(Constants.INTENT_EXTRA_SPEECH_PRIORITY, 0);
+                    int priority = intent.getIntExtra(Constants.INTENT_EXTRA_SPEECH_PRIORITY, 1);
                     say(text, earcon, priority);
                     break;
             }
@@ -96,6 +134,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         tts = new TextToSpeech(this, this);
         ttsMap = new HashMap<>();
         ttsMap.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "WheelLogSpeech");
+        timerStart();
     }
 
     @Override
@@ -131,8 +170,8 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                     --sayCount;
                     if (sayCount <= 0) {
                         sayCount = 0;
+                        if (sayPriority > 0) am.abandonAudioFocus(afl);
                         sayPriority = -1;
-                        am.abandonAudioFocus(afl);
                     }
                     Log.d("", String.format(Locale.US, "UtteranceProgressListener: onDone(%s), sayCount = %d", utterance_id, sayCount));
                 }
@@ -155,15 +194,14 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     @Override
     public void onDestroy() {
         instance = null;
+        timer.cancel();
         unregisterReceiver(receiver);
         if (tts != null) {
             tts.stop();
             tts.shutdown();
         }
-
         Intent serviceStartedIntent = new Intent(Constants.ACTION_SPEECH_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, false);
         sendBroadcast(serviceStartedIntent);
-
         super.onDestroy();
     }
 
@@ -176,17 +214,22 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         if (ttsEnabled && (priority > sayPriority)) {
             setPitch(SettingsUtil.getSpeechPitch(this));
             setRate(SettingsUtil.getSpeechRate(this));
-            int res = am.requestAudioFocus(afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+            int res = (priority > 0) ? am.requestAudioFocus(afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK) : AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 if (priority > 0) sayCount = 0;
                 if (!earcon.isEmpty()) {
-                    sayCount += 2;
+                    sayCount += 1;
                     tts.playEarcon(earcon, (priority > 0) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, ttsMap);
-                    tts.speak(text, TextToSpeech.QUEUE_ADD, ttsMap);
+                    if (!text.equals("")) {
+                        sayCount += 1;
+                        tts.speak(text, TextToSpeech.QUEUE_ADD, ttsMap);
+                    }
                 }
                 else {
-                    sayCount += 1;
-                    tts.speak(text, (priority > 0) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, ttsMap);
+                    if (!text.equals("")) {
+                        sayCount += 1;
+                        tts.speak(text, (priority > 0) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, ttsMap);
+                    }
                 }
                 sayPriority = priority;
             }
@@ -194,19 +237,19 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     }
 
     private void say(String text) {
-        say(text, "", 0);
-    }
-
-    private void say(String text, String earcon) {
-        say(text, earcon, 0);
-    }
-
-    private void sayNow(String text) {
         say(text, "", 1);
     }
 
-    private void sayNow(String text, String earcon) {
+    private void say(String text, String earcon) {
         say(text, earcon, 1);
+    }
+
+    private void sayNow(String text) {
+        say(text, "", 2);
+    }
+
+    private void sayNow(String text, String earcon) {
+        say(text, earcon, 2);
     }
 
     private void setPitch(int pitch) {
@@ -231,6 +274,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         }
     }
 
+    @TargetApi(21)
     private int getPhoneBatteryLevel() {
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (bm != null)) {
             return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
@@ -243,9 +287,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         String text = "";
         long now = SystemClock.elapsedRealtime();
         if ((sayPriority == -1) && (now - ttsLastWheelData) > SettingsUtil.getSpeechMsgInterval(this) * 1000) {
-
             ttsLastWheelData = now;
-
             if (!SettingsUtil.getSpeechOnlyInMotion(this) || WheelData.getInstance().getSpeedDouble() >= 3) {
 
                 // Speed

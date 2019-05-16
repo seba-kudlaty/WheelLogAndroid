@@ -357,5 +357,8 @@
     <string name="show_when_locked_title">Show when locked</string>
     <string name="show_when_locked_summary">Show main window even if the screen is locked</string>
     <string name="livemap_api_error_server">Temporary server error. Please try again later.</string>
+    <string name="livemap_image_preparation_error">Error when preparing image for upload</string>
+    <string name="livemap_image_upload_error">Image upload failed</string>
+    <string name="livemap_image_uploaded">Image uploaded successfully</string>
 
 </resources>

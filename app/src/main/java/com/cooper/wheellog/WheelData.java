@@ -493,9 +493,8 @@ public class WheelData {
         return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
     }
 
-    double getSpeedDouble() {
-        return mSpeed / 100.0;
-    }
+    double getSpeedDouble() { return mSpeed / 100.0; }
+    double getSpeedForTizen() { return (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? mSpeed / 160.9 : mSpeed / 100.0; }
 
     double getVoltageDouble() {
         return mVoltage / 100.0;
@@ -516,7 +515,17 @@ public class WheelData {
     }
 
     int getDistance() { return (int) (mTotalDistance - mStartTotalDistance); }
-	
+    String getDistanceForTizen() {
+        double dist = (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? getWheelDistanceDouble() / 1.609 : getWheelDistanceDouble();
+        if (dist >= 10)
+            return String.format(Locale.US, "%.1f", dist);
+        else
+        if (dist >= 1)
+            return String.format(Locale.US, "%.2f", dist);
+        else
+            return String.format(Locale.US, "%.3f", dist);
+    }
+
 	long getWheelDistance() { 
 		return mDistance; 
 	}

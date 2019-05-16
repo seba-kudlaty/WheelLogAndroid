@@ -1,6 +1,7 @@
 package com.cooper.wheellog;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -15,8 +16,11 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -40,6 +44,8 @@ import android.view.MenuItem;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.TextClock;
 import android.widget.TextView;
@@ -78,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import id.zelory.compressor.Compressor;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
@@ -123,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     TextView tvLivemapStatus;
     TextView tvLivemapLastUpdated;
 
-    ImageButton ibEucWorld;
     ImageButton ibLivemapStartFinish;
     ImageButton ibLivemapPause;
     ImageButton ibLivemapShare;
@@ -131,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     LineChart chart1;
 
+    WebView wvEucWorld;
     WheelView wheelView;
 
     private BluetoothLeService mBluetoothLeService;
@@ -138,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private String mDeviceAddress;
     private int mConnectionState = BluetoothLeService.STATE_DISCONNECTED;
     int tourStatus = 0;
-    private String livemapUrl = "";
     private boolean doubleBackToExitPressedOnce = false;
     private Snackbar snackbar;
     int viewPagerPage = 0;
@@ -243,76 +249,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 					}
 					break;
                 case Constants.ACTION_LIVEMAP_STATUS:
-                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_START)) {
-                        int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_START, -1);
-                        switch (error) {
-                            case 0:
-                                tourStatus = 0;
-                                tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
-                                setBtnState(ibLivemapStartFinish, true, true);
-                                break;
-                            default:
-                                tvLivemapStatus.setText(getString(R.string.livemap_offline));
-                                setBtnState(ibLivemapStartFinish, false, true);
-                                break;
-                        }
-                    }
-                    else
-                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_UPDATE)) {
-                        int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_UPDATE, -1);
-                        switch (error) {
-                            case 0:
-                                if (tourStatus == 0) {
-                                    tourStatus = 1;
-                                    setBtnState(ibLivemapPause, false, true);
-                                    setBtnState(ibLivemapPhoto, false, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
-                                    tvLivemapStatus.setText(getString(R.string.livemap_live));
-                                }
-                                if (LivemapService.isInstanceCreated())
-                                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
-                                break;
-                            default:
-                                tvLivemapLastUpdated.setText("");
-                                break;
-                        }
-                    }
-                    else
-                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_PAUSE)) {
-                        int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_PAUSE, -1);
-                        switch (error) {
-                            case 0:
-                                tourStatus = 2;
-                                setBtnState(ibLivemapPause, true, true);
-                                break;
-                            default:
-                                setBtnState(ibLivemapPause, false, true);
-                                break;
-                        }
-                    }
-                    else
-                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME)) {
-                        int error = intent.getIntExtra(Constants.INTENT_EXTRA_LIVEMAP_RESUME, -1);
-                        switch (error) {
-                            case 0:
-                                tourStatus = 1;
-                                setBtnState(ibLivemapPause, false, true);
-                                break;
-                            default:
-                                setBtnState(ibLivemapPause, true, true);
-                                break;
-                        }
-                    }
-                    else
-                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_FINISH)) {
-                        tvLivemapStatus.setText(getString(R.string.livemap_offline));
-                        tvLivemapLastUpdated.setText("");
-                        setBtnState(ibLivemapStartFinish, false, true);
-                        setBtnState(ibLivemapPause, false, false);
-                        setBtnState(ibLivemapPhoto, false, false);
-                    }
-                    if (intent.hasExtra(Constants.INTENT_EXTRA_LIVEMAP_URL)) {
-                        setLivemapUrl(intent.getStringExtra(Constants.INTENT_EXTRA_LIVEMAP_URL));
-                    }
+                    updateLivemapUI();
                     break;
             }
         }
@@ -796,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         updateScreen(true);
     }
 
-    @Override
+    @Override @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -847,11 +784,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         tvLivemapStatus = findViewById(R.id.tvLivemapStatus);
         tvLivemapLastUpdated = findViewById(R.id.tvLivemapLastUpdated);
-        ibEucWorld = findViewById(R.id.ibEucWorld);
         ibLivemapStartFinish = findViewById(R.id.ibLivemapStartFinish);
         ibLivemapPause = findViewById(R.id.ibLivemapPause);
         ibLivemapPhoto = findViewById(R.id.ibLivemapPhoto);
         ibLivemapShare = findViewById(R.id.ibLivemapShare);
+        wvEucWorld = findViewById(R.id.wvEucWorld);
+        wvEucWorld.getSettings().setJavaScriptEnabled(true);
+        clearEucWorldApp();
 
         mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -869,15 +808,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             public void onDrawerStateChanged(int newState) {
-            }
-        });
-
-        ibEucWorld.setOnClickListener(new ImageButton.OnClickListener() {
-            public void onClick(View v)  {
-                if (livemapUrl.equals(""))
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://euc.world")));
-                else
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(livemapUrl)));
             }
         });
 
@@ -911,7 +841,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
-        //Typeface typefacePrime = Typefaces.get(this, "fonts/prime.otf");
         Typeface tf = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
         TextClock textClock = (TextClock) findViewById(R.id.textClock);
         TextView tvWaitText = (TextView) findViewById(R.id.tvWaitText);
@@ -1003,36 +932,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         registerReceiver(mBluetoothUpdateReceiver, makeIntentFilter());
         updateScreen(true);
-
-        if (LivemapService.isInstanceCreated()) {
-            switch (LivemapService.getInstance().getStatus()) {
-                case 0:
-                    tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
-                    tvLivemapLastUpdated.setText("");
-                    break;
-                case 1:
-                    tvLivemapStatus.setText(getString(R.string.livemap_live));
-                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
-                    setBtnState(ibLivemapPause, false, true);
-                    setBtnState(ibLivemapPhoto, false, this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
-                    break;
-                case 2:
-                    tvLivemapStatus.setText(getString(R.string.livemap_live));
-                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
-                    break;
-                case 3:
-                    tvLivemapStatus.setText(getString(R.string.livemap_offline));
-                    tvLivemapLastUpdated.setText("");
-            }
-        }
-        else {
-            tvLivemapStatus.setText(getString(R.string.livemap_offline));
-            tvLivemapLastUpdated.setText("");
-            setBtnState(ibLivemapStartFinish, false, true);
-            setBtnState(ibLivemapPause, false, false);
-            setBtnState(ibLivemapPhoto, false, false);
-            setBtnState(ibLivemapShare, false, false);
-        }
+        updateLivemapUI();
     }
 
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -1384,42 +1284,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 break;
             case REQUEST_IMAGE_CAPTURE:
                 if ((resultCode == RESULT_OK) && (!mImagePath.isEmpty()) && (LivemapService.isInstanceCreated())) {
-                    final RequestParams requestParams = new RequestParams();
-                    try {
-                        requestParams.put("image", new File(mImagePath));
-                        requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
-                        requestParams.put("k", LivemapService.getInstance().getTourKey());
-                        requestParams.put("dt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date()));
-                        requestParams.put("ldt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date(LivemapService.getInstance().getLocationTime())));
-                        requestParams.put("llt", String.format(Locale.US, "%.7f", LivemapService.getInstance().getLatitude()));
-                        requestParams.put("lln", String.format(Locale.US, "%.7f", LivemapService.getInstance().getLongitude()));
-                        HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/upload", requestParams, new JsonHttpResponseHandler() {
-                            @Override
-                            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                                int error = -1;
-                                try {
-                                    error = response.getInt("error");
-                                    switch (error) {
-                                        case 0:
-                                            break;
-                                        case 1:
-                                            break;
-                                        default:
-                                    }
-                                }
-                                catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            @Override
-                            public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                                Log.d("upload", "onFailure: " + statusCode);
-                            }
-                        });
-                    }
-                    catch(FileNotFoundException e) {
-
-                    }
+                    uploadImageToEucWorld();
                 }
                 break;
         }
@@ -1491,23 +1356,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         return frag;
     }
 
-    private void setLivemapUrl(String url) {
-        livemapUrl = url;
-        if (url.equals(""))
-            setBtnState(ibLivemapShare,false, false);
-        else
-            setBtnState(ibLivemapShare,false, true);
-    }
-
     private void shareLivemapUrl() {
-        if (livemapUrl != null) {
+        if (!LivemapService.getUrl().equals("")) {
             Intent share = new Intent(android.content.Intent.ACTION_SEND);
             share.setType("text/plain");
             share.putExtra(Intent.EXTRA_SUBJECT, R.string.link_livemap_subject);
-            share.putExtra(Intent.EXTRA_TEXT, livemapUrl);
+            share.putExtra(Intent.EXTRA_TEXT, LivemapService.getUrl());
 
             Intent view = new Intent(Intent.ACTION_VIEW);
-            view.setData(Uri.parse(livemapUrl));
+            view.setData(Uri.parse(LivemapService.getUrl()));
 
             Intent chooserIntent = Intent.createChooser(share, getString(R.string.share_livemap));
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{view});
@@ -1563,5 +1420,165 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         else
             this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+    }
+
+    private void updateLivemapUI() {
+        if (LivemapService.isInstanceCreated()) {
+            switch (LivemapService.getStatus()) {
+                case DISCONNECTED:
+                    tvLivemapStatus.setText(getString(R.string.livemap_offline));
+                    tvLivemapLastUpdated.setText("");
+                    setBtnState(ibLivemapStartFinish, false, !SettingsUtil.getLivemapApiKey(this).equals(""));
+                    setBtnState(ibLivemapPause, false, false);
+                    setBtnState(ibLivemapPhoto, false, false);
+                    setBtnState(ibLivemapShare, false, false);
+                    break;
+                case CONNECTING:
+                    tvLivemapStatus.setText(getString(R.string.livemap_connecting));
+                    tvLivemapLastUpdated.setText("");
+                    setBtnState(ibLivemapStartFinish, false, false);
+                    setBtnState(ibLivemapPause, false, false);
+                    setBtnState(ibLivemapPhoto, false, false);
+                    setBtnState(ibLivemapShare, false, false);
+                    break;
+                case WAITING_FOR_GPS:
+                    tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
+                    tvLivemapLastUpdated.setText("");
+                    setBtnState(ibLivemapStartFinish, true, true);
+                    setBtnState(ibLivemapPause, false, false);
+                    setBtnState(ibLivemapPhoto, false, false);
+                    setBtnState(ibLivemapShare, false, false);
+                    break;
+                case STARTED:
+                    tvLivemapStatus.setText(getString(R.string.livemap_live));
+                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
+                    setBtnState(ibLivemapStartFinish, true, true);
+                    setBtnState(ibLivemapPause, false, true);
+                    setBtnState(ibLivemapPhoto, false, true);
+                    setBtnState(ibLivemapShare, false, true);
+                    break;
+                case PAUSING:
+                case RESUMING:
+                    tvLivemapStatus.setText(getString(R.string.livemap_live));
+                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
+                    setBtnState(ibLivemapStartFinish, true, false);
+                    setBtnState(ibLivemapPause, true, true);
+                    setBtnState(ibLivemapPhoto, false, true);
+                    setBtnState(ibLivemapShare, false, true);
+                    break;
+                case PAUSED:
+                    tvLivemapStatus.setText(getString(R.string.livemap_live));
+                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
+                    setBtnState(ibLivemapStartFinish, true, true);
+                    setBtnState(ibLivemapPause, true, true);
+                    setBtnState(ibLivemapPhoto, false, true);
+                    setBtnState(ibLivemapShare, false, true);
+                    break;
+            }
+        }
+        else {
+            tvLivemapStatus.setText(getString(R.string.livemap_offline));
+            tvLivemapLastUpdated.setText("");
+            setBtnState(ibLivemapStartFinish, false, !SettingsUtil.getLivemapApiKey(this).equals(""));
+            setBtnState(ibLivemapPause, false, false);
+            setBtnState(ibLivemapPhoto, false, false);
+            setBtnState(ibLivemapShare, false, false);
+        }
+    }
+
+    private void clearEucWorldApp() {
+        wvEucWorld.loadData("<html><body style=\"background: #284a73;\"></body></html>", "text/html", "UTF-8");
+    }
+
+    private void loadEucWorldApp() {
+        if (!SettingsUtil.getLivemapApiKey(this).equals(""))
+            wvEucWorld.loadUrl("https://euc.world/app?apikey="+SettingsUtil.getLivemapApiKey(this)+"&version="+BuildConfig.VERSION_NAME);
+        else
+            wvEucWorld.loadUrl("https://euc.world/app?version="+BuildConfig.VERSION_NAME);
+    }
+
+    private void uploadImageToEucWorld() {
+        final RequestParams requestParams = new RequestParams();
+
+        // Set image location
+        requestParams.put("llt", String.format(Locale.US, "%.7f", LivemapService.getInstance().getLatitude()));
+        requestParams.put("lln", String.format(Locale.US, "%.7f", LivemapService.getInstance().getLongitude()));
+        float[] latLon = new float[2];
+        try {
+            final ExifInterface exifInterface = new ExifInterface(mImagePath);
+            if (exifInterface.getLatLong(latLon)) {
+                // Update image location with EXIF values
+                requestParams.put("llt", String.format(Locale.US, "%.7f", latLon[0]));
+                requestParams.put("lln", String.format(Locale.US, "%.7f", latLon[1]));
+            }
+        }
+        catch (IOException e) { }
+
+        // Get source image size
+        BitmapFactory.Options bopts = new BitmapFactory.Options();
+        bopts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mImagePath, bopts);
+        int width = bopts.outWidth;
+        int height = bopts.outHeight;
+
+        // Limit image size and quality
+        final File img;
+        try {
+            // Compressor doesn't scale image if you define both setMaxWidth() and setMaxHeight()
+            if (width > height)
+                img = new Compressor(this)
+                        .setMaxWidth(2000)
+                        .setQuality(75)
+                        .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                        .compressToFile(new File(mImagePath));
+            else
+                img = new Compressor(this)
+                        .setMaxHeight(2000)
+                        .setQuality(75)
+                        .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                        .compressToFile(new File(mImagePath));
+        }
+        catch (IOException e) {
+            Toast.makeText(this, R.string.livemap_image_preparation_error, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            requestParams.put("image", img);
+            requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
+            requestParams.put("k", LivemapService.getInstance().getTourKey());
+            requestParams.put("dt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date()));
+            requestParams.put("ldt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date(LivemapService.getInstance().getLocationTime())));
+            HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/upload", requestParams, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
+                    img.delete();
+                    int error = -1;
+                    try {
+                        error = response.getInt("error");
+                        if (error == 0)
+                            Toast.makeText(getApplicationContext(), R.string.livemap_image_upload_error, Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(getApplicationContext(), R.string.livemap_image_uploaded, Toast.LENGTH_LONG).show();
+                    }
+                    catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    img.delete();
+                    Toast.makeText(getApplicationContext(), R.string.livemap_image_upload_error, Toast.LENGTH_LONG).show();
+                }
+                @Override
+                public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
+                    img.delete();
+                    Toast.makeText(getApplicationContext(), R.string.livemap_image_upload_error, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+        catch(FileNotFoundException e) {
+
+        }
     }
 }

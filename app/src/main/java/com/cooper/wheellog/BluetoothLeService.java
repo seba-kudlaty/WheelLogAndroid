@@ -31,20 +31,22 @@ import timber.log.Timber;
  */
 public class BluetoothLeService extends Service {
 
-    private BluetoothManager mBluetoothManager;
-    private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
-    private BluetoothGatt mBluetoothGatt;
-    private int mConnectionState = STATE_DISCONNECTED;
-    private Date mDisconnectTime;
-
     public static final int STATE_DISCONNECTED = 0;
     public static final int STATE_CONNECTING = 1;
     public static final int STATE_CONNECTED = 2;
 
+    private static int mConnectionState = STATE_DISCONNECTED;
+
+    private BluetoothManager mBluetoothManager;
+    private BluetoothAdapter mBluetoothAdapter;
+    private String mBluetoothDeviceAddress;
+    private BluetoothGatt mBluetoothGatt;
+    private Date mDisconnectTime;
+
     private boolean disconnectRequested = false;
     private boolean autoConnect = false;
     private NotificationUtil mNotificationHandler;
+
 
     private final BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
@@ -135,10 +137,9 @@ public class BluetoothLeService extends Service {
         return intentFilter;
     }
 
-    public int getConnectionState() {
+    public static int getConnectionState() {
         return mConnectionState;
     }
-
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
