@@ -14,7 +14,6 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,8 +25,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -38,16 +35,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -95,7 +91,6 @@ import timber.log.Timber;
 
 import static com.cooper.wheellog.utils.MathsUtil.kmToMiles;
 
-
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -138,6 +133,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     ImageButton ibLivemapShare;
     ImageButton ibLivemapPhoto;
 
+    ImageView ivUploadingPhoto;
+    ImageView ivLivemapStatus;
+
     LineChart chart1;
 
     WebView wvEucWorld;
@@ -147,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private BluetoothAdapter mBluetoothAdapter;
     private String mDeviceAddress;
     private int mConnectionState = BluetoothLeService.STATE_DISCONNECTED;
-    int tourStatus = 0;
     private boolean doubleBackToExitPressedOnce = false;
     private Snackbar snackbar;
     int viewPagerPage = 0;
@@ -156,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private GoogleApiClient mGoogleApiClient;
     private DrawerLayout mDrawer;
     private String mImagePath = "";
+    private int imageUploadCount = 0;
 
     protected static final int RESULT_DEVICE_SCAN_REQUEST = 20;
     protected static final int RESULT_REQUEST_ENABLE_BT = 30;
@@ -791,6 +789,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ibLivemapPause = findViewById(R.id.ibLivemapPause);
         ibLivemapPhoto = findViewById(R.id.ibLivemapPhoto);
         ibLivemapShare = findViewById(R.id.ibLivemapShare);
+        ivUploadingPhoto = findViewById(R.id.ivUploadingPhoto);
+        ivLivemapStatus = findViewById(R.id.ivLivemapStatus);
         wvEucWorld = findViewById(R.id.wvEucWorld);
         wvEucWorld.getSettings().setJavaScriptEnabled(true);
         clearEucWorldApp();
@@ -825,7 +825,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ibLivemapPause.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v)  {
                 setBtnState(ibLivemapPause, false, false);
-                if (tourStatus == 1)
+                if (LivemapService.getStatus() == LivemapService.LivemapStatus.STARTED)
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_PAUSE));
                 else
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_RESUME));
@@ -1218,6 +1218,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (LivemapService.isInstanceCreated())
             toggleLivemapService();
     }
+
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void toggleLivemapService() {
         Intent livemapServiceIntent = new Intent(getApplicationContext(), LivemapService.class);
@@ -1390,7 +1391,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             btn.setBackgroundColor(getResources().getColor(R.color.disabled));
     }
 
-    private File createImageFile() throws IOException {
+    private File createImageFile() {
         String filename = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".jpg";
         File path = new File(Environment.getExternalStorageDirectory(), Constants.PICTURE_FOLDER_NAME);
         path.mkdirs();
@@ -1403,12 +1404,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void imageCapture() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (intent.resolveActivity(getPackageManager()) != null) {
-            File imageFile = null;
-            try {
-                imageFile = createImageFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            File imageFile = createImageFile();
             if (imageFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
                     "com.cooper.wheellog.fileprovider",
@@ -1431,6 +1427,29 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     private void updateLivemapUI() {
+        // Image upload notification
+        if (imageUploadCount > 0)
+            ivUploadingPhoto.setVisibility(View.VISIBLE);
+        else
+            ivUploadingPhoto.setVisibility(View.GONE);
+        // Live map status notification
+        switch (LivemapService.getLivemapStatus()) {
+            case -1:
+                ivLivemapStatus.setVisibility(View.GONE);
+                break;
+            case 0:
+                ivLivemapStatus.setVisibility(View.GONE);
+                break;
+            case 1:
+                ivLivemapStatus.setImageResource(R.drawable.ic_warning);
+                ivLivemapStatus.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                ivLivemapStatus.setImageResource(R.drawable.ic_error);
+                ivLivemapStatus.setVisibility(View.VISIBLE);
+                break;
+        }
+        // Buttons and text
         if (LivemapService.isInstanceCreated()) {
             switch (LivemapService.getStatus()) {
                 case DISCONNECTED:
@@ -1481,6 +1500,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     setBtnState(ibLivemapPause, true, true);
                     setBtnState(ibLivemapPhoto, false, true);
                     setBtnState(ibLivemapShare, false, true);
+                    break;
+                case DISCONNECTING:
+                    tvLivemapStatus.setText(getString(R.string.livemap_disconnecting));
+                    tvLivemapLastUpdated.setText("");
+                    setBtnState(ibLivemapStartFinish, false, false);
+                    setBtnState(ibLivemapPause, false, false);
+                    setBtnState(ibLivemapPhoto, false, false);
+                    setBtnState(ibLivemapShare, false, false);
                     break;
             }
         }
@@ -1558,13 +1585,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             requestParams.put("dt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date()));
             requestParams.put("ldt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date(LivemapService.getInstance().getLocationTime())));
             Toast.makeText(getApplicationContext(), R.string.livemap_image_uploading, Toast.LENGTH_LONG).show();
+            imageUploadCount += 1;
             HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/upload", requestParams, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
+                    imageUploadCount -= 1;
                     img.delete();
-                    int error = -1;
                     try {
-                        error = response.getInt("error");
+                        int error = response.getInt("error");
                         if (error == 0)
                             Toast.makeText(getApplicationContext(), R.string.livemap_image_uploaded, Toast.LENGTH_LONG).show();
                         else
@@ -1573,16 +1601,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    updateLivemapUI();
                 }
                 @Override
                 public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    imageUploadCount -= 1;
                     img.delete();
                     Toast.makeText(getApplicationContext(), R.string.livemap_image_upload_error, Toast.LENGTH_LONG).show();
+                    updateLivemapUI();
                 }
                 @Override
                 public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
+                    imageUploadCount -= 1;
                     img.delete();
                     Toast.makeText(getApplicationContext(), R.string.livemap_image_upload_error, Toast.LENGTH_LONG).show();
+                    updateLivemapUI();
                 }
             });
         }

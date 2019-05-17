@@ -33,4 +33,16 @@
 		android:dependency="@string/livemap_api_key"
 		android:summary="@string/livemap_start_new_segment_summary" />
 
+	<CheckBoxPreference
+		android:key="@string/livemap_auto_start"
+		android:title="@string/livemap_auto_start_title"
+		android:dependency="@string/livemap_api_key"
+		android:summary="@string/livemap_auto_start_summary" />
+
+	<CheckBoxPreference
+		android:key="@string/livemap_hold_without_wheel"
+		android:title="@string/livemap_hold_without_wheel_title"
+		android:dependency="@string/livemap_api_key"
+		android:summary="@string/livemap_hold_without_wheel_summary" />
+
 </PreferenceScreen>

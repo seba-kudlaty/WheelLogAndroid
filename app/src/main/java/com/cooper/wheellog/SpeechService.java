@@ -18,6 +18,11 @@ import android.util.Log;
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.SettingsUtil;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +42,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     private boolean ttsWheelConnected = false;
     private boolean ttsEnabled = false;
     private long ttsLastWheelData = 0;
+    private double ttsLastWheelDistance = -999;
     private long ttsLastDisconnected = 0;
     private long ttsWheelDataAge = 0;
     private HashMap<String, String> ttsMap;
@@ -128,6 +134,8 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
 
     @Override
     public void onCreate() {
+        ttsLastWheelData = 0;
+        ttsLastWheelDistance = -999;
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
@@ -139,17 +147,14 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         instance = this;
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_WHEEL_DATA_AVAILABLE);
         intentFilter.addAction(Constants.ACTION_BLUETOOTH_CONNECTION_STATE);
         intentFilter.addAction(Constants.ACTION_SPEECH_SAY);
         registerReceiver(receiver, intentFilter);
-
         Intent serviceStartedIntent = new Intent(Constants.ACTION_SPEECH_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, true);
         sendBroadcast(serviceStartedIntent);
-
         return START_STICKY;
     }
 
@@ -284,106 +289,116 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     }
 
     private void sayWheelData() {
-        String text = "";
         long now = SystemClock.elapsedRealtime();
-        if ((sayPriority == -1) && (now - ttsLastWheelData) > SettingsUtil.getSpeechMsgInterval(this) * 1000) {
-            ttsLastWheelData = now;
-            if (!SettingsUtil.getSpeechOnlyInMotion(this) || WheelData.getInstance().getSpeedDouble() >= 3) {
+        double dist = (SettingsUtil.isUseMiles(this)) ? WheelData.getInstance().getDistanceDouble() / 1.609 : WheelData.getInstance().getDistanceDouble();
 
-                // Speed
-                if (SettingsUtil.getSpeechMessagesSpeed(this)) {
-                    if (WheelData.getInstance().getSpeedDouble() >= 3.0d) {
-                        text += " " + String.format(Locale.US, getString(R.string.speech_text_speed), formatSpeed(WheelData.getInstance().getSpeedDouble()));
-                    }
+        if (sayPriority != -1) return;  // Wait for other messages to finish playing
+        if (SettingsUtil.getSpeechOnlyInMotion(this) && WheelData.getInstance().getSpeedDouble() < 3.0d) return; // If activated in settings, hold messages when speed < 3 km/h
+        if (SettingsUtil.getSpeechMsgMode(this) == 0) {
+            if (now - ttsLastWheelData < SettingsUtil.getSpeechMsgInterval(this) * 1000) return;
+        }
+        else {
+            double d = (double)SettingsUtil.getSpeechMsgInterval(this) / 60;
+            if (dist < ttsLastWheelDistance + d) return;
+        }
+
+        String text = "";
+        ttsLastWheelData = now;
+        ttsLastWheelDistance = dist;
+        if (!SettingsUtil.getSpeechOnlyInMotion(this) || WheelData.getInstance().getSpeedDouble() >= 3) {
+
+            // Speed
+            if (SettingsUtil.getSpeechMessagesSpeed(this)) {
+                if (WheelData.getInstance().getSpeedDouble() >= 3.0d) {
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_speed), formatSpeed(WheelData.getInstance().getSpeedDouble()));
                 }
-
-                // Average speed
-                if (SettingsUtil.getSpeechMessagesAvgSpeed(this)) {
-                    if (WheelData.getInstance().getAverageSpeedDouble() >= 3.0d) {
-                        text += " " + String.format(Locale.US, getString(R.string.speech_text_avg_speed), formatSpeed(WheelData.getInstance().getAverageSpeedDouble()));
-                    }
-                }
-
-                // Distance
-                if (SettingsUtil.getSpeechMessagesDistance(this)) {
-                    double f = (WheelData.getInstance().isKS18L()) ? 0.82 : 1.0;
-                    String distance = formatDistance(WheelData.getInstance().getDistanceDouble() * f);
-                    if (!distance.equals(""))
-                        text += " " + String.format(Locale.US, getString(R.string.speech_text_distance), distance);
-                }
-
-                // Battery level
-                if (SettingsUtil.getSpeechMessagesBattery(this))
-                    text += " " + String.format(Locale.US, getString(R.string.speech_text_battery), WheelData.getInstance().getAverageBatteryLevelDouble());
-
-                // Phone battery level
-                if (SettingsUtil.getSpeechMessagesPhoneBattery(this)) {
-                    int bl = getPhoneBatteryLevel();
-                    if (bl >= 0)
-                        text += " " + String.format(Locale.US, getString(R.string.speech_phone_battery), bl);
-                }
-                // Voltage
-                if (SettingsUtil.getSpeechMessagesVoltage(this))
-                    text += " " + String.format(Locale.US, getString(R.string.speech_text_voltage), WheelData.getInstance().getVoltageDouble());
-
-                // Current
-                if (SettingsUtil.getSpeechMessagesCurrent(this))
-                    text += " " + String.format(Locale.US, getString(R.string.speech_text_current), WheelData.getInstance().getCurrentDouble());
-
-                // Power
-                if (SettingsUtil.getSpeechMessagesPower(this))
-                    text += " " + String.format(Locale.US, getString(R.string.speech_text_power), WheelData.getInstance().getPowerDouble());
-
-                // Temperature
-                if (SettingsUtil.getSpeechMessagesTemperature(this))
-                    text += " " + String.format(Locale.US, getString(R.string.speech_text_temperature), formatTemperature(WheelData.getInstance().getTemperature()));
-
-                // Time
-                if (SettingsUtil.getSpeechMessagesTime(this)) {
-                    SimpleDateFormat df = new SimpleDateFormat("HH:mm", Locale.US);
-                    String time = df.format(new Date());
-                    text += " " + String.format(Locale.US, getString(R.string.speech_text_time), time);
-                }
-
-                // Time from start
-                if (SettingsUtil.getSpeechMessagesTimeFromStart(this)) {
-                    String timefromstart = formatDuration(WheelData.getInstance().getRideTime());
-                    if (!timefromstart.equals(""))
-                        text += " " + String.format(Locale.US, getString(R.string.speech_text_time_from_start), timefromstart);
-                }
-
-                // Time in motion
-                if (SettingsUtil.getSpeechMessagesTimeInMotion(this)) {
-                    String timeinmotion = formatDuration(WheelData.getInstance().getRidingTime());
-                    if (!timeinmotion.equals(""))
-                        text += " " + String.format(Locale.US, getString(R.string.speech_text_time_in_motion), timeinmotion);
-                }
-
-                // Weather
-                if (SettingsUtil.getSpeechMessagesWeather(this) && LivemapService.isInstanceCreated()) {
-                    if (LivemapService.getInstance().getWeatherAge() < 2000 * SettingsUtil.getLivemapUpdateInterval(this)) {
-                        String temp = formatTemperature(LivemapService.getInstance().getWeatherTemperature());
-                        String tempf = formatTemperature(LivemapService.getInstance().getWeatherTemperatureFeels());
-                        text += " " + getString(R.string.speech_text_weather);
-                        if (temp.equals(tempf))
-                            text += " " + String.format(Locale.US, getString(R.string.speech_text_weather_temp), temp);
-                        else
-                            text += " " + String.format(Locale.US, getString(R.string.speech_text_weather_temp_feels), temp, tempf);
-                    }
-                }
-
             }
 
-            if (!text.equals(""))
-                say(text, "info");
+            // Average speed
+            if (SettingsUtil.getSpeechMessagesAvgSpeed(this)) {
+                if (WheelData.getInstance().getAverageSpeedDouble() >= 3.0d) {
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_avg_speed), formatSpeed(WheelData.getInstance().getAverageSpeedDouble()));
+                }
+            }
 
-            if (SettingsUtil.getSpeechMessagesBatteryLowLevel(this) > 0 && WheelData.getInstance().getAverageBatteryLevelDouble() < SettingsUtil.getSpeechMessagesBatteryLowLevel(this))
-                say(getString(R.string.speech_text_low_battery), "warning1");
+            // Distance
+            if (SettingsUtil.getSpeechMessagesDistance(this)) {
+                double f = (WheelData.getInstance().isKS18L()) ? 0.82 : 1.0;
+                String distance = formatDistance(WheelData.getInstance().getDistanceDouble() * f);
+                if (!distance.equals(""))
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_distance), distance);
+            }
 
-            if (SettingsUtil.getSpeechMessagesPhoneBatteryLowLevel(this) > 0 && getPhoneBatteryLevel() < SettingsUtil.getSpeechMessagesPhoneBatteryLowLevel(this))
-                say(getString(R.string.speech_text_low_phone_battery), "warning1");
+            // Battery level
+            if (SettingsUtil.getSpeechMessagesBattery(this))
+                text += " " + String.format(Locale.US, getString(R.string.speech_text_battery), WheelData.getInstance().getAverageBatteryLevelDouble());
+
+            // Phone battery level
+            if (SettingsUtil.getSpeechMessagesPhoneBattery(this)) {
+                int bl = getPhoneBatteryLevel();
+                if (bl >= 0)
+                    text += " " + String.format(Locale.US, getString(R.string.speech_phone_battery), bl);
+            }
+            // Voltage
+            if (SettingsUtil.getSpeechMessagesVoltage(this))
+                text += " " + String.format(Locale.US, getString(R.string.speech_text_voltage), WheelData.getInstance().getVoltageDouble());
+
+            // Current
+            if (SettingsUtil.getSpeechMessagesCurrent(this))
+                text += " " + String.format(Locale.US, getString(R.string.speech_text_current), WheelData.getInstance().getCurrentDouble());
+
+            // Power
+            if (SettingsUtil.getSpeechMessagesPower(this))
+                text += " " + String.format(Locale.US, getString(R.string.speech_text_power), WheelData.getInstance().getPowerDouble());
+
+            // Temperature
+            if (SettingsUtil.getSpeechMessagesTemperature(this))
+                text += " " + String.format(Locale.US, getString(R.string.speech_text_temperature), formatTemperature(WheelData.getInstance().getTemperature()));
+
+            // Time
+            if (SettingsUtil.getSpeechMessagesTime(this)) {
+                SimpleDateFormat df = new SimpleDateFormat("HH:mm", Locale.US);
+                String time = df.format(new Date());
+                text += " " + String.format(Locale.US, getString(R.string.speech_text_time), time);
+            }
+
+            // Time from start
+            if (SettingsUtil.getSpeechMessagesTimeFromStart(this)) {
+                String timefromstart = formatDuration(WheelData.getInstance().getRideTime());
+                if (!timefromstart.equals(""))
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_time_from_start), timefromstart);
+            }
+
+            // Time in motion
+            if (SettingsUtil.getSpeechMessagesTimeInMotion(this)) {
+                String timeinmotion = formatDuration(WheelData.getInstance().getRidingTime());
+                if (!timeinmotion.equals(""))
+                    text += " " + String.format(Locale.US, getString(R.string.speech_text_time_in_motion), timeinmotion);
+            }
+
+            // Weather
+            if (SettingsUtil.getSpeechMessagesWeather(this) && LivemapService.isInstanceCreated()) {
+                if (LivemapService.getInstance().getWeatherAge() < 2000 * SettingsUtil.getLivemapUpdateInterval(this)) {
+                    String temp = formatTemperature(LivemapService.getInstance().getWeatherTemperature());
+                    String tempf = formatTemperature(LivemapService.getInstance().getWeatherTemperatureFeels());
+                    text += " " + getString(R.string.speech_text_weather);
+                    if (temp.equals(tempf))
+                        text += " " + String.format(Locale.US, getString(R.string.speech_text_weather_temp), temp);
+                    else
+                        text += " " + String.format(Locale.US, getString(R.string.speech_text_weather_temp_feels), temp, tempf);
+                }
+            }
 
         }
+
+        if (!text.equals(""))
+            say(text, "info");
+
+        if (SettingsUtil.getSpeechMessagesBatteryLowLevel(this) > 0 && WheelData.getInstance().getAverageBatteryLevelDouble() < SettingsUtil.getSpeechMessagesBatteryLowLevel(this))
+            say(getString(R.string.speech_text_low_battery), "warning1");
+
+        if (SettingsUtil.getSpeechMessagesPhoneBatteryLowLevel(this) > 0 && getPhoneBatteryLevel() < SettingsUtil.getSpeechMessagesPhoneBatteryLowLevel(this))
+            say(getString(R.string.speech_text_low_phone_battery), "warning1");
 
     }
 

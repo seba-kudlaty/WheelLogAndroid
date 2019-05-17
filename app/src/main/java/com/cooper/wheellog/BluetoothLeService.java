@@ -1,5 +1,6 @@
 package com.cooper.wheellog;
 
+import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -15,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.widget.Toast;
 
@@ -23,6 +25,7 @@ import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 
 import java.util.*;
 
+import permissions.dispatcher.NeedsPermission;
 import timber.log.Timber;
 
 /**
@@ -58,6 +61,8 @@ public class BluetoothLeService extends Service {
                     switch (connectionState) {
                         case STATE_CONNECTED:
                             mConnectionState = STATE_CONNECTED;
+                            if (!LivemapService.isInstanceCreated() && SettingsUtil.getLivemapAutoStart(getApplicationContext()) && !SettingsUtil.getLivemapApiKey(getApplicationContext()).equals(""))
+                                startLivemapService();
                             if (!LoggingService.isInstanceCreated() && SettingsUtil.isAutoLogEnabled(BluetoothLeService.this))
                                 startService(new Intent(getApplicationContext(), LoggingService.class));
 							if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.KINGSONG) {
@@ -557,4 +562,15 @@ public class BluetoothLeService extends Service {
     public String getBluetoothDeviceAddress() {
         return mBluetoothDeviceAddress;
     }
+
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    void startLivemapService() {
+        Intent livemapServiceIntent = new Intent(getApplicationContext(), LivemapService.class);
+        LivemapService.setAutoStarted(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startForegroundService(livemapServiceIntent);
+        else
+            startService(livemapServiceIntent);
+    }
+
 }

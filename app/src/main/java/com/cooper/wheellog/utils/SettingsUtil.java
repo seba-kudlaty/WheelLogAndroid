@@ -135,6 +135,10 @@ public class SettingsUtil {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_msg_interval), "60"));
     }
 
+    public static int getSpeechMsgMode(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_msg_mode), "0"));
+    }
+
     public static boolean getSpeechOnlyInMotion(Context context) {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_only_when_moving), false);
     }
@@ -217,6 +221,14 @@ public class SettingsUtil {
 
     public static boolean getShowWhenLocked(Context context) {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.show_when_locked), false);
+    }
+
+    public static boolean getLivemapAutoStart(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.livemap_auto_start), false);
+    }
+
+    public static boolean getLivemapHoldWithoutWheel(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.livemap_hold_without_wheel), false);
     }
 
 }

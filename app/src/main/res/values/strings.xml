@@ -361,5 +361,13 @@
     <string name="livemap_image_upload_error">Image upload failed</string>
     <string name="livemap_image_uploaded">Image uploaded!</string>
     <string name="livemap_image_uploading">Uploading image...</string>
+    <string name="livemap_auto_start" translatable="false">livemap_auto_start</string>
+    <string name="livemap_auto_start_title">Start when wheel is connected</string>
+    <string name="livemap_auto_start_summary">Select this option if you want to start tour in \"Link only\" mode after connecting to the wheel</string>
+    <string name="livemap_hold_without_wheel" translatable="false">livemap_hold_without_wheel</string>
+    <string name="livemap_hold_without_wheel_title">Hold when wheel connection is lost</string>
+    <string name="livemap_hold_without_wheel_summary">Select this option if you want to hold up data updates while connection to the wheel is lost</string>
+    <string name="livemap_disconnecting">Disconnecting...</string>
+    <string name="livemap_speech_tour_started">Tour logging has started.</string>
 
 </resources>

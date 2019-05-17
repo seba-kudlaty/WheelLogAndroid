@@ -262,4 +262,10 @@
     <string name="livemap_image_upload_error">Wysyłanie zdjęcia nie udało się</string>
     <string name="livemap_image_uploaded">Zdjęcie wysłane!</string>
     <string name="livemap_image_uploading">Wysyłanie zdjęcia...</string>
+    <string name="livemap_auto_start_summary">Zaznacz jeśli chcesz rozpocząć trasę w trybie prywatnym automatycznie po połączeniu z monocyklem</string>
+    <string name="livemap_auto_start_title">Rozpocznij po połączeniu z monocyklem</string>
+    <string name="livemap_hold_without_wheel_summary">Zaznacz jeśli chcesz wstrzymać aktualizację trasy w czasie utraty połączenia z monocyklem</string>
+    <string name="livemap_hold_without_wheel_title">Wstrzymaj na czas utraty połączenia z monocyklem</string>
+    <string name="livemap_disconnecting">Rozłączanie...</string>
+    <string name="livemap_speech_tour_started">Rozpoczęto rejestrację trasy.</string>
 </resources>
