@@ -359,6 +359,7 @@
     <string name="livemap_api_error_server">Temporary server error. Please try again later.</string>
     <string name="livemap_image_preparation_error">Error when preparing image for upload</string>
     <string name="livemap_image_upload_error">Image upload failed</string>
-    <string name="livemap_image_uploaded">Image uploaded successfully</string>
+    <string name="livemap_image_uploaded">Image uploaded!</string>
+    <string name="livemap_image_uploading">Uploading image...</string>
 
 </resources>

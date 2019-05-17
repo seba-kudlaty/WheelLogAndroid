@@ -516,7 +516,7 @@ public class WheelData {
 
     int getDistance() { return (int) (mTotalDistance - mStartTotalDistance); }
     String getDistanceForTizen() {
-        double dist = (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? getWheelDistanceDouble() / 1.609 : getWheelDistanceDouble();
+        double dist = (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? getDistanceDouble() / 1.609 : getDistanceDouble();
         if (dist >= 10)
             return String.format(Locale.US, "%.1f", dist);
         else

@@ -257,4 +257,9 @@
     <string name="show_when_locked_title">Pokaż mimo blokady</string>
     <string name="show_when_locked_summary">Pokaż okno główne nawet jeśli ekran jest zablokowany</string>
     <string name="notification_livemap_title">Mapa na żywo</string>
+    <string name="livemap_api_error_server">Tymczasowy błąd serwera. Spróbuj ponownie później.</string>
+    <string name="livemap_image_preparation_error">Błąd podczas przygotowania zdjęcia do wysłania</string>
+    <string name="livemap_image_upload_error">Wysyłanie zdjęcia nie udało się</string>
+    <string name="livemap_image_uploaded">Zdjęcie wysłane!</string>
+    <string name="livemap_image_uploading">Wysyłanie zdjęcia...</string>
 </resources>

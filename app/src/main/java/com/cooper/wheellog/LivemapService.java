@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cooper.wheellog.utils.Constants;
@@ -292,7 +293,7 @@ public class LivemapService extends Service {
         requestParams.put("m", SettingsUtil.getLivemapStartNewSegment(this));
         requestParams.put("t", TimeZone.getDefault().getID());
         requestParams.put("l", String.valueOf(Locale.getDefault()));
-        requestParams.put("info", i);
+        requestParams.put("ci", i);
         HttpClient.post(LivemapApiURL + "/tour/start", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
@@ -354,7 +355,6 @@ public class LivemapService extends Service {
 
     private void stopLivemap() {
         if (status != LivemapStatus.DISCONNECTED) {
-            status = LivemapStatus.DISCONNECTED;
             final RequestParams requestParams = new RequestParams();
             requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
             requestParams.put("k", tourKey);
@@ -362,13 +362,21 @@ public class LivemapService extends Service {
             requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
             HttpClient.post(LivemapApiURL + "/tour/finish", requestParams, new JsonHttpResponseHandler() {
                 @Override
-                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) { }
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
+                    status = LivemapStatus.DISCONNECTED;
+                    sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
+                }
                 @Override
-                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) { }
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    status = LivemapStatus.DISCONNECTED;
+                    sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
+                }
                 @Override
-                public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) { }
+                public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
+                    status = LivemapStatus.DISCONNECTED;
+                    sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
+                }
             });
-            sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
         }
     }
 

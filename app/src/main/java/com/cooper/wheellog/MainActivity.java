@@ -27,6 +27,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -83,6 +84,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import id.zelory.compressor.Compressor;
 import permissions.dispatcher.NeedsPermission;
@@ -962,21 +965,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             mBluetoothLeService = null;
         }
         super.onDestroy();
-        new CountDownTimer(500, 100) {
-
+        //
+        new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
-            public void onTick(long millisUntilFinished) {
-                // do something after 1s
+            public void run() {
+                // Wait until livemap finish gracefully
+                if (LivemapService.getStatus() == LivemapService.LivemapStatus.DISCONNECTED)
+                    android.os.Process.killProcess(android.os.Process.myPid());
             }
-
+        }, 0, 250);
+        /*
+        new CountDownTimer(5000, 15) {
+            @Override
+            public void onTick(long millisUntilFinished) { }
             @Override
             public void onFinish() {
+                // Destroy application after 5 seconds
                 android.os.Process.killProcess(android.os.Process.myPid());
-                // do something end times 5s
             }
-
         }.start();
-
+        */
     }
 
     @Override
@@ -1549,6 +1557,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             requestParams.put("k", LivemapService.getInstance().getTourKey());
             requestParams.put("dt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date()));
             requestParams.put("ldt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date(LivemapService.getInstance().getLocationTime())));
+            Toast.makeText(getApplicationContext(), R.string.livemap_image_uploading, Toast.LENGTH_LONG).show();
             HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/upload", requestParams, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
@@ -1557,9 +1566,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     try {
                         error = response.getInt("error");
                         if (error == 0)
-                            Toast.makeText(getApplicationContext(), R.string.livemap_image_upload_error, Toast.LENGTH_LONG).show();
-                        else
                             Toast.makeText(getApplicationContext(), R.string.livemap_image_uploaded, Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(getApplicationContext(), R.string.livemap_image_upload_error, Toast.LENGTH_LONG).show();
                     }
                     catch (JSONException e) {
                         e.printStackTrace();
