@@ -4,9 +4,25 @@ import java.util.UUID;
 
 public class Constants {
 
+    public static final double MIN_RIDING_SPEED = 2.0d;     // km/h
+    public static final int LIVEMAP_UPDATE_TIMEOUT = 10;    // Seconds
+    public static final int WHEEL_DATA_VALIDITY = 3000;     // Milliseconds
+    public static final int GPS_DATA_VALIDITY = 5000;       // Milliseconds
+    public static final int MAIN_NOTIFICATION_ID = 10;
+    public static final String SUPPORT_FOLDER_NAME = "WheelLog/Support Files";
+    public static final String LOG_FOLDER_NAME = "WheelLog/Logs";
+    public static final String PICTURE_FOLDER_NAME = "WheelLog/Pictures";
+    public static final String EMPTY_HTML = "<html><body style=\"background: #284a73;\"></body></html>";
+
+
+    public static final String ACTION_BLUETOOTH_CONNECT = "com.cooper.wheellog.bluetoothConnect";
+    public static final String ACTION_BLUETOOTH_DISCONNECT = "com.cooper.wheellog.bluetoothDisconnect";
     public static final String ACTION_BLUETOOTH_CONNECTION_STATE = "com.cooper.wheellog.bluetoothConnectionState";
-    public static final String ACTION_WHEEL_DATA_AVAILABLE = "com.cooper.wheelTimber.wheelDataAvailable";
-	public static final String ACTION_WHEEL_SETTING_CHANGED = "com.cooper.wheelTimber.wheelSettingChanged";
+    public static final String ACTION_WHEEL_DATA_AVAILABLE = "com.cooper.wheellog.wheelDataAvailable";
+	public static final String ACTION_WHEEL_SETTING_CHANGED = "com.cooper.wheellog.wheelSettingChanged";
+    public static final String ACTION_WHEEL_CONNECTED = "com.cooper.wheellog.wheelConnected";
+    public static final String ACTION_WHEEL_CONNECTION_LOST = "com.cooper.wheellog.wheelConnectionLost";
+    public static final String ACTION_WHEEL_DISCONNECTED = "com.cooper.wheellog.wheelDisconnected";
     public static final String ACTION_REQUEST_KINGSONG_SERIAL_DATA = "com.cooper.wheellog.requestSerialData";
     public static final String ACTION_REQUEST_KINGSONG_NAME_DATA = "com.cooper.wheellog.requestNameData";
     public static final String ACTION_REQUEST_KINGSONG_HORN = "com.cooper.wheellog.requestHorn";
@@ -78,13 +94,7 @@ public class Constants {
     public static final String INTENT_EXTRA_SPEECH_TEXT = "speech_text";
     public static final String INTENT_EXTRA_SPEECH_EARCON = "speech_earcon";
     public static final String INTENT_EXTRA_SPEECH_PRIORITY = "speech_now";
-
-    public static final String INTENT_EXTRA_LIVEMAP_START = "livemap_start";
-    public static final String INTENT_EXTRA_LIVEMAP_UPDATE = "livemap_update";
-    public static final String INTENT_EXTRA_LIVEMAP_PAUSE = "livemap_pause";
-    public static final String INTENT_EXTRA_LIVEMAP_RESUME = "livemap_resume";
-    public static final String INTENT_EXTRA_LIVEMAP_FINISH = "livemap_finish";
-    public static final String INTENT_EXTRA_LIVEMAP_URL = "livemap_url";
+    public static final String INTENT_EXTRA_SPEECH_NOW_OR_NEVER = "speech_noqueue";
 
     public static final String PREFERENCES_FRAGMENT_TAG = "tagPrefs";
 
@@ -131,11 +141,9 @@ public class Constants {
 
     }
 
-    public static final int ACTION_IMAGE_CAPTURE_REQUEST = -1;
+    public static String getEucWorldUrl() {
+        return (android.os.Debug.isDebuggerConnected()) ? "http://192.168.28.100" : "https://euc.world";
+    }
 
-    public static final int MAIN_NOTIFICATION_ID = 10;
 
-    public static final String LOG_FOLDER_NAME = "WheelLog/Logs";
-    public static final String PICTURE_FOLDER_NAME = "WheelLog/Pictures";
-    public static final String EUCWORLD_URL = "https://euc.world";
 }

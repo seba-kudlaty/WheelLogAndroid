@@ -35,6 +35,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +43,7 @@ import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
@@ -126,15 +128,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 	TextView tvRidingTime;
     TextView tvMode;
     TextView tvLivemapStatus;
-    TextView tvLivemapLastUpdated;
 
     ImageButton ibLivemapStartFinish;
     ImageButton ibLivemapPause;
     ImageButton ibLivemapShare;
     ImageButton ibLivemapPhoto;
 
-    ImageView ivUploadingPhoto;
-    ImageView ivLivemapStatus;
+    ImageView ivUploadProgressWarning;
+    ImageView ivLivemapError;
+    ImageView ivGPSError;
 
     LineChart chart1;
 
@@ -155,6 +157,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private String mImagePath = "";
     private int imageUploadCount = 0;
 
+    private String mAppLatestVersionName;
+    private int mAppLatestVersionCode;
+    private String mAppLatestVersionReleased;
+
     protected static final int RESULT_DEVICE_SCAN_REQUEST = 20;
     protected static final int RESULT_REQUEST_ENABLE_BT = 30;
     protected static final int REQUEST_CODE_RESOLUTION = 40;
@@ -171,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 finish();
             }
 
-            if (mBluetoothLeService.getConnectionState() == BluetoothLeService.STATE_DISCONNECTED &&
+            if (BluetoothLeService.getConnectionState() == BluetoothLeService.STATE_DISCONNECTED &&
                     mDeviceAddress != null && !mDeviceAddress.isEmpty()) {
                 mBluetoothLeService.setDeviceAddress(mDeviceAddress);
                 toggleConnectToWheel();
@@ -725,6 +731,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         break;
                     }
                 }
+                break;
+            case 3: // Livemap View
+                break;
         }
     }
 
@@ -738,7 +747,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        WheelData.initiate();
+        WheelData.initiate(this);
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.settings_frame, getPreferencesFragment(), Constants.PREFERENCES_FRAGMENT_TAG)
@@ -784,16 +793,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         wheelView = (WheelView) findViewById(R.id.wheelView);
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         tvLivemapStatus = findViewById(R.id.tvLivemapStatus);
-        tvLivemapLastUpdated = findViewById(R.id.tvLivemapLastUpdated);
         ibLivemapStartFinish = findViewById(R.id.ibLivemapStartFinish);
         ibLivemapPause = findViewById(R.id.ibLivemapPause);
         ibLivemapPhoto = findViewById(R.id.ibLivemapPhoto);
         ibLivemapShare = findViewById(R.id.ibLivemapShare);
-        ivUploadingPhoto = findViewById(R.id.ivUploadingPhoto);
-        ivLivemapStatus = findViewById(R.id.ivLivemapStatus);
+        ivUploadProgressWarning = findViewById(R.id.ivLivemapUploadProgressWarning);
+        ivLivemapError = findViewById(R.id.ivLivemapError);
+        ivGPSError = findViewById(R.id.ivLivemapGPSError);
+
         wvEucWorld = findViewById(R.id.wvEucWorld);
+        wvEucWorld.setWebViewClient(new WebViewClient() {
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                wvEucWorld.loadData(Constants.EMPTY_HTML, "text/html", "UTF-8");
+            }
+        });
         wvEucWorld.getSettings().setJavaScriptEnabled(true);
-        clearEucWorldApp();
+        wvEucWorld.addJavascriptInterface(WheelLogJSInterface.getInstance(), "WheelLog");
+        wvEucWorld.loadData(Constants.EMPTY_HTML, "text/html", "UTF-8");
 
         mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -816,9 +832,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         ibLivemapStartFinish.setOnClickListener(new ImageButton.OnClickListener() {
             public void onClick(View v)  {
+            if (LivemapService.getStatus() == LivemapService.LivemapStatus.DISCONNECTED)
                 tvLivemapStatus.setText(getString(R.string.livemap_connecting));
-                setBtnState(ibLivemapStartFinish, false, false);
-                MainActivityPermissionsDispatcher.toggleLivemapServiceWithCheck(MainActivity.this);
+            else
+                tvLivemapStatus.setText(getString(R.string.livemap_disconnecting));
+            setBtnState(ibLivemapStartFinish, false, false);
+            setBtnState(ibLivemapPause, false, false);
+            MainActivityPermissionsDispatcher.toggleLivemapServiceWithCheck(MainActivity.this);
             }
         });
 
@@ -882,8 +902,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mDrawer.openDrawer(GravityCompat.START, true);                }
-            }, 1000);
+                    mDrawer.openDrawer(GravityCompat.START, true);
+                }}, 1000);
         }
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -897,9 +917,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
-        BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        if (bluetoothManager != null) mBluetoothAdapter = bluetoothManager.getAdapter();
 
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
@@ -917,6 +936,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Enable voice messages on startup
         if (SettingsUtil.isSpeechEnabledOnStartup(this))
             startSpeechService();
+
+        // Check for updates
+        checkForUpdatesOnStartup();
     }
 
     @Override
@@ -927,8 +949,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             getGoogleApiClient().connect();
 
         if (mBluetoothLeService != null &&
-                mConnectionState != mBluetoothLeService.getConnectionState())
-            setConnectionState(mBluetoothLeService.getConnectionState());
+                mConnectionState != BluetoothLeService.getConnectionState())
+            setConnectionState(BluetoothLeService.getConnectionState());
 
         if (WheelData.getInstance().getWheelType() != WHEEL_TYPE.Unknown)
             configureDisplay(WheelData.getInstance().getWheelType());
@@ -973,18 +995,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (LivemapService.getStatus() == LivemapService.LivemapStatus.DISCONNECTED)
                     android.os.Process.killProcess(android.os.Process.myPid());
             }
-        }, 0, 250);
-        /*
-        new CountDownTimer(5000, 15) {
-            @Override
-            public void onTick(long millisUntilFinished) { }
-            @Override
-            public void onFinish() {
-                // Destroy application after 5 seconds
-                android.os.Process.killProcess(android.os.Process.myPid());
-            }
-        }.start();
-        */
+        }, 0, 100);
     }
 
     @Override
@@ -1406,9 +1417,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (intent.resolveActivity(getPackageManager()) != null) {
             File imageFile = createImageFile();
             if (imageFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                    "com.cooper.wheellog.fileprovider",
-                    imageFile);
+                Uri photoURI = FileProvider.getUriForFile(this, "com.cooper.wheellog.fileprovider", imageFile);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
                     intent.setClipData(ClipData.newRawUri("", photoURI));
@@ -1427,26 +1436,31 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     private void updateLivemapUI() {
+        // GPS signal
+        if (LivemapService.isConnected() && !LivemapService.getLivemapGPS())
+            ivGPSError.setVisibility(View.VISIBLE);
+        else
+            ivGPSError.setVisibility(View.GONE);
         // Image upload notification
         if (imageUploadCount > 0)
-            ivUploadingPhoto.setVisibility(View.VISIBLE);
+            ivUploadProgressWarning.setVisibility(View.VISIBLE);
         else
-            ivUploadingPhoto.setVisibility(View.GONE);
+            ivUploadProgressWarning.setVisibility(View.GONE);
         // Live map status notification
-        switch (LivemapService.getLivemapStatus()) {
+        switch (LivemapService.getLivemapError()) {
             case -1:
-                ivLivemapStatus.setVisibility(View.GONE);
+                ivLivemapError.setVisibility(View.GONE);
                 break;
             case 0:
-                ivLivemapStatus.setVisibility(View.GONE);
+                ivLivemapError.setVisibility(View.GONE);
                 break;
             case 1:
-                ivLivemapStatus.setImageResource(R.drawable.ic_warning);
-                ivLivemapStatus.setVisibility(View.VISIBLE);
+                ivLivemapError.setImageResource(R.drawable.ic_warning);
+                ivLivemapError.setVisibility(View.VISIBLE);
                 break;
             case 2:
-                ivLivemapStatus.setImageResource(R.drawable.ic_error);
-                ivLivemapStatus.setVisibility(View.VISIBLE);
+                ivLivemapError.setImageResource(R.drawable.ic_error);
+                ivLivemapError.setVisibility(View.VISIBLE);
                 break;
         }
         // Buttons and text
@@ -1454,7 +1468,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             switch (LivemapService.getStatus()) {
                 case DISCONNECTED:
                     tvLivemapStatus.setText(getString(R.string.livemap_offline));
-                    tvLivemapLastUpdated.setText("");
                     setBtnState(ibLivemapStartFinish, false, !SettingsUtil.getLivemapApiKey(this).equals(""));
                     setBtnState(ibLivemapPause, false, false);
                     setBtnState(ibLivemapPhoto, false, false);
@@ -1462,7 +1475,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     break;
                 case CONNECTING:
                     tvLivemapStatus.setText(getString(R.string.livemap_connecting));
-                    tvLivemapLastUpdated.setText("");
                     setBtnState(ibLivemapStartFinish, false, false);
                     setBtnState(ibLivemapPause, false, false);
                     setBtnState(ibLivemapPhoto, false, false);
@@ -1470,7 +1482,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     break;
                 case WAITING_FOR_GPS:
                     tvLivemapStatus.setText(getString(R.string.livemap_gps_wait));
-                    tvLivemapLastUpdated.setText("");
                     setBtnState(ibLivemapStartFinish, true, true);
                     setBtnState(ibLivemapPause, false, false);
                     setBtnState(ibLivemapPhoto, false, false);
@@ -1478,7 +1489,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     break;
                 case STARTED:
                     tvLivemapStatus.setText(getString(R.string.livemap_live));
-                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
                     setBtnState(ibLivemapStartFinish, true, true);
                     setBtnState(ibLivemapPause, false, true);
                     setBtnState(ibLivemapPhoto, false, true);
@@ -1487,15 +1497,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 case PAUSING:
                 case RESUMING:
                     tvLivemapStatus.setText(getString(R.string.livemap_live));
-                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
-                    setBtnState(ibLivemapStartFinish, true, false);
-                    setBtnState(ibLivemapPause, true, true);
+                    setBtnState(ibLivemapStartFinish, true, true);
+                    setBtnState(ibLivemapPause, true, false);
                     setBtnState(ibLivemapPhoto, false, true);
                     setBtnState(ibLivemapShare, false, true);
                     break;
                 case PAUSED:
                     tvLivemapStatus.setText(getString(R.string.livemap_live));
-                    tvLivemapLastUpdated.setText(getString(R.string.livemap_last_update, LivemapService.getInstance().getUpdateDateTime()));
                     setBtnState(ibLivemapStartFinish, true, true);
                     setBtnState(ibLivemapPause, true, true);
                     setBtnState(ibLivemapPhoto, false, true);
@@ -1503,8 +1511,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     break;
                 case DISCONNECTING:
                     tvLivemapStatus.setText(getString(R.string.livemap_disconnecting));
-                    tvLivemapLastUpdated.setText("");
-                    setBtnState(ibLivemapStartFinish, false, false);
+                    setBtnState(ibLivemapStartFinish, true, false);
                     setBtnState(ibLivemapPause, false, false);
                     setBtnState(ibLivemapPhoto, false, false);
                     setBtnState(ibLivemapShare, false, false);
@@ -1513,7 +1520,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
         else {
             tvLivemapStatus.setText(getString(R.string.livemap_offline));
-            tvLivemapLastUpdated.setText("");
             setBtnState(ibLivemapStartFinish, false, !SettingsUtil.getLivemapApiKey(this).equals(""));
             setBtnState(ibLivemapPause, false, false);
             setBtnState(ibLivemapPhoto, false, false);
@@ -1521,15 +1527,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
-    private void clearEucWorldApp() {
-        wvEucWorld.loadData("<html><body style=\"background: #284a73;\"></body></html>", "text/html", "UTF-8");
-    }
-
     private void loadEucWorldApp() {
         if (!SettingsUtil.getLivemapApiKey(this).equals(""))
-            wvEucWorld.loadUrl("https://euc.world/app?apikey="+SettingsUtil.getLivemapApiKey(this)+"&version="+BuildConfig.VERSION_NAME);
+            wvEucWorld.loadUrl(Constants.getEucWorldUrl()+"/app?k="+SettingsUtil.getLivemapApiKey(this));
         else
-            wvEucWorld.loadUrl("https://euc.world/app?version="+BuildConfig.VERSION_NAME);
+            wvEucWorld.loadUrl(Constants.getEucWorldUrl()+"/app");
     }
 
     private void uploadImageToEucWorld() {
@@ -1586,7 +1588,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             requestParams.put("ldt", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).format(new Date(LivemapService.getInstance().getLocationTime())));
             Toast.makeText(getApplicationContext(), R.string.livemap_image_uploading, Toast.LENGTH_LONG).show();
             imageUploadCount += 1;
-            HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/upload", requestParams, new JsonHttpResponseHandler() {
+            HttpClient.post(Constants.getEucWorldUrl() + "/api/tour/upload", requestParams, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
                     imageUploadCount -= 1;
@@ -1619,8 +1621,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             });
         }
-        catch(FileNotFoundException e) {
-
-        }
+        catch(FileNotFoundException e) { }
     }
+
+    private void checkForUpdatesOnStartup() {
+        final RequestParams requestParams = new RequestParams();
+        String apiKey = SettingsUtil.getLivemapApiKey(this);
+        requestParams.put("resource", "app");
+        if (!apiKey.equals("")) requestParams.put("k", apiKey);
+        HttpClient.post(Constants.getEucWorldUrl() + "/api/get", requestParams, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
+                try {
+                    int error = response.getInt("error");
+                    if (error == 0) {
+                        WheelLogJSInterface.getInstance().setAppLatestVersionName(response.getJSONObject("data").getString("appLatestVersionName"));
+                        WheelLogJSInterface.getInstance().setAppLatestVersionCode(response.getJSONObject("data").getInt("appLatestVersionCode"));
+                        WheelLogJSInterface.getInstance().setAppLatestDownloadUrl(response.getJSONObject("data").getString("appLatestDownloadUrl"));
+                        loadEucWorldApp();
+                    }
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) { }
+            @Override
+            public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) { }
+        });
+    }
+
 }

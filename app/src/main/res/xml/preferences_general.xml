@@ -23,9 +23,9 @@
         android:title="@string/max_speed_title"
         android:summary="@string/max_speed_summary"
         android:enabled="true"
-        android:defaultValue="30"
+        android:defaultValue="40"
         sample:msbp_minValue="10"
-        sample:msbp_maxValue="50"
+        sample:msbp_maxValue="70"
         sample:msbp_interval="1"
         sample:msbp_measurementUnit="km/h"
         sample:msbp_dialogEnabled="true"/>

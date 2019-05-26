@@ -1,6 +1,5 @@
 package com.cooper.wheellog;
 
-import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.widget.Toast;
 
@@ -25,7 +25,6 @@ import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 
 import java.util.*;
 
-import permissions.dispatcher.NeedsPermission;
 import timber.log.Timber;
 
 /**
@@ -39,17 +38,21 @@ public class BluetoothLeService extends Service {
     public static final int STATE_CONNECTED = 2;
 
     private static int mConnectionState = STATE_DISCONNECTED;
+    private static BluetoothLeService instance = null;
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private Date mDisconnectTime;
-
+    private String mBluetoothDeviceAddress;
     private boolean disconnectRequested = false;
     private boolean autoConnect = false;
     private NotificationUtil mNotificationHandler;
 
+    public static boolean isInstanceCreated() {
+        return instance != null;
+    }
+    public static BluetoothLeService getInstance() { return instance; }
 
     private final BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
@@ -61,8 +64,8 @@ public class BluetoothLeService extends Service {
                     switch (connectionState) {
                         case STATE_CONNECTED:
                             mConnectionState = STATE_CONNECTED;
-                            if (!LivemapService.isInstanceCreated() && SettingsUtil.getLivemapAutoStart(getApplicationContext()) && !SettingsUtil.getLivemapApiKey(getApplicationContext()).equals(""))
-                                startLivemapService();
+                            if (!LivemapService.isInstanceCreated() && SettingsUtil.getLivemapAutoStart(getApplicationContext()))
+                                startLivemapServiceAuto();
                             if (!LoggingService.isInstanceCreated() && SettingsUtil.isAutoLogEnabled(BluetoothLeService.this))
                                 startService(new Intent(getApplicationContext(), LoggingService.class));
 							if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.KINGSONG) {
@@ -142,6 +145,7 @@ public class BluetoothLeService extends Service {
         return intentFilter;
     }
 
+    public static boolean isDisconnected() { return mConnectionState == STATE_DISCONNECTED; }
     public static int getConnectionState() {
         return mConnectionState;
     }
@@ -240,26 +244,26 @@ public class BluetoothLeService extends Service {
             if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.KINGSONG) {
                 if (characteristic.getUuid().toString().equals(Constants.KINGSONG_READ_CHARACTER_UUID)) {
                     byte[] value = characteristic.getValue();
-                    WheelData.getInstance().decodeResponse(value, getApplicationContext());
+                    WheelData.getInstance().decodeResponse(value);
                 }
             }
 
             if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.GOTWAY) {
                 byte[] value = characteristic.getValue();
-                WheelData.getInstance().decodeResponse(value, getApplicationContext());
+                WheelData.getInstance().decodeResponse(value);
             }
 
             if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.INMOTION) {
                 byte[] value = characteristic.getValue();
                 if (characteristic.getUuid().toString().equals(Constants.INMOTION_READ_CHARACTER_UUID)) {
-                    WheelData.getInstance().decodeResponse(value, getApplicationContext());
+                    WheelData.getInstance().decodeResponse(value);
                 }
             }
 
             if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.NINEBOT_Z) {
                 byte[] value = characteristic.getValue();
                 if (characteristic.getUuid().toString().equals(Constants.NINEBOT_Z_READ_CHARACTER_UUID)) {
-                    WheelData.getInstance().decodeResponse(value, getApplicationContext());
+                    WheelData.getInstance().decodeResponse(value);
                 }
             }
         }
@@ -270,7 +274,6 @@ public class BluetoothLeService extends Service {
     }
 
     private void broadcastConnectionUpdate(int connectionState, boolean auto_connect) {
-        WheelData.getInstance().setConnected(connectionState == STATE_CONNECTED);
         final Intent intent = new Intent(Constants.ACTION_BLUETOOTH_CONNECTION_STATE);
         intent.putExtra(Constants.INTENT_EXTRA_CONNECTION_STATE, connectionState);
         if (auto_connect)
@@ -301,6 +304,7 @@ public class BluetoothLeService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        instance = this;
         if (mBluetoothGatt != null &&
                 mConnectionState != STATE_DISCONNECTED)
             mBluetoothGatt.disconnect();
@@ -318,6 +322,7 @@ public class BluetoothLeService extends Service {
      * @return Return true if the initialization is successful.
      */
     public boolean initialize() {
+        instance = this;
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             if (mBluetoothManager == null) {
@@ -351,6 +356,8 @@ public class BluetoothLeService extends Service {
      */
 
     public boolean connect() { //final String address) {
+        sendBroadcast(new Intent(Constants.ACTION_BLUETOOTH_CONNECT));
+
         disconnectRequested = false;
         autoConnect = false;
         mDisconnectTime = null;
@@ -390,6 +397,7 @@ public class BluetoothLeService extends Service {
      * callback.
      */
     public void disconnect() {
+        sendBroadcast(new Intent(Constants.ACTION_BLUETOOTH_DISCONNECT));
         disconnectRequested = true;
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Timber.i("BluetoothAdapter not initialized");
@@ -563,14 +571,26 @@ public class BluetoothLeService extends Service {
         return mBluetoothDeviceAddress;
     }
 
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    void startLivemapService() {
-        Intent livemapServiceIntent = new Intent(getApplicationContext(), LivemapService.class);
-        LivemapService.setAutoStarted(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            startForegroundService(livemapServiceIntent);
-        else
-            startService(livemapServiceIntent);
+    void startLivemapServiceAuto() {
+        if (!SettingsUtil.getLivemapApiKey(getApplicationContext()).equals("")) {
+            new CountDownTimer(3000, 10) {
+                @Override
+                public void onTick(long millisUntilFinished) { }
+                @Override
+                public void onFinish() {
+                    if (SettingsUtil.getLivemapAutoStart(getApplicationContext()) && PermissionsUtil.checkLocationPermission(getApplicationContext())) {
+                        Intent intent = new Intent(getApplicationContext(), LivemapService.class);
+                        if (LivemapService.getStatus() == LivemapService.LivemapStatus.DISCONNECTED) {
+                            LivemapService.setAutoStarted(true);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                startForegroundService(intent);
+                            else
+                                startService(intent);
+                        }
+                    }
+                }
+            }.start();
+        }
     }
 
 }

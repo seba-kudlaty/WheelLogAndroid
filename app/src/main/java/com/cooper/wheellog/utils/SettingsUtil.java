@@ -140,7 +140,11 @@ public class SettingsUtil {
     }
 
     public static boolean getSpeechOnlyInMotion(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_only_when_moving), false);
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_only_when_moving), true);
+    }
+
+    public static boolean getSpeechGPSBTStatus(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_gps_bt_status), true);
     }
 
     public static boolean getSpeechMessagesSpeed(Context context) {
@@ -227,8 +231,12 @@ public class SettingsUtil {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.livemap_auto_start), false);
     }
 
-    public static boolean getLivemapHoldWithoutWheel(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(R.string.livemap_hold_without_wheel), false);
+    public static boolean getLivemapAutoFinish(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.livemap_auto_finish), false);
+    }
+
+    public static int getLivemapAutoFinishDelay(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_auto_finish_delay), "180"));
     }
 
 }

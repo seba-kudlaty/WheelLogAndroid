@@ -3,9 +3,13 @@ package com.cooper.wheellog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.SystemClock;
 import android.os.Vibrator;
+import android.util.Log;
 
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.Constants.ALARM_TYPE;
@@ -21,16 +25,17 @@ import java.util.concurrent.TimeUnit;
 import timber.log.Timber;
 
 public class WheelData {
+
     private static final int TIME_BUFFER = 10;
     private static WheelData mInstance;
-	private Timer ridingTimerControl;
+	private Timer timer;
+	private Context mContext;
 
     private BluetoothLeService mBluetoothLeService;
 
     private long graph_last_update_time;
     private static final int GRAPH_UPDATE_INTERVAL = 1000; // milliseconds
     private static final int MAX_BATTERY_AVERAGE_COUNT = 150;
-	private static final int RIDING_SPEED = 200; // 2km/h
 	private static final double RATIO_GW = 0.875;
     private ArrayList<String> xAxis = new ArrayList<>();
     private ArrayList<Float> currentAxis = new ArrayList<>();
@@ -62,7 +67,8 @@ public class WheelData {
     private int mLastRideTime;
     private int mTopSpeed;
     private int mFanStatus;
-    private boolean mConnectionState = false;
+    private long mLastDataReceived = 0;
+    private boolean mConnected = false;
 	private boolean mNewWheelSettings = false;
     private String mName = "";
     private String mModel = "";
@@ -103,30 +109,58 @@ public class WheelData {
     private boolean mCurrentAlarmExecuted = false;
 	private boolean mTemperatureAlarmExecuted = false;
 
-    static void initiate() {
-        if (mInstance == null)
-            mInstance = new WheelData();
-		else {
-			if (mInstance.ridingTimerControl != null) {
-				mInstance.ridingTimerControl.cancel();
-				mInstance.ridingTimerControl = null;
-			}
-		}
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            String action = intent.getAction();
+            if (Constants.ACTION_BLUETOOTH_CONNECTION_STATE.equals(action)) {
+                int connectionState = intent.getIntExtra(Constants.INTENT_EXTRA_CONNECTION_STATE, BluetoothLeService.STATE_DISCONNECTED);
+                switch (connectionState) {
+                    case BluetoothLeService.STATE_CONNECTED:
+                        break;
+                    case BluetoothLeService.STATE_DISCONNECTED:
+                        if (mConnected) {
+                            mConnected = false;
+                            mContext.sendBroadcast(new Intent(Constants.ACTION_WHEEL_DISCONNECTED));
+                        }
+                        break;
+                    case BluetoothLeService.STATE_CONNECTING:
+                        break;
+                }
+            }
+        }
+    };
 
+    static void initiate(Context context) {
+        if (mInstance == null) {
+            mInstance = new WheelData();
+            mInstance.init(context);
+        }
         mInstance.full_reset();
-		mInstance.startRidingTimerControl();
     }
-	
-	
-	public void startRidingTimerControl() {
+
+    private void init(Context context) {
+        mContext = context;
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.ACTION_BLUETOOTH_CONNECTION_STATE);
+        mContext.registerReceiver(receiver, intentFilter);
+
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                if (mConnectionState && (mSpeed > RIDING_SPEED)) mRidingTime += 1;
+                long now = SystemClock.elapsedRealtime();
+                if (!BluetoothLeService.isDisconnected() && now - mLastDataReceived >= Constants.WHEEL_DATA_VALIDITY) {
+                    if (mConnected) {
+                        mConnected = false;
+                        mContext.sendBroadcast(new Intent(Constants.ACTION_WHEEL_CONNECTION_LOST));
+                    }
+                }
+                if (mConnected && getSpeedDouble() >= Constants.MIN_RIDING_SPEED) mRidingTime += 1;
             }
         };
-        ridingTimerControl = new Timer();
-        ridingTimerControl.scheduleAtFixedRate(timerTask, 0, 1000);
+        timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 0, 1000);
     }
 
     public static WheelData getInstance() {
@@ -134,6 +168,10 @@ public class WheelData {
     }
 
     public boolean isKS18L() { return (mModel.compareTo("KS-18L") == 0); }
+
+    public long getDataAge() {
+        return SystemClock.elapsedRealtime() - mLastDataReceived;
+    }
 
     int getSpeed() {
         return mSpeed / 10;
@@ -417,7 +455,7 @@ public class WheelData {
     }
 
     boolean isConnected() {
-        return mConnectionState;
+        return mConnected;
     }
 
     //    int getTopSpeed() { return mTopSpeed; }
@@ -537,7 +575,6 @@ public class WheelData {
 	
 	public double getUserDistanceDouble() {
 		if (mUserDistance == 0 && mTotalDistance != 0 )  {
-			Context mContext = mBluetoothLeService.getApplicationContext();
 			mUserDistance = SettingsUtil.getUserDistance(mContext, mBluetoothLeService.getBluetoothDeviceAddress());
 			if (mUserDistance == 0) {
 				SettingsUtil.setUserDistance(mContext, mBluetoothLeService.getBluetoothDeviceAddress(),mTotalDistance);
@@ -549,8 +586,7 @@ public class WheelData {
 	
 	public void resetUserDistance() {		
 		if (mTotalDistance != 0)  {
-			Context mContext = mBluetoothLeService.getApplicationContext();
-			SettingsUtil.setUserDistance(mContext, mBluetoothLeService.getBluetoothDeviceAddress(), mTotalDistance);		
+			SettingsUtil.setUserDistance(mContext, mBluetoothLeService.getBluetoothDeviceAddress(), mTotalDistance);
 			mUserDistance = mTotalDistance;
 		}
 
@@ -584,18 +620,6 @@ public class WheelData {
     ArrayList<Float> getSpeedAxis() {
         return speedAxis;
     }
-
-    void setConnected(boolean connected) {		
-        mConnectionState = connected;
-        Timber.i("State %b", connected);
-
-		//if (mWheelType == WHEEL_TYPE.INMOTION || !mConnectionState) InMotionAdapter.getInstance().stopTimer();
-        //if (mWheelType == WHEEL_TYPE.NINEBOT_Z) NinebotZAdapter.getInstance().resetConnection();
-    }
-	
-//	void setUserDistance(long userDistance) {
-//        mUserDistance = userDistance;
-//    }
 
     void setAlarmsEnabled(boolean enabled) {
         mAlarmsEnabled = enabled;
@@ -695,18 +719,18 @@ public class WheelData {
             return false;
     }
 
-    private void checkAlarmStatus(Context mContext) {
+    private void checkAlarmStatus() {
         // SPEED ALARM
         if (!mSpeedAlarmExecuted) {
             if (mAlarm1Speed > 0 && mAlarm1Battery > 0 &&
                     mAverageBattery <= mAlarm1Battery && mSpeed >= mAlarm1Speed)
-                raiseAlarm(ALARM_TYPE.SPEED, mContext);
+                raiseAlarm(ALARM_TYPE.SPEED);
             else if (mAlarm2Speed > 0 && mAlarm2Battery > 0 &&
                     mAverageBattery <= mAlarm2Battery && mSpeed >= mAlarm2Speed)
-                raiseAlarm(ALARM_TYPE.SPEED, mContext);
+                raiseAlarm(ALARM_TYPE.SPEED);
             else if (mAlarm3Speed > 0 && mAlarm3Battery > 0 &&
                     mAverageBattery <= mAlarm3Battery && mSpeed >= mAlarm3Speed)
-                raiseAlarm(ALARM_TYPE.SPEED, mContext);
+                raiseAlarm(ALARM_TYPE.SPEED);
         } else {
             boolean alarm_finished = false;
             if (mAlarm1Speed > 0 && mAlarm1Battery > 0 &&
@@ -726,7 +750,7 @@ public class WheelData {
         if (!mCurrentAlarmExecuted) {
             if (mAlarmCurrent > 0 &&
                     mCurrent >= mAlarmCurrent) {
-                raiseAlarm(ALARM_TYPE.CURRENT, mContext);
+                raiseAlarm(ALARM_TYPE.CURRENT);
             }
         } else {
             if (mCurrent < mAlarmCurrent)
@@ -736,7 +760,7 @@ public class WheelData {
 		// TEMP
 		if (!mTemperatureAlarmExecuted) {
             if (mAlarmTemperature > 0 && mTemperature >= mAlarmTemperature) {
-                raiseAlarm(ALARM_TYPE.TEMPERATURE, mContext);
+                raiseAlarm(ALARM_TYPE.TEMPERATURE);
             }
         } else {
             if (mTemperature < mAlarmTemperature)
@@ -745,7 +769,7 @@ public class WheelData {
 		
     }
 
-    private void raiseAlarm(ALARM_TYPE alarmType, Context mContext) {
+    private void raiseAlarm(ALARM_TYPE alarmType) {
         Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         long[] pattern = {0};
         Intent intent = new Intent(Constants.ACTION_ALARM_TRIGGERED);
@@ -770,7 +794,7 @@ public class WheelData {
             v.vibrate(pattern, -1);
     }
 
-    void decodeResponse(byte[] data, Context mContext) {
+    void decodeResponse(byte[] data) {
 
         StringBuilder stringBuilder = new StringBuilder(data.length);
         for (byte aData : data)
@@ -815,9 +839,14 @@ public class WheelData {
         }
 
 		if (mAlarmsEnabled) 
-			checkAlarmStatus(mContext);
-		mContext.sendBroadcast(intent);
+			checkAlarmStatus();
 
+        mLastDataReceived = SystemClock.elapsedRealtime();
+        if (!mConnected && BluetoothLeService.getConnectionState() == BluetoothLeService.STATE_CONNECTED) {
+            mConnected = true;
+            mContext.sendBroadcast(new Intent(Constants.ACTION_WHEEL_CONNECTED));
+        }
+        mContext.sendBroadcast(intent);
     }
 
     private boolean decodeKingSong(byte[] data) {
@@ -865,7 +894,7 @@ public class WheelData {
                     mLastTimestamp = System.currentTimeMillis();
                 }
 
-                if ((mModel.compareTo("KS-18L") == 0) || (mBtName.compareTo("RW") == 0 )) {
+                if ((mModel.compareTo("KS-18L") == 0) || (mBtName.compareTo("RW") == 0 ) || (mName.startsWith("ROCKW"))) {
 
                     if (mVoltage > 8350) {
                         battery = 100;
@@ -1143,7 +1172,6 @@ public class WheelData {
 
     boolean detectWheel(BluetoothLeService bluetoothService) {
         mBluetoothLeService = bluetoothService;
-        Context mContext = bluetoothService.getApplicationContext();
 
         Class<R.array> res = R.array.class;
         String wheel_types[] = mContext.getResources().getStringArray(R.array.wheel_types);
@@ -1202,8 +1230,8 @@ public class WheelData {
 				mContext.sendBroadcast(intent);
 				Timber.i("Protocol recognized as %s", wheel_Type);
 				//System.out.println("WheelRecognizedWD");
-                if (mContext.getResources().getString(R.string.gotway).equals(wheel_Type) && (mBtName.equals("RW"))) {
-                    Timber.i("It seems to be RochWheel, force to Kingsong proto");
+                if (mContext.getResources().getString(R.string.gotway).equals(wheel_Type) && (mBtName.equals("RW") || mName.startsWith("ROCKW"))) {
+                    Timber.i("It seems to be RockWheel, force to Kingsong proto");
                     wheel_Type = mContext.getResources().getString(R.string.kingsong);
                 }
                 if (mContext.getResources().getString(R.string.kingsong).equals(wheel_Type)) {

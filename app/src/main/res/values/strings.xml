@@ -211,7 +211,7 @@
     <string name="speech_enable_on_startup_title">Turn on voice messages on startup</string>
     <string name="speech_rate_title">Speech rate</string>
     <string name="speech_pitch_title">Speech pitch</string>
-    <string name="speech_only_when_moving_title">Pause messages when not in motion</string>
+    <string name="speech_only_when_moving_title">Messages only in motion</string>
     <string name="speech_only_when_moving_summary">Alarms and warnings are always active</string>
     <string name="speech_msg_mode_title">Triggering</string>
     <string name="speech_msg_interval_title">Interval</string>
@@ -357,17 +357,26 @@
     <string name="show_when_locked_title">Show when locked</string>
     <string name="show_when_locked_summary">Show main window even if the screen is locked</string>
     <string name="livemap_api_error_server">Temporary server error. Please try again later.</string>
-    <string name="livemap_image_preparation_error">Error when preparing image for upload</string>
-    <string name="livemap_image_upload_error">Image upload failed</string>
+    <string name="livemap_image_preparation_error">Error during image processing</string>
+    <string name="livemap_image_upload_error">Image upload failed!</string>
     <string name="livemap_image_uploaded">Image uploaded!</string>
-    <string name="livemap_image_uploading">Uploading image...</string>
+    <string name="livemap_image_uploading">Uploading image…</string>
     <string name="livemap_auto_start" translatable="false">livemap_auto_start</string>
     <string name="livemap_auto_start_title">Start when wheel is connected</string>
-    <string name="livemap_auto_start_summary">Select this option if you want to start tour in \"Link only\" mode after connecting to the wheel</string>
-    <string name="livemap_hold_without_wheel" translatable="false">livemap_hold_without_wheel</string>
-    <string name="livemap_hold_without_wheel_title">Hold when wheel connection is lost</string>
-    <string name="livemap_hold_without_wheel_summary">Select this option if you want to hold up data updates while connection to the wheel is lost</string>
-    <string name="livemap_disconnecting">Disconnecting...</string>
-    <string name="livemap_speech_tour_started">Tour logging has started.</string>
+    <string name="livemap_auto_start_summary">Check if you want to automatically start tour after wheel connection is estabilished</string>
+    <string name="livemap_auto_finish" translatable="false">livemap_auto_finish</string>
+    <string name="livemap_auto_finish_title">Finish when wheel connection is lost</string>
+    <string name="livemap_auto_finish_summary">Check if you want to automatically finish tour after wheel connection is lost</string>
+    <string name="livemap_auto_finish_delay" translatable="false">livemap_auto_finish_delay</string>
+    <string name="livemap_auto_finish_delay_title">Finish delay</string>
+    <string name="livemap_auto_finish_delay_summary">Define delay after which tour will be finished</string>
+    <string name="livemap_disconnecting">Disconnecting…</string>
+    <string name="livemap_speech_tour_started">Tour logging has been started.</string>
+    <string name="livemap_speech_tour_finished">Tour logging has been finished.</string>
+    <string name="livemap_speech_gps_signal_regained">GPS signal regained.</string>
+    <string name="livemap_speech_gps_signal_lost">GPS signal lost.</string>
+    <string name="speech_gps_bt_status" translatable="false">speech_gps_bt_status</string>
+    <string name="speech_gps_bt_status_title"><![CDATA[GPS & BT status messages]]></string>
+    <string name="speech_text_disconnected">Disconnected.</string>
 
 </resources>

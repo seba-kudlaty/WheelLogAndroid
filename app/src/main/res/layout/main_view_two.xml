@@ -18,6 +18,7 @@
 
             <TextView
                 android:id="@+id/tvWaitText"
+                android:layout_width="match_parent"
                 android:text="@string/waiting_for_wheel"
                 android:textAlignment="center"
                 android:textSize="20sp"

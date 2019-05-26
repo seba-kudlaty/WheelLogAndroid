@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import com.cooper.wheellog.utils.SettingsUtil;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,8 +36,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LivemapService extends Service {
+
     public enum LivemapStatus {
         DISCONNECTED,
         CONNECTING,
@@ -52,26 +57,29 @@ public class LivemapService extends Service {
     private static String url = "";
     private static boolean autoStarted = false;
     private static int autoStartedPublish = 1;
-    private static int livemapStatus = -1;
+    private static int livemapError = -1;
+    private static boolean livemapGPS = false;
+    private static double currentDistance;
+    private static double currentSpeed;
     private static final int NOTIFY_ID = 36901;
     private static final String CHANNEL_ID = "chan_wl_livemap";
 
+    private Timer timer;
     private NotificationManager notificationManager;
     private String updateDateTime = "";
     private String tourKey;
     private long lastUpdated;
+    private long lastGPS;
     private Location lastLocation;
     private double lastLatitude;
     private double lastLongitude;
     private long lastLocationTime;
     private Location currentLocation;
-    private long wheelUpdated = 0;
-    private boolean wheelDisconnected = false;
-    private double currentDistance;
+    private long tourStartInitiated = 0;
     private LocationManager locationManager;
     private BatteryManager batteryManager;
     private SimpleDateFormat df;
-    private boolean updating = false;
+    private int updateTimer = 0;
 
     private long weatherTimestamp = 0;
     private double weatherTemperature;
@@ -83,28 +91,40 @@ public class LivemapService extends Service {
     private double weatherPrecipitation;
     private double weatherVisibility;
     private double weatherCloudCoverage;
-    private int weatherCondition;
+    private int weatherConditionCode;
 
     public static boolean isInstanceCreated() {
         return instance != null;
     }
     public static LivemapService getInstance() { return instance; }
+    public static double getDistance() { return currentDistance / 1000; }
+    public static double getSpeed() { return (livemapGPS) ? currentSpeed : 0; }
     public static LivemapStatus getStatus() { return status; }
     public static String getUrl() { return url; }
     public static boolean getAutoStarted() { return autoStarted; }
     public static void setAutoStarted(boolean b) { autoStarted = b; }
-    public static int getLivemapStatus() { return livemapStatus; }
+    public static int getLivemapError() { return livemapError; }
+    public static boolean getLivemapGPS() { return livemapGPS; }
+    public static boolean isConnected() { return status.ordinal() >= LivemapStatus.CONNECTING.ordinal() && status.ordinal() < LivemapStatus.DISCONNECTING.ordinal(); }
 
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
+            if (!livemapGPS) {
+                livemapGPS = true;
+                sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
+                if (lastLocation != null && SettingsUtil.getSpeechGPSBTStatus(getApplicationContext()))
+                    say(getString(R.string.livemap_speech_gps_signal_regained), "info", 1);
+            }
+            lastGPS = SystemClock.elapsedRealtime();
             currentLocation = location;
+            currentSpeed = location.getSpeed() * 3.6f;
             lastLocationTime = location.getTime();
+            lastLatitude = location.getLatitude();
+            lastLongitude = location.getLongitude();
             if (lastLocation != null) {
-                if ((currentLocation.getSpeed() * 3.6 >= 3.0f) || (lastLocation.distanceTo(currentLocation) >= location.getAccuracy())) {
-                    lastLocation = currentLocation;
-                    lastLatitude = location.getLatitude();
-                    lastLongitude = location.getLongitude();
+                if (currentLocation.getSpeed() * 3.6f >= Constants.MIN_RIDING_SPEED || lastLocation.distanceTo(currentLocation) >= location.getAccuracy()) {
                     currentDistance += lastLocation.distanceTo(currentLocation);
+                    lastLocation = currentLocation;
                 }
             }
             else
@@ -122,10 +142,6 @@ public class LivemapService extends Service {
         {
             String action = intent.getAction();
             switch (action) {
-                case Constants.ACTION_WHEEL_DATA_AVAILABLE:
-                    wheelDisconnected = false;
-                    wheelUpdated = SystemClock.elapsedRealtime();
-                    break;
                 case Constants.ACTION_LIVEMAP_PAUSE:
                     pauseLivemap();
                     break;
@@ -136,30 +152,55 @@ public class LivemapService extends Service {
         }
     };
 
+    private void startTimer() {
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                long now = SystemClock.elapsedRealtime();
+                // Decrement API update timer
+                if (updateTimer > 0) --updateTimer;
+                // Toggle GPS signal lost
+                if (livemapGPS && now - lastGPS > Constants.GPS_DATA_VALIDITY) {
+                    livemapGPS = false;
+                    sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
+                    if (SettingsUtil.getSpeechGPSBTStatus(getApplicationContext()))
+                        say(getString(R.string.livemap_speech_gps_signal_lost), "warning1", 1);
+                }
+                // If enabled in settings, finish unpaused tour after wheel connection is lost
+                if (status != LivemapStatus.DISCONNECTED &&
+                        status != LivemapStatus.PAUSED &&
+                        SettingsUtil.getLivemapAutoFinish(getApplicationContext()) &&
+                        WheelData.getInstance().getDataAge() > SettingsUtil.getLivemapAutoFinishDelay(getApplicationContext()) * 1000 &&
+                        tourStartInitiated + SettingsUtil.getLivemapAutoFinishDelay(getApplicationContext()) * 1000 < now)
+                    stop();
+            }
+        };
+        timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 1000, 1000);
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_WHEEL_DATA_AVAILABLE);
-        intentFilter.addAction(Constants.ACTION_BLUETOOTH_CONNECTION_STATE);
         intentFilter.addAction(Constants.ACTION_LIVEMAP_PAUSE);
         intentFilter.addAction(Constants.ACTION_LIVEMAP_RESUME);
         registerReceiver(receiver, intentFilter);
         if (!PermissionsUtil.checkLocationPermission(this)) {
             showToast(R.string.livemap_error_no_location_permission, Toast.LENGTH_LONG);
-            stopSelf();
+            stop();
             return START_STICKY;
         }
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if ((locationManager == null) || (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))) {
             locationManager = null;
             showToast(R.string.livemap_error_no_gps_provider, Toast.LENGTH_LONG);
-            stopSelf();
+            stop();
             return START_STICKY;
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
-        Intent serviceStartedIntent = new Intent(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, true);
-        sendBroadcast(serviceStartedIntent);
+        sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, true));
         startLivemap();
+        startTimer();
         return START_STICKY;
     }
 
@@ -167,8 +208,11 @@ public class LivemapService extends Service {
     public void onCreate() {
         startForeground(NOTIFY_ID, getNotification(getString(R.string.notification_livemap_title), getString(R.string.livemap_connecting)));
         instance = this;
-        livemapStatus = 0;
-        batteryManager = (BatteryManager)getSystemService(BATTERY_SERVICE);
+        livemapGPS = false;
+        livemapError = 0;
+        currentDistance = 0;
+        currentSpeed = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) batteryManager = (BatteryManager)getSystemService(BATTERY_SERVICE);
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -181,18 +225,20 @@ public class LivemapService extends Service {
 
     @Override
     public void onDestroy() {
-        stopForeground(true);
+        unregisterReceiver(receiver);
+        timer.cancel();
         stopLivemap();
         autoStarted = false;
-        unregisterReceiver(receiver);
         if (locationManager != null)
             locationManager.removeUpdates(locationListener);
+        livemapGPS = false;
         Intent serviceStartedIntent = new Intent(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, false);
         sendBroadcast(serviceStartedIntent);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.deleteNotificationChannel(CHANNEL_ID);
         }
         super.onDestroy();
+        currentSpeed = 0;
         instance = null;
     }
 
@@ -210,11 +256,15 @@ public class LivemapService extends Service {
         return builder.build();
     }
 
+    private void stop() {
+        stopForeground(true);
+        stopSelf();
+    }
+
     private void updateLivemap() {
-        if (SettingsUtil.getLivemapHoldWithoutWheel(this) && wheelDisconnected) return;
         long now = SystemClock.elapsedRealtime();
-        if (!updating && (currentLocation != null) && (tourKey != null) && ((now - lastUpdated) > SettingsUtil.getLivemapUpdateInterval(this) * 1000)) {
-            updating = true;
+        if (isConnected() && updateTimer == 0 && tourKey != null && now - lastUpdated > SettingsUtil.getLivemapUpdateInterval(this) * 1000) {
+            updateTimer = Constants.LIVEMAP_UPDATE_TIMEOUT;
             lastUpdated = now;
 
             final RequestParams requestParams = new RequestParams();
@@ -223,12 +273,14 @@ public class LivemapService extends Service {
             requestParams.put("p", (autoStarted) ? autoStartedPublish : SettingsUtil.getLivemapPublish(this));
             requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
             requestParams.put("dt", df.format(new Date()));
+            // Weather timestamp
+            requestParams.put("xts", weatherTimestamp);
             // Location data
             requestParams.put("ldt", df.format(new Date(currentLocation.getTime())));
             requestParams.put("llt", String.format(Locale.US, "%.7f", currentLocation.getLatitude()));
             requestParams.put("lln", String.format(Locale.US, "%.7f", currentLocation.getLongitude()));
             requestParams.put("lds", String.format(Locale.US, "%.3f", currentDistance / 1000.0));
-            if (currentLocation.hasSpeed())     requestParams.put("lsp", String.format(Locale.US, "%.1f", currentLocation.getSpeed() * 3.6));
+            if (currentLocation.hasSpeed())     requestParams.put("lsp", String.format(Locale.US, "%.1f", currentLocation.getSpeed() * 3.6f));
             if (currentLocation.hasAccuracy())  requestParams.put("lac", String.format(Locale.US, "%.1f", currentLocation.getAccuracy()));
             if (currentLocation.hasAltitude())  requestParams.put("lat", String.format(Locale.US, "%.1f", currentLocation.getAltitude()));
             if (currentLocation.hasBearing())   requestParams.put("lbg", String.format(Locale.US, "%.1f", currentLocation.getBearing()));
@@ -236,8 +288,7 @@ public class LivemapService extends Service {
             int deviceBattery = getDeviceBattery();
             if (deviceBattery > -1) requestParams.put("dbl", String.format(Locale.US, "%d", deviceBattery));
             // Wheel data
-            if (wheelUpdated + 2000 > now && BluetoothLeService.getConnectionState() == BluetoothLeService.STATE_CONNECTED) {
-                wheelDisconnected = false;
+            if (WheelData.getInstance().isConnected()) {
                 requestParams.put("was", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageSpeedDouble()));
                 requestParams.put("wbl", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageBatteryLevelDouble()));
                 requestParams.put("wcu", String.format(Locale.US, "%.1f", WheelData.getInstance().getCurrentDouble()));
@@ -247,22 +298,21 @@ public class LivemapService extends Service {
                 requestParams.put("wtm", String.format(Locale.US, "%.1f", WheelData.getInstance().getTemperatureDouble()));
                 requestParams.put("wvt", String.format(Locale.US, "%.1f", WheelData.getInstance().getVoltageDouble()));
             }
-            else
-                wheelDisconnected = true;
-            HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/update", requestParams, new JsonHttpResponseHandler() {
+            HttpClient.post(Constants.getEucWorldUrl() + "/api/tour/update", requestParams, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                    livemapStatus = 2;
-                    if (status == LivemapStatus.WAITING_FOR_GPS)
+                    livemapError = 2;
+                    if (status == LivemapStatus.WAITING_FOR_GPS) {
                         say(getString(R.string.livemap_speech_tour_started), "info", 1);
-                    status = LivemapStatus.STARTED;
+                        status = LivemapStatus.STARTED;
+                    }
                     try {
                         int error = response.getInt("error");
                         if (error == 0) {
-                            livemapStatus = 0;
-                            if (response.getJSONObject("data").has("xtm")) {
-                                notificationManager.notify(NOTIFY_ID, getNotification(getString(R.string.notification_livemap_title), getString(R.string.livemap_live)));
-                                weatherTimestamp = SystemClock.elapsedRealtime();
+                            livemapError = 0;
+                            updateDateTime = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date());
+                            notificationManager.notify(NOTIFY_ID, getNotification(getString(R.string.notification_livemap_title), getString(R.string.livemap_live)));
+                            if (response.has("data") && response.getJSONObject("data").has("xtm")) {
                                 weatherTemperature = response.getJSONObject("data").getDouble("xtm");
                                 weatherTemperatureFeels = response.getJSONObject("data").getDouble("xtf");
                                 weatherWindSpeed = response.getJSONObject("data").getDouble("xws");
@@ -272,27 +322,27 @@ public class LivemapService extends Service {
                                 weatherPrecipitation = response.getJSONObject("data").getDouble("xpc");
                                 weatherVisibility = response.getJSONObject("data").getDouble("xvi");
                                 weatherCloudCoverage = response.getJSONObject("data").getDouble("xcl");
-                                weatherCondition = response.getJSONObject("data").getInt("xco");
+                                weatherConditionCode = response.getJSONObject("data").getInt("xco");
+                                weatherTimestamp = response.getJSONObject("data").getInt("xts");
                             }
                         }
-                        updateDateTime = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date());
                         sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                     }
                     catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    updating = false;
+                    updateTimer = 0;
                 }
                 @Override
                 public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    livemapStatus = 1;
-                    updating = false;
+                    livemapError = 1;
+                    updateTimer = 0;
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                 }
                 @Override
                 public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
-                    livemapStatus = 2;
-                    updating = false;
+                    livemapError = 2;
+                    updateTimer = 0;
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                 }
             });
@@ -300,9 +350,17 @@ public class LivemapService extends Service {
     }
 
     private void startLivemap() {
+        tourStartInitiated = SystemClock.elapsedRealtime();
         status = LivemapStatus.CONNECTING;
         JSONObject info = new JSONObject();
         try {
+            /*
+
+                Basic device, EUC & app data collected
+                for diagnostic, support and further development
+
+             */
+            // Device data
             info.put("manufacturer", Build.MANUFACTURER);
             info.put("brand", Build.BRAND);
             info.put("device", Build.DEVICE);
@@ -311,8 +369,24 @@ public class LivemapService extends Service {
             info.put("model", Build.MODEL);
             info.put("product", Build.PRODUCT);
             info.put("sdk", Build.VERSION.SDK_INT);
+            // Application data
             info.put("appVersionName", BuildConfig.VERSION_NAME);
             info.put("appVersionCode", BuildConfig.VERSION_CODE);
+            // EUC data
+            info.put("eucSerial", WheelData.getInstance().getSerial());
+            info.put("eucModel", WheelData.getInstance().getModel());
+            info.put("eucType", WheelData.getInstance().getWheelType().toString());
+            info.put("eucType", WheelData.getInstance().getWheelType().toString());
+            if (BluetoothLeService.isInstanceCreated()) {
+                // EUC Bluetooth data
+                info.put("eucBluetoothAddress", BluetoothLeService.getInstance().getBluetoothDeviceAddress());
+                if (BluetoothLeService.getInstance().getSupportedGattServices() != null) {
+                    JSONArray array = new JSONArray();
+                    for (BluetoothGattService service: BluetoothLeService.getInstance().getSupportedGattServices())
+                        array.put(service.getUuid().toString());
+                    info.put("eucBluetoothServices", array);
+                }
+            }
         }
         catch (Exception e) {}
         String i = info.toString();
@@ -325,7 +399,7 @@ public class LivemapService extends Service {
         requestParams.put("t", TimeZone.getDefault().getID());
         requestParams.put("l", String.valueOf(Locale.getDefault()));
         requestParams.put("ci", i);
-        HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/start", requestParams, new JsonHttpResponseHandler() {
+        HttpClient.post(Constants.getEucWorldUrl() + "/api/tour/start", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
                 int error = -1;
@@ -333,12 +407,12 @@ public class LivemapService extends Service {
                     error = response.getInt("error");
                     switch (error) {
                         case 0:
-                            livemapStatus = 0;
+                            livemapError = 0;
                             status = LivemapStatus.WAITING_FOR_GPS;
                             notificationManager.notify(NOTIFY_ID, getNotification(getString(R.string.notification_livemap_title), getString(R.string.livemap_gps_wait)));
                             showToast(R.string.livemap_api_connected, Toast.LENGTH_LONG);
                             tourKey = response.getJSONObject("data").getString("k");
-                            url = Constants.EUCWORLD_URL + "/tour/" + tourKey;
+                            url = Constants.getEucWorldUrl() + "/tour/" + tourKey;
                             break;
                         case 1:
                             showToast(R.string.livemap_api_error_general, Toast.LENGTH_LONG);
@@ -358,59 +432,61 @@ public class LivemapService extends Service {
                 }
                 catch (JSONException e) {
                     e.printStackTrace();
-                    stopSelf();
+                    stop();
                 }
                 if (error != 0) {
-                    livemapStatus = 2;
+                    livemapError = 2;
                     status = LivemapStatus.DISCONNECTED;
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
-                    stopSelf();
+                    stop();
                 }
                 else
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
             }
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                livemapStatus = 2;
+                livemapError = 2;
                 status = LivemapStatus.DISCONNECTED;
                 sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                 showToast(R.string.livemap_api_error_no_connection, Toast.LENGTH_LONG);
-                stopSelf();
+                stop();
             }
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
-                livemapStatus = 2;
+                livemapError = 2;
                 status = LivemapStatus.DISCONNECTED;
                 sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                 showToast(R.string.livemap_api_error_server, Toast.LENGTH_LONG);
-                stopSelf();
+                stop();
             }
         });
     }
 
     private void stopLivemap() {
-        if (status != LivemapStatus.DISCONNECTING) {
+        if (status != LivemapStatus.DISCONNECTED) {
             final RequestParams requestParams = new RequestParams();
             requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
             requestParams.put("k", tourKey);
             requestParams.put("p", (autoStarted) ? autoStartedPublish : SettingsUtil.getLivemapPublish(this));
             requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-            HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/finish", requestParams, new JsonHttpResponseHandler() {
+            HttpClient.post(Constants.getEucWorldUrl() + "/api/tour/finish", requestParams, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                    livemapStatus = -1;
+                    if (status.ordinal() > LivemapStatus.WAITING_FOR_GPS.ordinal())
+                        say(getString(R.string.livemap_speech_tour_finished), "info", 1);
+                    livemapError = -1;
                     status = LivemapStatus.DISCONNECTED;
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                 }
                 @Override
                 public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    livemapStatus = 1;
+                    livemapError = 1;
                     status = LivemapStatus.DISCONNECTED;
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                 }
                 @Override
                 public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
-                    livemapStatus = 1;
+                    livemapError = 1;
                     status = LivemapStatus.DISCONNECTED;
                     sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
                 }
@@ -425,14 +501,14 @@ public class LivemapService extends Service {
         requestParams.put("k", tourKey);
         requestParams.put("p", (autoStarted) ? autoStartedPublish : SettingsUtil.getLivemapPublish(this));
         requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-        HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/pause", requestParams, new JsonHttpResponseHandler() {
+        HttpClient.post(Constants.getEucWorldUrl() + "/api/tour/pause", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                livemapStatus = 1;
+                livemapError = 1;
                 try {
                     int error = response.getInt("error");
                     if (error == 0) {
-                        livemapStatus = 0;
+                        livemapError = 0;
                         status = LivemapStatus.PAUSED;
                     }
                     else
@@ -443,13 +519,13 @@ public class LivemapService extends Service {
             }
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                livemapStatus = 1;
+                livemapError = 1;
                 status = LivemapStatus.STARTED;
                 sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
             }
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
-                livemapStatus = 1;
+                livemapError = 1;
                 status = LivemapStatus.STARTED;
                 sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
             }
@@ -463,14 +539,14 @@ public class LivemapService extends Service {
         requestParams.put("k", tourKey);
         requestParams.put("p", (autoStarted) ? autoStartedPublish : SettingsUtil.getLivemapPublish(this));
         requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));
-        HttpClient.post(Constants.EUCWORLD_URL + "/api/tour/resume", requestParams, new JsonHttpResponseHandler() {
+        HttpClient.post(Constants.getEucWorldUrl() + "/api/tour/resume", requestParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
-                livemapStatus = 1;
+                livemapError = 1;
                 try {
                     int error = response.getInt("error");
                     if (error == 0) {
-                        livemapStatus = 0;
+                        livemapError = 0;
                         status = LivemapStatus.STARTED;
                     }
                     else
@@ -482,13 +558,13 @@ public class LivemapService extends Service {
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                livemapStatus = 1;
+                livemapError = 1;
                 status = LivemapStatus.PAUSED;
                 sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
             }
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) {
-                livemapStatus = 1;
+                livemapError = 1;
                 status = LivemapStatus.PAUSED;
                 sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_STATUS));
             }
@@ -508,9 +584,10 @@ public class LivemapService extends Service {
         Toast.makeText(this, message_id, duration).show();
     }
 
-    public long getWeatherAge() { return (weatherTimestamp - SystemClock.elapsedRealtime()); }
+    public long getWeatherTimestamp() { return weatherTimestamp; }
     public double getWeatherTemperature() { return weatherTemperature; }
     public double getWeatherTemperatureFeels() { return weatherTemperatureFeels; }
+    public int getWeatherConditionCode() { return weatherConditionCode; }
     public String getUpdateDateTime() { return updateDateTime; }
     public String getTourKey() { return tourKey; }
     public double getLatitude() { return lastLatitude; }

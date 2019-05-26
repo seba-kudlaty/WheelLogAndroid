@@ -21,11 +21,6 @@
 		android:entries="@array/speech_pitch"
 		android:entryValues="@array/speech_pitch_values" />
 
-	<CheckBoxPreference
-		android:key="@string/speech_only_when_moving"
-		android:title="@string/speech_only_when_moving_title"
-		android:summary="@string/speech_only_when_moving_summary" />
-
 	<ListPreference
 		android:key="@string/speech_msg_mode"
 		android:title="@string/speech_msg_mode_title"
@@ -43,5 +38,16 @@
 	<Preference
 		android:key="@string/speech_messages_preferences"
 		android:title="@string/speech_messages_preferences_title" />
+
+	<CheckBoxPreference
+		android:defaultValue="1"
+		android:key="@string/speech_only_when_moving"
+		android:title="@string/speech_only_when_moving_title" />
+
+	<CheckBoxPreference
+		android:defaultValue="1"
+		android:key="@string/speech_gps_bt_status"
+		android:title="@string/speech_gps_bt_status_title" />
+
 
 </PreferenceScreen>

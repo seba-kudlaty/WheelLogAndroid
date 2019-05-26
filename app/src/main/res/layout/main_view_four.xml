@@ -5,41 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvLivemapStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        android:text="@string/livemap_offline"
-        android:textSize="20sp"
-        app:layout_columnSpan="2"
-        app:layout_constraintBottom_toTopOf="@+id/tvLivemapLastUpdated"
-        app:layout_constraintEnd_toEndOf="@+id/wvEucWorld"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/tvLivemapLastUpdated"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:textSize="12sp"
-        app:layout_columnSpan="2"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="wrap_content"
+        android:id="@+id/clLivemapButtons"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -58,11 +30,11 @@
             android:id="@+id/ibLivemapPause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@color/disabled"
             android:clickable="false"
             android:padding="16dp"
-            app:layout_constraintStart_toEndOf="@+id/ibLivemapStartFinish"
+            app:layout_constraintEnd_toStartOf="@+id/ibLivemapPhoto"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_btn_pause" />
 
@@ -70,11 +42,11 @@
             android:id="@+id/ibLivemapPhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@color/disabled"
             android:clickable="false"
             android:padding="16dp"
-            app:layout_constraintStart_toEndOf="@+id/ibLivemapPause"
+            app:layout_constraintEnd_toStartOf="@+id/ibLivemapShare"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_btn_photo" />
 
@@ -82,12 +54,10 @@
             android:id="@+id/ibLivemapShare"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:background="@color/disabled"
             android:clickable="false"
             android:padding="16dp"
-            android:visibility="visible"
-            app:layout_constraintStart_toEndOf="@+id/ibLivemapPhoto"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_btn_share" />
 
@@ -97,33 +67,62 @@
         android:id="@+id/wvEucWorld"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/background"
-        app:layout_constraintBottom_toTopOf="@+id/tvLivemapStatus"
+        app:layout_constraintBottom_toTopOf="@+id/clLivemapButtons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/clLivemapHeader" >
 
-    <ImageView
-        android:id="@+id/ivUploadingPhoto"
+    </WebView>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/clLivemapHeader"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/tvLivemapStatus"
-        app:layout_constraintEnd_toStartOf="@+id/ivLivemapStatus"
-        app:layout_constraintTop_toTopOf="@+id/tvLivemapStatus"
-        app:srcCompat="@drawable/ic_image_upload" />
-
-    <ImageView
-        android:id="@+id/ivLivemapStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/tvLivemapStatus"
+        android:layout_height="32dp"
+        android:paddingRight="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvLivemapStatus" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvLivemapStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/livemap_offline"
+            android:textSize="20sp"
+            app:layout_columnSpan="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivLivemapError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_error" />
+
+        <ImageView
+            android:id="@+id/ivLivemapGPSError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/ivLivemapError"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_no_gps" />
+
+        <ImageView
+            android:id="@+id/ivLivemapUploadProgressWarning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/ivLivemapGPSError"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_upload" />
+    </android.support.constraint.ConstraintLayout>
 
 
 </android.support.constraint.ConstraintLayout>

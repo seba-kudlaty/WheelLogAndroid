@@ -1,8 +1,10 @@
 package com.cooper.wheellog;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.preference.CheckBoxPreference;
@@ -11,6 +13,8 @@ import android.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.webkit.DownloadListener;
+import android.webkit.WebView;
 import android.widget.*;
 import android.text.InputType;
 
@@ -353,18 +357,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                     about_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            String versionName = BuildConfig.VERSION_NAME;
-                            String buildTime = BuildConfig.BUILD_TIME;
-                            new AlertDialog.Builder(getActivity())
-                                    .setTitle(R.string.about_wheellog_title)
-                                    .setMessage(Html.fromHtml(String.format(getString(R.string.about_text), versionName, buildTime)))
-                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                        }
-                                    })
-                                    .setIcon(android.R.drawable.ic_dialog_info)
-                                    .show();
+                            showAboutDialog();
                             return true;
                         }
                     });
@@ -609,6 +602,27 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
         addPreferencesFromResource(R.xml.preferences_speech);
         setup_screen();
         return true;
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void showAboutDialog() {
+        WebView webView = new WebView(getActivity());
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(WheelLogJSInterface.getInstance(), "WheelLog");
+        webView.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+        webView.loadUrl("file:///android_asset/about.html");
+        new AlertDialog.Builder(getActivity())
+                .setView(webView)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) { }
+                })
+                .show();
     }
 
 }

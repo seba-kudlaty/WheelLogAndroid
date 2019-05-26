@@ -102,7 +102,7 @@ public class LoggingService extends Service
             logLocationData = false;
         }
 
-        sdf = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss.SSS", Locale.US);
+        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US);
 
         SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US);
 
@@ -142,7 +142,7 @@ public class LoggingService extends Service
             }
 
             if (logLocationData) {
-                FileUtil.writeLine(filename, "date,time,latitude,longitude,gps_speed,gps_alt,gps_heading,gps_distance,speed,voltage,current,power,battery_level,distance,totaldistance,system_temp,cpu_temp,tilt,roll,mode,alert,wh,ah,wh_discharge,ah_discharge,wh_recharge,ah_recharge");
+                FileUtil.writeLine(filename, "datetime,latitude,longitude,gps_speed,gps_alt,gps_heading,gps_distance,speed,voltage,current,power,battery_level,distance,totaldistance,system_temp,cpu_temp,tilt,roll,mode,alert,wh,ah,wh_discharge,ah_discharge,wh_recharge,ah_recharge");
                 mLocation = getLastBestLocation();
                 mLocationProvider = LocationManager.NETWORK_PROVIDER;
                 if (useGPS)
@@ -150,10 +150,10 @@ public class LoggingService extends Service
                 // Acquire a reference to the system Location Manager
                 mLocationManager.requestLocationUpdates(mLocationProvider, 250, 0, locationListener);
             } else
-                FileUtil.writeLine(filename, "date,time,speed,voltage,current,power,battery_level,distance,totaldistance,system_temp,cpu_temp,tilt,roll,mode,alert,wh,ah,wh_discharge,ah_discharge,wh_recharge,ah_recharge");
+                FileUtil.writeLine(filename, "datetime,speed,voltage,current,power,battery_level,distance,totaldistance,system_temp,cpu_temp,tilt,roll,mode,alert,wh,ah,wh_discharge,ah_discharge,wh_recharge,ah_recharge");
         }
         else
-            FileUtil.writeLine(filename, "date,time,speed,voltage,current,power,battery_level,distance,totaldistance,system_temp,cpu_temp,tilt,roll,mode,alert,wh,ah,wh_discharge,ah_discharge,wh_recharge,ah_recharge");
+            FileUtil.writeLine(filename, "datetime,speed,voltage,current,power,battery_level,distance,totaldistance,system_temp,cpu_temp,tilt,roll,mode,alert,wh,ah,wh_discharge,ah_discharge,wh_recharge,ah_recharge");
 
         Intent serviceIntent = new Intent(Constants.ACTION_LOGGING_SERVICE_TOGGLED);
         serviceIntent.putExtra(Constants.INTENT_EXTRA_LOGGING_FILE_LOCATION, file.getAbsolutePath());
