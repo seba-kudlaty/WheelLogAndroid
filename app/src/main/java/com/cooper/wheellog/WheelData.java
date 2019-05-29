@@ -137,7 +137,7 @@ public class WheelData {
             mInstance = new WheelData();
             mInstance.init(context);
         }
-        mInstance.full_reset();
+        mInstance.full_reset(false);
     }
 
     private void init(Context context) {
@@ -174,7 +174,7 @@ public class WheelData {
     }
 
     int getSpeed() {
-        return mSpeed / 10;
+        return (int)((mSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)) / 10);
     }
 	
 	boolean getWheelLight() {
@@ -190,7 +190,7 @@ public class WheelData {
     }
 	
     int getWheelMaxSpeed() {
-        return mWheelMaxSpeed;
+        return (int)(mWheelMaxSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext));
     }
 	
 	int getSpeakerVolume() {
@@ -500,14 +500,14 @@ public class WheelData {
 
     double getAverageSpeedDouble() {
 		if (mTotalDistance!=0 && mRideTime !=0) {
-			return (((mTotalDistance - mStartTotalDistance)*3.6)/(mRideTime + mLastRideTime));
+			return (((mTotalDistance - mStartTotalDistance)*3.6)/(mRideTime + mLastRideTime)) * SettingsUtil.getSpeedCorrectionFactor(mContext);
 		}
 		else return 0.0;
 	}
 	
 	double getAverageRidingSpeedDouble() {
 		if (mTotalDistance!=0 && mRidingTime !=0) {
-			return (((mTotalDistance - mStartTotalDistance)*3.6)/mRidingTime);
+			return (((mTotalDistance - mStartTotalDistance)*3.6)/mRidingTime) * SettingsUtil.getSpeedCorrectionFactor(mContext);
 		}
 		else return 0.0;
 	}
@@ -531,8 +531,8 @@ public class WheelData {
         return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
     }
 
-    double getSpeedDouble() { return mSpeed / 100.0; }
-    double getSpeedForTizen() { return (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? mSpeed / 160.9 : mSpeed / 100.0; }
+    double getSpeedDouble() { return (mSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)) / 100.0; }
+    double getSpeedForTizen() { return (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? getSpeedDouble() / 1.609 : getSpeedDouble(); }
 
     double getVoltageDouble() {
         return mVoltage / 100.0;
@@ -546,10 +546,10 @@ public class WheelData {
         return mCurrent / 100.0;
     }
 
-    int getTopSpeed() { return mTopSpeed; }
+    int getTopSpeed() { return (int)(mTopSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)); }
 
     double getTopSpeedDouble() {
-        return mTopSpeed / 100.0;
+        return (mTopSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)) / 100.0;
     }
 
     int getDistance() { return (int) (mTotalDistance - mStartTotalDistance); }
@@ -565,11 +565,11 @@ public class WheelData {
     }
 
 	long getWheelDistance() { 
-		return mDistance; 
+		return (long)(mDistance * SettingsUtil.getDistCorrectionFactor(mContext));
 	}
 	
 	public double getWheelDistanceDouble() {
-        return mDistance / 1000.0;
+        return (mDistance * SettingsUtil.getDistCorrectionFactor(mContext)) / 1000.0;
     }
 	
 	
@@ -598,15 +598,15 @@ public class WheelData {
 	
 
     public double getDistanceDouble() {
-        return (mTotalDistance - mStartTotalDistance) / 1000.0;
+        return ((mTotalDistance - mStartTotalDistance) * SettingsUtil.getDistCorrectionFactor(mContext)) / 1000.0;
     }
 
     double getTotalDistanceDouble() {
-        return mTotalDistance / 1000.0;
+        return (mTotalDistance * SettingsUtil.getDistCorrectionFactor(mContext)) / 1000.0;
     }
 	
 	long getTotalDistance() {
-        return mTotalDistance;
+        return (long)(mTotalDistance * SettingsUtil.getDistCorrectionFactor(mContext));
     }
 
     ArrayList<String> getXAxis() {
@@ -1119,7 +1119,7 @@ public class WheelData {
         return true;
     }
 
-    void full_reset() {
+    void full_reset(boolean keepData) {
         if (mWheelType == WHEEL_TYPE.INMOTION) InMotionAdapter.getInstance().stopTimer();
         if (mWheelType == WHEEL_TYPE.NINEBOT_Z) NinebotZAdapter.getInstance().stopTimer();
         mBluetoothLeService = null;
@@ -1127,7 +1127,8 @@ public class WheelData {
         xAxis.clear();
         speedAxis.clear();
         currentAxis.clear();
-        reset();
+        if (!keepData)
+            reset();
     }
 
     void reset() {

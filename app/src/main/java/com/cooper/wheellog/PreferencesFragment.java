@@ -608,7 +608,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
     private void showAboutDialog() {
         WebView webView = new WebView(getActivity());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(WheelLogJSInterface.getInstance(), "WheelLog");
+        webView.addJavascriptInterface(new WheelLogJSInterface(getActivity()), "WheelLog");
         webView.setDownloadListener(new DownloadListener() {
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
                 Intent i = new Intent(Intent.ACTION_VIEW);

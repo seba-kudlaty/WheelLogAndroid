@@ -102,12 +102,12 @@ public class ScanActivity extends AppCompatActivity {
             setResult(RESULT_OK, intent);
             //Ask for inmotion password
             AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-            builder.setTitle("Wheel Password ( InMotion only )");
+            builder.setTitle(getString(R.string.wheel_password));
 
             final EditText input = new EditText(view.getContext());
             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             builder.setView(input);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     String password = input.getText().toString();
@@ -115,7 +115,7 @@ public class ScanActivity extends AppCompatActivity {
                     finish();
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();

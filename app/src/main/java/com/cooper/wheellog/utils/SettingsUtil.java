@@ -239,4 +239,22 @@ public class SettingsUtil {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.livemap_auto_finish_delay), "180"));
     }
 
+    public static double getDistCorrectionFactor(Context context) {
+        int v = getSharedPreferences(context).getInt(context.getString(R.string.dist_correction), 0);
+        return ((double)v + 100.0) / 100.0;
+    }
+
+    public static double getSpeedCorrectionFactor(Context context) {
+        int v = getSharedPreferences(context).getInt(context.getString(R.string.speed_correction), 0);
+        return ((double)v + 100.0) / 100.0;
+    }
+
+    public static boolean getSpeechUseA2DPOnly(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_use_a2dp_only), false);
+    }
+
+    public static boolean getDontResetData(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.dont_reset_data), false);
+    }
+
 }

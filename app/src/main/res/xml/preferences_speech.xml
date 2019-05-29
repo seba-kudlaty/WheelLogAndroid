@@ -45,6 +45,10 @@
 		android:title="@string/speech_only_when_moving_title" />
 
 	<CheckBoxPreference
+		android:key="@string/speech_use_a2dp_only"
+		android:title="@string/speech_use_a2dp_only_title" />
+
+	<CheckBoxPreference
 		android:defaultValue="1"
 		android:key="@string/speech_gps_bt_status"
 		android:title="@string/speech_gps_bt_status_title" />

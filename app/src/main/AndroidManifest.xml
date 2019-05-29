@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" tools:ignore="GoogleAppIndexingWarning" package="com.cooper.wheellog">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" tools:ignore="GoogleAppIndexingWarning,UnusedAttribute" package="com.cooper.wheellog">
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-feature android:name="android.hardware.location.gps" /> <!-- Desde API21 es necesario -->
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -15,7 +15,6 @@
     <uses-permission android:name="com.samsung.wmanager.ENABLE_NOTIFICATION" />
     <uses-permission android:name="com.samsung.accessory.permission.ACCESSORY_FRAMEWORK" />
     <uses-permission android:name="com.samsung.android.providers.context.permission.WRITE_USE_APP_FEATURE_SURVEY" />
-    <!-- <uses-permission android:name="android.permission.SET_DEBUG_APP" /> -->
     <uses-permission android:name="com.samsung.WATCH_APP_TYPE.Companion" />
     <supports-screens
         android:anyDensity="true"

@@ -35,7 +35,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -156,10 +155,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private DrawerLayout mDrawer;
     private String mImagePath = "";
     private int imageUploadCount = 0;
-
-    private String mAppLatestVersionName;
-    private int mAppLatestVersionCode;
-    private String mAppLatestVersionReleased;
+    private WheelLogJSInterface jsInterface;
 
     protected static final int RESULT_DEVICE_SCAN_REQUEST = 20;
     protected static final int RESULT_REQUEST_ENABLE_BT = 30;
@@ -801,6 +797,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ivLivemapError = findViewById(R.id.ivLivemapError);
         ivGPSError = findViewById(R.id.ivLivemapGPSError);
 
+        jsInterface = new WheelLogJSInterface(this);
+
         wvEucWorld = findViewById(R.id.wvEucWorld);
         wvEucWorld.setWebViewClient(new WebViewClient() {
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
@@ -808,7 +806,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
         wvEucWorld.getSettings().setJavaScriptEnabled(true);
-        wvEucWorld.addJavascriptInterface(WheelLogJSInterface.getInstance(), "WheelLog");
+        wvEucWorld.addJavascriptInterface(jsInterface, "WheelLog");
         wvEucWorld.loadData(Constants.EMPTY_HTML, "text/html", "UTF-8");
 
         mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -980,7 +978,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         stopPebbleService();
         stopLoggingService();
         stopSpeechService();
-        WheelData.getInstance().full_reset();
+        WheelData.getInstance().full_reset(false);
         if (mBluetoothLeService != null) {
             unbindService(mServiceConnection);
             stopService(new Intent(getApplicationContext(), BluetoothLeService.class));
@@ -1026,7 +1024,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 togglePebbleService();
                 return true;
             case R.id.miSpeech:
-                toggleSpeechService();
+                MainActivityPermissionsDispatcher.toggleSpeechServiceWithCheck(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -1217,7 +1215,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (SpeechService.isInstanceCreated())
             toggleSpeechService();
     }
-    private void toggleSpeechService() {
+
+    @NeedsPermission({Manifest.permission.BLUETOOTH})
+    void toggleSpeechService() {
         Intent speechServiceIntent = new Intent(getApplicationContext(), SpeechService.class);
         if (SpeechService.isInstanceCreated())
             stopService(speechServiceIntent);
@@ -1278,7 +1278,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     String mDeviceName = data.getStringExtra("NAME");
                     Timber.i("Device selected = %s", mDeviceName);
                     mBluetoothLeService.setDeviceAddress(mDeviceAddress);
-                    WheelData.getInstance().full_reset();
+                    WheelData.getInstance().full_reset(SettingsUtil.getDontResetData(this));
                     WheelData.getInstance().setBtName(mDeviceName);
                     updateScreen(true);
                     setMenuIconStates();
@@ -1635,10 +1635,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 try {
                     int error = response.getInt("error");
                     if (error == 0) {
-                        WheelLogJSInterface.getInstance().setAppLatestVersionName(response.getJSONObject("data").getString("appLatestVersionName"));
-                        WheelLogJSInterface.getInstance().setAppLatestVersionCode(response.getJSONObject("data").getInt("appLatestVersionCode"));
-                        WheelLogJSInterface.getInstance().setAppLatestDownloadUrl(response.getJSONObject("data").getString("appLatestDownloadUrl"));
+                        jsInterface.setAppLatestVersionName(response.getJSONObject("data").getString("appLatestVersionName"));
+                        jsInterface.setAppLatestVersionCode(response.getJSONObject("data").getInt("appLatestVersionCode"));
+                        jsInterface.setAppLatestDownloadUrl(response.getJSONObject("data").getString("appLatestDownloadUrl"));
                         loadEucWorldApp();
+
+                        if (jsInterface.getAppLatestVersionCode() > BuildConfig.VERSION_CODE) {
+                            Snackbar snackbar = Snackbar.make(findViewById(R.id.main_view), getString(R.string.update_available, jsInterface.getAppLatestVersionName()), Snackbar.LENGTH_LONG);
+                            snackbar.setAction(R.string.update_available_download, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent i = new Intent(Intent.ACTION_VIEW);
+                                    i.setData(Uri.parse(jsInterface.getAppLatestDownloadUrl()));
+                                    startActivity(i);
+                                }
+                            });
+                            snackbar.getView().setBackgroundResource(R.color.primary_dark);
+                            snackbar.setDuration(5000);
+                            snackbar.show();
+                        }
                     }
                 }
                 catch (JSONException e) {

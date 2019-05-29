@@ -18,6 +18,11 @@
         android:title="@string/use_f_title"
         android:summary="@string/use_f_summary" />
 
+    <CheckBoxPreference
+        android:key="@string/dont_reset_data"
+        android:title="@string/dont_reset_data_title"
+        android:summary="@string/dont_reset_data_summary" />
+
     <com.pavelsikun.seekbarpreference.SeekBarPreference
         android:key="@string/max_speed"
         android:title="@string/max_speed_title"
@@ -28,6 +33,26 @@
         sample:msbp_maxValue="70"
         sample:msbp_interval="1"
         sample:msbp_measurementUnit="km/h"
+        sample:msbp_dialogEnabled="true"/>
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/speed_correction"
+        android:title="@string/speed_correction_title"
+        android:defaultValue="0"
+        sample:msbp_minValue="-50"
+        sample:msbp_maxValue="50"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit="%"
+        sample:msbp_dialogEnabled="true"/>
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/dist_correction"
+        android:title="@string/dist_correction_title"
+        android:defaultValue="0"
+        sample:msbp_minValue="-50"
+        sample:msbp_maxValue="50"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit="%"
         sample:msbp_dialogEnabled="true"/>
 
 </PreferenceScreen>

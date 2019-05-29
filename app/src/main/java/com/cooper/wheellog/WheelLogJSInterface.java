@@ -1,19 +1,24 @@
 package com.cooper.wheellog;
 
+import android.content.Context;
 import android.webkit.JavascriptInterface;
 
 public class WheelLogJSInterface {
 
-    private static WheelLogJSInterface instance;
-    private String appLatestVersionName;
-    private int appLatestVersionCode;
-    private String appLatestDownloadUrl;
+    private Context mContext;
+    private static String appLatestVersionName;
+    private static int appLatestVersionCode;
+    private static String appLatestDownloadUrl;
 
-    public static WheelLogJSInterface getInstance() {
-        if (instance == null)
-            instance = new WheelLogJSInterface();
-        return instance;
-    };
+    WheelLogJSInterface(Context context) {
+        mContext = context;
+    }
+
+    @JavascriptInterface
+    public String getResourceString(String name) {
+        int id = mContext.getResources().getIdentifier(name, "string", mContext.getPackageName());
+        return (id > 0) ? mContext.getString(id) : "";
+    }
 
     @JavascriptInterface
     public String getAppVersionName() {

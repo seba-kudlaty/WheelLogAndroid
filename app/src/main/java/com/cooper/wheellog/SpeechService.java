@@ -2,6 +2,8 @@ package com.cooper.wheellog;
 
 import android.annotation.TargetApi;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -53,7 +55,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             public void run() {
                 long now = SystemClock.elapsedRealtime();
                 // Periodic message
-                if (LivemapService.getStatus() != LivemapService.LivemapStatus.PAUSED || getSpeed() >= Constants.MIN_RIDING_SPEED)
+                if ((isBTAudioConnected() || !SettingsUtil.getSpeechUseA2DPOnly(getApplicationContext())) && (LivemapService.getStatus() != LivemapService.LivemapStatus.PAUSED || getSpeed() >= Constants.MIN_RIDING_SPEED))
                     sayPeriodicMessage();
                 // Wheel connection stale warning
                 if (!WheelData.getInstance().isConnected() &&
@@ -79,18 +81,18 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                     ttsLastDisconnectedMessageTime = SystemClock.elapsedRealtime();
                     break;
                 case Constants.ACTION_WHEEL_CONNECTED:
-                    if (SettingsUtil.getSpeechGPSBTStatus(getApplicationContext()))
+                    if ((isBTAudioConnected() || !SettingsUtil.getSpeechUseA2DPOnly(getApplicationContext()) && SettingsUtil.getSpeechGPSBTStatus(getApplicationContext())))
                         say(getString(R.string.speech_text_connected), "info");
                     break;
                 case Constants.ACTION_WHEEL_CONNECTION_LOST:
                     ttsLastDisconnectedMessageTime = SystemClock.elapsedRealtime();
-                    if (SettingsUtil.getSpeechGPSBTStatus(getApplicationContext()))
+                    if ((isBTAudioConnected() || !SettingsUtil.getSpeechUseA2DPOnly(getApplicationContext()) && SettingsUtil.getSpeechGPSBTStatus(getApplicationContext())))
                         say(getString(R.string.speech_text_connection_lost), "warning1");
                     break;
                 case Constants.ACTION_WHEEL_DISCONNECTED:
                     ttsLastPeriodicMessageTime = 0;
                     ttsLastPeriodicMessageDistance = -999;
-                    if (SettingsUtil.getSpeechGPSBTStatus(getApplicationContext()))
+                    if ((isBTAudioConnected() || !SettingsUtil.getSpeechUseA2DPOnly(getApplicationContext()) && SettingsUtil.getSpeechGPSBTStatus(getApplicationContext())))
                             say(getString(R.string.speech_text_disconnected), "info");
                     break;
                 case Constants.ACTION_WHEEL_DATA_AVAILABLE:
@@ -110,11 +112,13 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                         say(getString(R.string.speech_text_slow_down_1), "warning1", 2, true);
                     break;
                 case Constants.ACTION_SPEECH_SAY:
-                    String text = intent.getStringExtra(Constants.INTENT_EXTRA_SPEECH_TEXT);
-                    String earcon = intent.getStringExtra(Constants.INTENT_EXTRA_SPEECH_EARCON);
                     int priority = intent.getIntExtra(Constants.INTENT_EXTRA_SPEECH_PRIORITY, 1);
-                    boolean nowOrNever = intent.getBooleanExtra(Constants.INTENT_EXTRA_SPEECH_NOW_OR_NEVER, false);
-                    say(text, earcon, priority, nowOrNever);
+                    if (isBTAudioConnected() || !SettingsUtil.getSpeechUseA2DPOnly(getApplicationContext()) || priority > 1) {
+                        String text = intent.getStringExtra(Constants.INTENT_EXTRA_SPEECH_TEXT);
+                        String earcon = intent.getStringExtra(Constants.INTENT_EXTRA_SPEECH_EARCON);
+                        boolean nowOrNever = intent.getBooleanExtra(Constants.INTENT_EXTRA_SPEECH_NOW_OR_NEVER, false);
+                        say(text, earcon, priority, nowOrNever);
+                    }
                     break;
             }
         }
@@ -181,7 +185,8 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 tts.addEarcon("warning3", getPackageName(), R.raw.warning_3);
                 ttsInitialized = true;
 
-                say(getString(R.string.speech_text_welcome_on_board), "info");
+                if (isBTAudioConnected() || !SettingsUtil.getSpeechUseA2DPOnly(getApplicationContext()))
+                    say(getString(R.string.speech_text_welcome_on_board), "info");
                 startTimer();
             }
         }
@@ -280,16 +285,14 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         // Speed
         double speed = 0;
         if (useWheelData) {
-            double f = (WheelData.getInstance().isKS18L()) ? 0.82d : 1.0d; // KS-18L/XL speed correction factor
-            speed = WheelData.getInstance().getSpeedDouble() * f;
+            speed = WheelData.getInstance().getSpeedDouble();
         }
         else if (useLivemapData)
             speed = LivemapService.getSpeed();
         // Speed avg
         double speed_avg = 0;
         if (useWheelData) {
-            double f = (WheelData.getInstance().isKS18L()) ? 0.82d : 1.0d; // KS-18L/XL speed correction factor
-            speed_avg = WheelData.getInstance().getAverageSpeedDouble() * f;
+            speed_avg = WheelData.getInstance().getAverageSpeedDouble();
         }
         else if (useLivemapData)
             speed_avg = 0;
@@ -484,5 +487,9 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             return 0;
     }
 
+    private boolean isBTAudioConnected() {
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        return (adapter.getProfileConnectionState(BluetoothProfile.A2DP) == BluetoothProfile.STATE_CONNECTED);
+    }
 
 }
