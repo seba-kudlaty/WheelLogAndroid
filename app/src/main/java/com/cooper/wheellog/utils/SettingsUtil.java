@@ -257,4 +257,8 @@ public class SettingsUtil {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.dont_reset_data), false);
     }
 
+    public static int getSpeechFocus(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_focus), "1"));
+    }
+
 }

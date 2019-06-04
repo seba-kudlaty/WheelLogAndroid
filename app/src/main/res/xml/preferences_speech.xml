@@ -35,6 +35,13 @@
         android:entries="@array/speech_interval"
         android:entryValues="@array/speech_interval_values" />
 
+	<ListPreference
+		android:key="@string/speech_focus"
+		android:title="@string/speech_focus_title"
+		android:defaultValue="1"
+		android:entries="@array/speech_focus"
+		android:entryValues="@array/speech_focus_values" />
+
 	<Preference
 		android:key="@string/speech_messages_preferences"
 		android:title="@string/speech_messages_preferences_title" />

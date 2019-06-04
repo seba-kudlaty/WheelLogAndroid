@@ -355,5 +355,33 @@
     <string name="show_when_locked_title">Mostrar cuando está bloqueado</string>
     <string name="show_when_locked_summary">Mostrar la ventana principal incluso si la pantalla está bloqueada</string>
     <string name="notification_livemap_title">Mapa</string>
+    <string name="update_available_download">Download</string>
+    <string name="livemap_speech_tour_finished">Tour logging has been finished.</string>
+    <string name="livemap_speech_tour_started">Tour logging has been started.</string>
+    <string name="update_available">Update to %s is available</string>
+    <string name="speed_correction_title">Wheel speed correction</string>
+    <string name="speech_use_a2dp_only_title">Messages only over BT</string>
+    <string name="speech_text_disconnected">Disconnected.</string>
+    <string name="speech_gps_bt_status_title"><![CDATA[GPS & BT status messages]]></string>
+    <string name="speech_focus_title">Focus</string>
+    <string name="about_content"><![CDATA[<p>This open-source software is licensed under GPL 3.0. Originally created by Kevin Cooper, later developed by others. This version is actively maintained and developed by Sebastian Łastowski (sebastian@euc.world).</p><p>This version is also an official application for "World of electric unicycles" available at https://euc.world. Feel invited!</p>]]></string>
+    <string name="about_version">Version</string>
+    <string name="dist_correction_title">Wheel distance correction</string>
+    <string name="dont_reset_data_summary">Check if you don\'t want to reset wheel data on manual reconnection</string>
+    <string name="dont_reset_data_title">Don\'t reset wheel data</string>
+    <string name="livemap_api_error_server">Temporary server error. Please try again later.</string>
+    <string name="livemap_auto_finish_delay_summary">Define delay after which tour will be finished</string>
+    <string name="livemap_auto_finish_delay_title">Finish delay</string>
+    <string name="livemap_auto_finish_summary">Check if you want to automatically finish tour after wheel connection is lost</string>
+    <string name="livemap_auto_finish_title">Finish when wheel connection is lost</string>
+    <string name="livemap_auto_start_summary">Check if you want to automatically start tour after wheel connection is estabilished</string>
+    <string name="livemap_auto_start_title">Start when wheel is connected</string>
+    <string name="livemap_disconnecting">Disconnecting…</string>
+    <string name="livemap_image_preparation_error">Error during image processing</string>
+    <string name="livemap_image_upload_error">Image upload failed!</string>
+    <string name="livemap_image_uploaded">Image uploaded!</string>
+    <string name="livemap_image_uploading">Uploading image…</string>
+    <string name="livemap_speech_gps_signal_lost">GPS signal lost.</string>
+    <string name="livemap_speech_gps_signal_regained">GPS signal regained.</string>
 
 </resources>

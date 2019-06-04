@@ -238,4 +238,36 @@
         <item>600</item>
     </string-array>
 
+    <string-array name="speech_focus">
+        <item>Nieaktywne</item>
+        <item>Zmniejsz głośność</item>
+        <item>Wstrzymaj</item>
+    </string-array>
+
+    <string-array name="speech_focus_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="livemap_auto_finish_delay">
+        <item>Niezwłocznie</item>
+        <item>1 minuta</item>
+        <item>2 minuty</item>
+        <item>3 minuty</item>
+        <item>5 minut</item>
+        <item>10 minut</item>
+        <item>15 minut</item>
+    </string-array>
+
+    <string-array name="livemap_auto_finish_delay_values">
+        <item>0</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>300</item>
+        <item>600</item>
+        <item>900</item>
+    </string-array>
+
 </resources>

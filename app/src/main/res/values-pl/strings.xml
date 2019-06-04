@@ -273,4 +273,16 @@
     <string name="livemap_speech_tour_finished">Rejestrowanie trasy zakończone.</string>
     <string name="livemap_speech_gps_signal_lost">Utracono sygnał GPS.</string>
     <string name="livemap_speech_gps_signal_regained">Odzyskano sygnał GPS.</string>
+    <string name="about_content"><![CDATA[<p>This open-source software is licensed under GPL 3.0. Originally created by Kevin Cooper, later developed by others. This version is actively maintained and developed by Sebastian Łastowski (sebastian@euc.world).</p><p>This version is also an official application for "World of electric unicycles" available at https://euc.world. Feel invited!</p>]]></string>
+    <string name="about_version">Wersja</string>
+    <string name="dist_correction_title">Korekta dystansu monocykla</string>
+    <string name="dont_reset_data_summary">Zaznacz jeśli nie chcesz zerować parametrów monocykla podczas ręcznego łączenia z monocyklem</string>
+    <string name="dont_reset_data_title">Nie zeruj danych monocykla</string>
+    <string name="speech_focus_title">Skupienie</string>
+    <string name="speech_gps_bt_status_title">Komunikaty o stanie GPS i BT</string>
+    <string name="speech_text_disconnected">Rozłączony.</string>
+    <string name="speech_use_a2dp_only_title">Komunikaty tylko przez BT</string>
+    <string name="speed_correction_title">Korekta prędkości monocykla</string>
+    <string name="update_available">Dostępna aktualizacja do %s</string>
+    <string name="update_available_download">Pobierz</string>
 </resources>

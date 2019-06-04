@@ -364,7 +364,36 @@
     <string name="livemap_auto_start" translatable="false">livemap_auto_start</string>
     <string name="livemap_auto_start_title">Start wenn das Rad verbunden ist</string>
     <string name="livemap_auto_start_summary">Auswählen wenn sie nach der Verbindung mit dem Rad die Fahrt im  \"Link only\"-Modus starten wollen</string>
+    <string name="livemap_auto_finish" translatable="false">livemap_auto_finish</string>
+    <string name="livemap_auto_finish_title">Beenden wenn Verbindung mit dem Rad verloren</string>
+    <string name="livemap_auto_finish_summary">Auswählen wenn die Tour nach Verbindungsverlust automatisch beendet werden soll</string>
+    <string name="livemap_auto_finish_delay" translatable="false">livemap_auto_finish_delay</string>
+    <string name="livemap_auto_finish_delay_title">Verzögerung vor dem Beenden</string>
+    <string name="livemap_auto_finish_delay_summary">Definiert den Zeitintervall nach dem die Tour beendet wird.</string>
     <string name="livemap_disconnecting">Verbindugn beenden…</string>
     <string name="livemap_speech_tour_started">Logging hat begonnen…</string>
+    <string name="livemap_speech_tour_finished">Tour logging beendet.</string>
+    <string name="livemap_speech_gps_signal_regained">GPS signal wiederhergestellt.</string>
+    <string name="livemap_speech_gps_signal_lost">GPS signal verloren.</string>
+    <string name="speech_gps_bt_status" translatable="false">speech_gps_bt_status</string>
+    <string name="speech_gps_bt_status_title"><![CDATA[GPS & BT Benachrichtigungen]]></string>
+    <string name="speech_text_disconnected">Verbindung unterbrochen.</string>
+
+    <string name="update_available">Ein Update zu Version %s ist verfügbar</string>
+    <string name="update_available_download">Herunterladen</string>
+
+    <string name="about_version">Version</string>
+    <string name="about_content"><![CDATA[<p>Diese Open-Source Software ist unter GPL 3.0 lizensiert. Originalsoftware geschrieben von Kevin Cooper, später von verschiedenen Entwicklern erweitert und verbessert. Diese Version wird aktiv von Sebastian Łastowski weiterentwickelt (sebastian@euc.world).</p><p>Es ist die offizielle "World of electric unicycles"-App ( https://euc.world ). Willkommen!</p>]]></string>
+    <string name="speed_correction" translatable="false">speed_correction</string>
+    <string name="speed_correction_title">Geschwindigkeitskorrektur</string>
+    <string name="dist_correction" translatable="false">dist_correction</string>
+    <string name="dist_correction_title">Entfernungskorrektur</string>
+    <string name="speech_use_a2dp_only" translatable="false">speech_use_a2dp_only</string>
+    <string name="speech_use_a2dp_only_title">Sprachnachrichten nur über BT</string>
+
+    <string name="dont_reset_data" translatable="false">dont_reset_data</string>
+    <string name="dont_reset_data_title">Raddaten nicht zurücksetzen</string>
+    <string name="dont_reset_data_summary">Auswählen wenn die Raddaten nach einer manuellen Wiederverbindung nicht zurückgesetzt werden sollen</string>
+    <string name="speech_focus_title">Focus</string>
 
 </resources>

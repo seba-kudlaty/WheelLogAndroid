@@ -394,5 +394,7 @@
     <string name="dont_reset_data" translatable="false">dont_reset_data</string>
     <string name="dont_reset_data_title">Don\'t reset wheel data</string>
     <string name="dont_reset_data_summary">Check if you don\'t want to reset wheel data on manual reconnection</string>
+    <string name="speech_focus" translatable="false">speech_focus</string>
+    <string name="speech_focus_title">Focus</string>
 
 </resources>

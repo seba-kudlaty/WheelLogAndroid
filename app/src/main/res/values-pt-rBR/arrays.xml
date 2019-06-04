@@ -6,9 +6,9 @@
     </string-array>
 
     <string-array name="horn_modes">
-        <item>Deaktiviert</item>
+        <item>Desativado</item>
         <item>On-board (KingSong)</item>
-        <item>Über bluetooth audio</item>
+        <item>Audio via bluetooth</item>
     </string-array>
 
     <string-array name="horn_mode_values">
@@ -18,9 +18,9 @@
     </string-array>
 	
 	<string-array name="pedals_mode">
-        <item>Hart</item>
-        <item>Mittel</item>
-        <item>Sanft</item>
+        <item>Duro</item>
+        <item>Médio</item>
+        <item>Leve</item>
     </string-array>
 	
 	<string-array name="pedals_mode_values">
@@ -30,22 +30,22 @@
     </string-array>
 	
 	<string-array name="light_mode_ks">
-        <item>An</item>
-        <item>Aus</item>
+        <item>On</item>
+        <item>Off</item>
         <item>Auto</item>
     </string-array>
 	
 	
 	<string-array name="light_mode_gw">
-        <item>Aus</item>
-        <item>An</item>
-        <item>Stroboskop</item>
+        <item>Off</item>
+        <item>On</item>
+        <item>Estroboscépico</item>
     </string-array>
 	
 	<string-array name="alarm_mode_gw">
-        <item>Level 1 Alarm aus</item>
-        <item>Level 2 Alarm aus</item>
-        <item>Alarm an</item>
+        <item>Desligar alarme nével 1</item>
+        <item>Desligar alarme nével 2</item>
+        <item>Ligar alarme</item>
     </string-array>
 	
 	<string-array name="alarm_mode_values">
@@ -61,8 +61,8 @@
     </string-array>	
 	
 	<string-array name="strobe_mode_ks">
-        <item>Aus</item>
-        <item>An</item>        
+        <item>Off</item>
+        <item>On</item>        
     </string-array>
 	
 	<string-array name="strobe_mode_values">
@@ -71,8 +71,8 @@
     </string-array>	
 	
 	<string-array name="led_mode">
-        <item>Aus</item>
-        <item>An</item>        
+        <item>Off</item>
+        <item>On</item>        
     </string-array>
 	
 	<string-array name="led_mode_values">
@@ -93,9 +93,9 @@
     </string-array>
 
     <string-array name="speech_pitch">
-        <item>Niedrig</item>
+        <item>Baixo</item>
         <item>Normal</item>
-        <item>Hoch</item>
+        <item>Alto</item>
     </string-array>
 
     <string-array name="speech_pitch_values">
@@ -105,9 +105,9 @@
     </string-array>
 
     <string-array name="speech_rate">
-        <item>Langsam</item>
+        <item>Lenta</item>
         <item>Normal</item>
-        <item>Schnell</item>
+        <item>Rápida</item>
     </string-array>
 
     <string-array name="speech_rate_values">
@@ -117,8 +117,8 @@
     </string-array>
 
     <string-array name="speech_mode">
-        <item>Zeit</item>
-        <item>Entfernung</item>
+        <item>Tempo</item>
+        <item>Distáncia</item>
     </string-array>
 
     <string-array name="speech_mode_values">
@@ -127,17 +127,17 @@
     </string-array>
 
     <string-array name="speech_messages">
-        <item>Geschwindigkeit</item>
-        <item>Mitt. Geschwindigkeit</item>
-        <item>Batterie</item>
-        <item>Spannung</item>
-        <item>Strom</item>
-        <item>Leistung</item>
-        <item>Temperatur</item>
-        <item>Fahrzeit</item>
-        <item>Zeit</item>
-        <item>zurückgelegte Entfernung</item>
-        <item>Telefonbatterie</item>
+        <item>Velocidade</item>
+        <item>Velocidade média</item>
+        <item>Bateria</item>
+        <item>Voltagem</item>
+        <item>Corrente</item>
+        <item>Poténcia</item>
+        <item>Temperatura</item>
+        <item>Tempo montado</item>
+        <item>Tempo</item>
+        <item>Distáncia viajada</item>
+        <item>Bateria do celular</item>
     </string-array>
 
     <string-array name="speech_messages_values">
@@ -155,13 +155,13 @@
     </string-array>
 
     <string-array name="livemap_update_interval">
-        <item>1 Sekunde</item>
-        <item>2 Sekunden</item>
-        <item>5 Sekunden</item>
-        <item>10 Sekunden</item>
-        <item>15 Sekunden</item>
-        <item>30 Sekunden</item>
-        <item>1 Minute</item>
+        <item>1 segundo</item>
+        <item>2 segundos</item>
+        <item>5 segundos</item>
+        <item>10 segundos</item>
+        <item>15 segundos</item>
+        <item>30 segundos</item>
+        <item>1 minuto</item>
     </string-array>
 
     <string-array name="livemap_update_interval_values">
@@ -175,16 +175,16 @@
     </string-array>
 
     <string-array name="livemap_publication_delay">
-        <item>Sofort</item>
-        <item>5 Minuten</item>
-        <item>15 Minuten</item>
-        <item>30 Minuten</item>
-        <item>1 Stunde</item>
-        <item>2 Stunden</item>
-        <item>3 Stunden</item>
-        <item>6 Stunden</item>
-        <item>12 Stunden</item>
-        <item>24 Stunden</item>
+        <item>Sem atraso</item>
+        <item>5 minutos</item>
+        <item>15 minutos</item>
+        <item>30 minutos</item>
+        <item>1 hora</item>
+        <item>2 horas</item>
+        <item>3 horas</item>
+        <item>6 horas</item>
+        <item>12 horas</item>
+        <item>24 horas</item>
     </string-array>
 
     <string-array name="livemap_publication_delay_values">
@@ -201,9 +201,9 @@
     </string-array>
 
     <string-array name="livemap_publish">
-        <item>Sichtbar für mich</item>
-        <item>Sichtbar wenn in Besitz des Links</item>
-        <item>Sichtbar für alle</item>
+        <item>Visável para mim</item>
+        <item>Visável para pessoas que tem o link</item>
+        <item>Visável para qualquer um</item>
     </string-array>
 
     <string-array name="livemap_publish_values">
@@ -213,16 +213,16 @@
     </string-array>
 
     <string-array name="speech_interval">
-        <item>1 Minute oder  km/mile</item>
-        <item>2 Minuten oder kms/miles</item>
-        <item>3 Minuten oder kms/miles</item>
-        <item>4 Minuten oder kms/miles</item>
-        <item>5 Minuten oder kms/miles</item>
-        <item>6 Minuten oder kms/miles</item>
-        <item>7 Minuten oder kms/miles</item>
-        <item>8 Minuten oder kms/miles</item>
-        <item>9 Minuten oder kms/miles</item>
-        <item>10 Minuten oder kms/miles</item>
+        <item>1 minuto or km/milha</item>
+        <item>2 minutos or km/milhas</item>
+        <item>3 minutos or km/milhas</item>
+        <item>4 minutos or km/milhas</item>
+        <item>5 minutos or km/milhas</item>
+        <item>6 minutos or km/milhas</item>
+        <item>7 minutos or km/milhas</item>
+        <item>8 minutos or km/milhas</item>
+        <item>9 minutos or km/milhas</item>
+        <item>10 minutos or km/milhas</item>
     </string-array>
 
     <string-array name="speech_interval_values">
@@ -238,26 +238,14 @@
         <item>600</item>
     </string-array>
 
-    <string-array name="speech_focus">
-        <item>Disabled</item>
-        <item>Decrease volume</item>
-        <item>Pause</item>
-    </string-array>
-
-    <string-array name="speech_focus_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-
     <string-array name="livemap_auto_finish_delay">
-        <item>No delay</item>
-        <item>1 minute</item>
-        <item>2 minutes</item>
-        <item>3 minutes</item>
-        <item>5 minutes</item>
-        <item>10 minutes</item>
-        <item>15 minutes</item>
+        <item>Sem atraso</item>
+        <item>1 minuto</item>
+        <item>2 minuto</item>
+        <item>3 minuto</item>
+        <item>5 minuto</item>
+        <item>10 minuto</item>
+        <item>15 minuto</item>
     </string-array>
 
     <string-array name="livemap_auto_finish_delay_values">
@@ -268,6 +256,18 @@
         <item>300</item>
         <item>600</item>
         <item>900</item>
+    </string-array>
+
+    <string-array name="speech_focus">
+        <item>Disabled</item>
+        <item>Decrease volume</item>
+        <item>Pause</item>
+    </string-array>
+
+    <string-array name="speech_focus_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 
 </resources>

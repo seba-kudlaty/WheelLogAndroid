@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -216,7 +217,15 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
     private void say(String text, String earcon, int priority, boolean nowOrNever) {
         if (priority <= sayPriority && nowOrNever) return;
         if (ttsInitialized && (priority >= sayPriority)) {
-            int res = (priority > 0) ? am.requestAudioFocus(afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK) : AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+            int res = AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+            switch (SettingsUtil.getSpeechFocus(this)) {
+                case 1:
+                    res = (priority > 0) ? am.requestAudioFocus(afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK) : AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+                    break;
+                case 2:
+                    res = (priority > 0) ? am.requestAudioFocus(afl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE) : AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+                    break;
+            }
             if (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 int count = 0;
                 if (priority > sayPriority) sayCount = 0;

@@ -212,6 +212,18 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="speech_focus">
+        <item>Disabled</item>
+        <item>Decrease volume</item>
+        <item>Pause</item>
+    </string-array>
+
+    <string-array name="speech_focus_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string-array name="speech_interval">
         <item>1 minute or km/mile</item>
         <item>2 minutes or kms/miles</item>
