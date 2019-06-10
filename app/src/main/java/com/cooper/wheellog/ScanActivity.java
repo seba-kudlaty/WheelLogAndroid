@@ -86,43 +86,48 @@ public class ScanActivity extends AppCompatActivity {
     }
 
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
-
         @Override
-        public void onItemClick(AdapterView<?> adapterView, final View view, int i, long l) {
-            if (mScanning)
-                scanLeDevice(false);
-            mHandler.removeCallbacksAndMessages(null);
-            final String deviceAddress = mDeviceListAdapter.getDevice(i).getAddress();
-            final String deviceName = mDeviceListAdapter.getDevice(i).getName();
-            Timber.i("Device selected = %s", deviceAddress);
-            Timber.i("Device selected = %s", deviceName);
-            Intent intent = new Intent();
-            intent.putExtra("MAC", deviceAddress);
-            intent.putExtra("NAME", deviceName);
-            setResult(RESULT_OK, intent);
-            //Ask for inmotion password
-            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-            builder.setTitle(getString(R.string.wheel_password));
+         public void onItemClick(AdapterView<?> adapterView, final View view, int i, long l) {
+             if (mScanning)
+                 scanLeDevice(false);
+             mHandler.removeCallbacksAndMessages(null);
+             final String deviceAddress = mDeviceListAdapter.getDevice(i).getAddress();
+             final String deviceName = mDeviceListAdapter.getDevice(i).getName();
+             Timber.i("Device selected = %s", deviceAddress);
+             Timber.i("Device selected = %s", deviceName);
+             Intent intent = new Intent();
+             intent.putExtra("MAC", deviceAddress);
+             intent.putExtra("NAME", deviceName);
+             setResult(RESULT_OK, intent);
+             //Ask for inmotion password (not on known non-IM wheels)
+             if (!deviceName.startsWith("KS") &&
+                 !deviceName.startsWith("GotWay") &&
+                 !deviceName.startsWith("RW")) {
+                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                 builder.setTitle(getString(R.string.wheel_password));
 
-            final EditText input = new EditText(view.getContext());
-            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            builder.setView(input);
-            builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String password = input.getText().toString();
-                    SettingsUtil.setPasswordForWheel(view.getContext(), deviceAddress, password);
-                    finish();
-                }
-            });
-            builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                    finish();
-                }
-            });
-            builder.show();
+                 final EditText input = new EditText(view.getContext());
+                 input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                 builder.setView(input);
+                 builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which) {
+                         String password = input.getText().toString();
+                         SettingsUtil.setPasswordForWheel(view.getContext(), deviceAddress, password);
+                         finish();
+                     }
+                 });
+                 builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which) {
+                         dialog.cancel();
+                         finish();
+                     }
+                 });
+                 builder.show();
+             } else {
+                 finish();
+             }
         }
     };
 
