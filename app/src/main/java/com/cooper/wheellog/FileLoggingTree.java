@@ -4,7 +4,10 @@ import timber.log.Timber;
 import android.content.Context;
 import java.io.File;
 import android.os.Environment;
+import android.util.Log;
+
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.util.Date;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
@@ -12,50 +15,44 @@ import com.cooper.wheellog.utils.Constants;
 
 public class FileLoggingTree extends Timber.DebugTree {
 
-    private static final String TAG = FileLoggingTree.class.getSimpleName();
+    Context context;
+    private String fileName;
 
-    private Context context;
-
-    public FileLoggingTree(Context context) {
+    FileLoggingTree(Context context) {
         this.context = context;
+        fileName = new SimpleDateFormat("yyyy-MM-dd'_'hhmm", Locale.US).format(new Date()) + ".html";
     }
 
     @Override
     protected void log(int priority, String tag, String message, Throwable t) {
-
         try {
-
-            File direct = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + Constants.LOG_FOLDER_NAME);
-
-            if (!direct.exists()) {
-                direct.mkdir();
+            String ts = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(new Date());
+            File file = generateFile();
+            if (file != null) {
+                FileWriter writer = new FileWriter(file, true);
+                String line = "<p style=\"background:lightgray;\"><strong style=\"background:lightblue;\">&nbsp&nbsp" + ts + " :&nbsp&nbsp</strong>&nbsp&nbsp" + message + "</p>";
+                writer.append(line);
+                writer.flush();
+                writer.close();
             }
-
-            String fileNameTimeStamp = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
-            String logTimeStamp = new SimpleDateFormat("E MMM dd yyyy 'at' hh:mm:ss:SSS aaa", Locale.US).format(new Date
-                    ());
-
-            String fileName = fileNameTimeStamp + ".html";
-
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + Constants.LOG_FOLDER_NAME + File.separator + fileName);
-
-            file.createNewFile();
-
-            if (file.exists()) {
-
-                FileOutputStream fileOutputStream = new FileOutputStream(file, true);
-
-                fileOutputStream.write(("<p style=\"background:lightgray;\"><strong style=\"background:lightblue;\">&nbsp&nbsp" + logTimeStamp + " :&nbsp&nbsp</strong>&nbsp&nbsp" + message + "</p>").getBytes());
-                fileOutputStream.close();
-
-            }
-
-            //if (context != null)
-                //MediaScannerConnection.scanFile(context, new String[]{file.getAbsolutePath()}, null, null);
-
-        } catch (Exception e) {
-            //Log.e(TAG, "Error while logging into file : " + e);
         }
-
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+    private File generateFile() {
+        File file = null;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            File dir = new File(Environment.getExternalStorageDirectory(), Constants.SUPPORT_FOLDER_NAME);
+            boolean dirExists = true;
+            if (!dir.exists())
+                dirExists = dir.mkdirs();
+            if (dirExists) {
+                file = new File(dir, fileName);
+            }
+        }
+        return file;
+    }
+
 }

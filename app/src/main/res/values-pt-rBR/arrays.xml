@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <string-array name="modes">
         <item>@string/mode_play</item>
         <item>@string/mode_ride</item>
@@ -39,12 +39,12 @@
 	<string-array name="light_mode_gw">
         <item>Off</item>
         <item>On</item>
-        <item>Estroboscépico</item>
+        <item>Estrobo</item>
     </string-array>
 	
 	<string-array name="alarm_mode_gw">
-        <item>Desligar alarme nével 1</item>
-        <item>Desligar alarme nével 2</item>
+        <item>Desligar alarme nível 1</item>
+        <item>Desligar alarme nível 2</item>
         <item>Ligar alarme</item>
     </string-array>
 	
@@ -118,7 +118,7 @@
 
     <string-array name="speech_mode">
         <item>Tempo</item>
-        <item>Distáncia</item>
+        <item>Distância</item>
     </string-array>
 
     <string-array name="speech_mode_values">
@@ -132,26 +132,26 @@
         <item>Bateria</item>
         <item>Voltagem</item>
         <item>Corrente</item>
-        <item>Poténcia</item>
+        <item>Potência</item>
         <item>Temperatura</item>
         <item>Tempo montado</item>
         <item>Tempo</item>
-        <item>Distáncia viajada</item>
+        <item>Distância viajada</item>
         <item>Bateria do celular</item>
     </string-array>
 
     <string-array name="speech_messages_values">
-        <item>speed</item>
-        <item>avgspeed</item>
-        <item>battery</item>
-        <item>voltage</item>
-        <item>current</item>
-        <item>power</item>
-        <item>temperature</item>
-        <item>ridetime</item>
-        <item>time</item>
-        <item>distance</item>
-        <item>phonebattery</item>
+        <item>Velocidade</item>
+        <item>Velocidade média</item>
+        <item>Bateria</item>
+        <item>Voltagem</item>
+        <item>Corrente</item>
+        <item>Potência</item>
+        <item>Temperatura</item>
+        <item>Tempo montado</item>
+        <item>Tempo</item>
+        <item>Distância viajada</item>
+        <item>Bateria do celular</item>
     </string-array>
 
     <string-array name="livemap_update_interval">
@@ -201,9 +201,9 @@
     </string-array>
 
     <string-array name="livemap_publish">
-        <item>Visável para mim</item>
-        <item>Visável para pessoas que tem o link</item>
-        <item>Visável para qualquer um</item>
+        <item>Visível para mim</item>
+        <item>Visível para pessoas que tem o link</item>
+        <item>Visível para qualquer um</item>
     </string-array>
 
     <string-array name="livemap_publish_values">
@@ -259,9 +259,9 @@
     </string-array>
 
     <string-array name="speech_focus">
-        <item>Disabled</item>
-        <item>Decrease volume</item>
-        <item>Pause</item>
+        <item>Inativo</item>
+        <item>Reduzir volume</item>
+        <item>Pausar</item>
     </string-array>
 
     <string-array name="speech_focus_values">

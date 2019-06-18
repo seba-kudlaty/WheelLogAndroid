@@ -128,7 +128,7 @@
 
     <string-array name="speech_messages">
         <item>Geschwindigkeit</item>
-        <item>Mitt. Geschwindigkeit</item>
+        <item>Mittl. Geschwindigkeit</item>
         <item>Batterie</item>
         <item>Spannung</item>
         <item>Strom</item>
@@ -213,16 +213,16 @@
     </string-array>
 
     <string-array name="speech_interval">
-        <item>1 Minute oder  km/mile</item>
-        <item>2 Minuten oder kms/miles</item>
-        <item>3 Minuten oder kms/miles</item>
-        <item>4 Minuten oder kms/miles</item>
-        <item>5 Minuten oder kms/miles</item>
-        <item>6 Minuten oder kms/miles</item>
-        <item>7 Minuten oder kms/miles</item>
-        <item>8 Minuten oder kms/miles</item>
-        <item>9 Minuten oder kms/miles</item>
-        <item>10 Minuten oder kms/miles</item>
+        <item>1 min oder  km/mile</item>
+        <item>2 min oder km/mile</item>
+        <item>3 min oder km/mile</item>
+        <item>4 min oder km/mile</item>
+        <item>5 min oder km/mile</item>
+        <item>6 min oder km/mile</item>
+        <item>7 min oder km/mile</item>
+        <item>8 min oder km/mile</item>
+        <item>9 min oder km/mile</item>
+        <item>10 min oder km/mile</item>
     </string-array>
 
     <string-array name="speech_interval_values">
@@ -239,8 +239,8 @@
     </string-array>
 
     <string-array name="speech_focus">
-        <item>Disabled</item>
-        <item>Decrease volume</item>
+        <item>Deaktiviert</item>
+        <item>Lautstärke senken</item>
         <item>Pause</item>
     </string-array>
 

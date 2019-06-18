@@ -6,9 +6,9 @@
     </string-array>
 
     <string-array name="horn_modes">
-        <item>Ανενεργό</item>
-        <item>Ενσωματωμένο (KingSong)</item>
-        <item>Μέσω bluetooth ήχου</item>
+        <item>Выключен</item>
+        <item>Бортовой (KingSong)</item>
+        <item>Через bluetooth</item>
     </string-array>
 
     <string-array name="horn_mode_values">
@@ -18,9 +18,9 @@
     </string-array>
 	
 	<string-array name="pedals_mode">
-        <item>Σκληρό</item>
-        <item>Μεσαίο</item>
-        <item>Μαλακό</item>
+        <item>Жесткий</item>
+        <item>Средний</item>
+        <item>Мягкий</item>
     </string-array>
 	
 	<string-array name="pedals_mode_values">
@@ -30,22 +30,22 @@
     </string-array>
 	
 	<string-array name="light_mode_ks">
-        <item>Ενεργό</item>
-        <item>Ανενεργό</item>
-        <item>Αυτόματο</item>
+        <item>Вкл</item>
+        <item>Выкл</item>
+        <item>Авто</item>
     </string-array>
 	
 	
 	<string-array name="light_mode_gw">
-        <item>Ανενεργό</item>
-        <item>Ενεργό</item>
-        <item>Ενάλλαξη</item>
+        <item>Выкл</item>
+        <item>Вкл</item>
+        <item>Строб</item>
     </string-array>
 	
 	<string-array name="alarm_mode_gw">
-        <item>Απενεργοίηση level 1 συναγερμού</item>
-        <item>Απενεργοίηση level 2 συναγερμού</item>
-        <item>Ενεργοποίηση συναγερμού</item>
+        <item>Выключить сигнал тревоги уровня 1</item>
+        <item>Выключить сигнал тревоги уровня 2</item>
+        <item>Включить сигнал тревоги</item>
     </string-array>
 	
 	<string-array name="alarm_mode_values">
@@ -61,8 +61,8 @@
     </string-array>	
 	
 	<string-array name="strobe_mode_ks">
-        <item>Ανενεργό</item>
-        <item>Ενεργό</item>        
+        <item>Выкл</item>
+        <item>Вкл</item>        
     </string-array>
 	
 	<string-array name="strobe_mode_values">
@@ -71,8 +71,8 @@
     </string-array>	
 	
 	<string-array name="led_mode">
-        <item>Ανενεργό</item>
-        <item>Ενεργό</item>        
+        <item>Выкл</item>
+        <item>Вкл</item>        
     </string-array>
 	
 	<string-array name="led_mode_values">
@@ -93,9 +93,9 @@
     </string-array>
 
     <string-array name="speech_pitch">
-        <item>Χαμηλό</item>
-        <item>Κανονικό</item>
-        <item>Υψηλό</item>
+        <item>Низкий</item>
+        <item>Нормальный</item>
+        <item>Высокий</item>
     </string-array>
 
     <string-array name="speech_pitch_values">
@@ -105,9 +105,9 @@
     </string-array>
 
     <string-array name="speech_rate">
-        <item>Αργά</item>
-        <item>Κανονικά</item>
-        <item>Γρήγορα</item>
+        <item>Медленная</item>
+        <item>Средняя</item>
+        <item>Быстрая</item>
     </string-array>
 
     <string-array name="speech_rate_values">
@@ -117,8 +117,8 @@
     </string-array>
 
     <string-array name="speech_mode">
-        <item>Ώρα</item>
-        <item>Απόσταση</item>
+        <item>Время</item>
+        <item>Дистанция</item>
     </string-array>
 
     <string-array name="speech_mode_values">
@@ -127,17 +127,17 @@
     </string-array>
 
     <string-array name="speech_messages">
-        <item>Ταχύτητα</item>
-        <item>Μέση ταχύτητα</item>
-        <item>Μπαταρία</item>
-        <item>Ρεύμα (V)</item>
-        <item>Φορτίο</item>
-        <item>Ισχύ</item>
-        <item>Θερμοκρασία</item>
-        <item>Χρόνος ανάβασης</item>
-        <item>Ώρα</item>
-        <item>Απόσταση κατά την ανάβαση</item>
-        <item>Μπαταρία κινητού</item>
+        <item>Скорость</item>
+        <item>Средняя скорость</item>
+        <item>Батарея</item>
+        <item>Напряжение</item>
+        <item>Сила Тока</item>
+        <item>Мощность</item>
+        <item>Температура</item>
+        <item>Время пробега</item>
+        <item>Время</item>
+        <item>Дистанция</item>
+        <item>Батарея Телефона</item>
     </string-array>
 
     <string-array name="speech_messages_values">
@@ -155,13 +155,13 @@
     </string-array>
 
     <string-array name="livemap_update_interval">
-        <item>1 δευτερόλεπτο</item>
-        <item>2 δευτερόλεπτα</item>
-        <item>5 δευτερόλεπτα</item>
-        <item>10 δευτερόλεπτα</item>
-        <item>15 δευτερόλεπτα</item>
-        <item>30 δευτερόλεπτα</item>
-        <item>1 λεπτό</item>
+        <item>1 секунда</item>
+        <item>2 секунды</item>
+        <item>5 секунд</item>
+        <item>10 секунд</item>
+        <item>15 секунд</item>
+        <item>30 секунд</item>
+        <item>1 минута</item>
     </string-array>
 
     <string-array name="livemap_update_interval_values">
@@ -175,16 +175,16 @@
     </string-array>
 
     <string-array name="livemap_publication_delay">
-        <item>Χωρίς καθυστέρηση</item>
-        <item>5 λεπτά</item>
-        <item>15 λεπτά</item>
-        <item>30 λεπτά</item>
-        <item>1 ώρα</item>
-        <item>2 ώρες</item>
-        <item>3 ώρες</item>
-        <item>6 ώρες</item>
-        <item>12 ώρες</item>
-        <item>24 ώρες</item>
+        <item>Без задержки</item>
+        <item>5 минут</item>
+        <item>15 минут</item>
+        <item>30 минут</item>
+        <item>1 час</item>
+        <item>2 часа</item>
+        <item>3 часа</item>
+        <item>6 часов</item>
+        <item>12 часов</item>
+        <item>24 часа</item>
     </string-array>
 
     <string-array name="livemap_publication_delay_values">
@@ -201,9 +201,9 @@
     </string-array>
 
     <string-array name="livemap_publish">
-        <item>Εμφανές σε μένα</item>
-        <item>Εμφανές μόνο με τον σύνδεσμο</item>
-        <item>Εμφανές σε όλους</item>
+        <item>Доступно только мне</item>
+        <item>Доступно только по ссылке</item>
+        <item>Доступно всем</item>
     </string-array>
 
     <string-array name="livemap_publish_values">
@@ -213,16 +213,16 @@
     </string-array>
 
     <string-array name="speech_interval">
-        <item>1 λεπτό ή χλμ/μίλι</item>
-        <item>2 λεπτά ή χλμ/μίλια</item>
-        <item>3 λεπτά ή χλμ/μίλια</item>
-        <item>4 λεπτά ή χλμ/μίλια</item>
-        <item>5 λεπτά ή χλμ/μίλια</item>
-        <item>6 λεπτά ή χλμ/μίλια</item>
-        <item>7 λεπτά ή χλμ/μίλια</item>
-        <item>8 λεπτά ή χλμ/μίλια</item>
-        <item>9 λεπτά ή χλμ/μίλια</item>
-        <item>10 λεπτά ή χλμ/μίλια</item>
+        <item>1 минута или км/миля</item>
+        <item>2 минуты или км/мили</item>
+        <item>3 минуты или км/мили</item>
+        <item>4 минуты или км/миль</item>
+        <item>5 минут или км/миль</item>
+        <item>6 минут или км/миль</item>
+        <item>7 минут или км/миль</item>
+        <item>8 минут или км/миль</item>
+        <item>9 минут или км/миль</item>
+        <item>10 минут или км/миль</item>
     </string-array>
 
     <string-array name="speech_interval_values">
@@ -238,26 +238,14 @@
         <item>600</item>
     </string-array>
 
-    <string-array name="speech_focus">
-        <item>Ανενεργό</item>
-        <item>Χαμηλή φωνή</item>
-        <item>Παύση</item>
-    </string-array>
-
-    <string-array name="speech_focus_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-
     <string-array name="livemap_auto_finish_delay">
-        <item>Χωρίς καθυστέρηση</item>
-        <item>1 λεπτό</item>
-        <item>2 λεπτά</item>
-        <item>3 λεπτά</item>
-        <item>5 λεπτά</item>
-        <item>10 λεπτά</item>
-        <item>15 λεπτά</item>
+        <item>Без задержки</item>
+        <item>1 минут</item>
+        <item>2 минуты</item>
+        <item>3 минуты</item>
+        <item>5 минут</item>
+        <item>10 минут</item>
+        <item>15 минут</item>
     </string-array>
 
     <string-array name="livemap_auto_finish_delay_values">

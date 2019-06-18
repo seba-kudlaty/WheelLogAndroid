@@ -239,9 +239,9 @@
     </string-array>
 
     <string-array name="speech_focus">
-        <item>Disabled</item>
-        <item>Decrease volume</item>
-        <item>Pause</item>
+        <item>Vypnuto</item>
+        <item>Snížení hlasitosti</item>
+        <item>Pauza</item>
     </string-array>
 
     <string-array name="speech_focus_values">
@@ -251,13 +251,13 @@
     </string-array>
 
     <string-array name="livemap_auto_finish_delay">
-        <item>No delay</item>
-        <item>1 minute</item>
-        <item>2 minutes</item>
-        <item>3 minutes</item>
-        <item>5 minutes</item>
-        <item>10 minutes</item>
-        <item>15 minutes</item>
+        <item>Bez zpoždění</item>
+        <item>1 minuta</item>
+        <item>2 minuty</item>
+        <item>3 minuty</item>
+        <item>5 minut</item>
+        <item>10 minut</item>
+        <item>15 minut</item>
     </string-array>
 
     <string-array name="livemap_auto_finish_delay_values">

@@ -140,6 +140,12 @@ public class WheelData {
         mInstance.full_reset(false);
     }
 
+    public void destroy() {
+        if (mInstance != null) {
+            mContext.unregisterReceiver(receiver);
+        }
+    }
+
     private void init(Context context) {
         mContext = context;
         IntentFilter intentFilter = new IntentFilter();
@@ -626,8 +632,10 @@ public class WheelData {
     }
 	
 	void setUseRatio(boolean enabled) {
-        mUseRatio = enabled;
-		reset();
+        if (mUseRatio != enabled) {
+            mUseRatio = enabled;
+            reset();
+        }
     }
 	
 	void setGotwayVoltage(int voltage) {

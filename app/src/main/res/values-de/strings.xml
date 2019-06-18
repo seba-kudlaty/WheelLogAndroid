@@ -394,6 +394,7 @@
     <string name="dont_reset_data" translatable="false">dont_reset_data</string>
     <string name="dont_reset_data_title">Raddaten nicht zurücksetzen</string>
     <string name="dont_reset_data_summary">Auswählen wenn die Raddaten nach einer manuellen Wiederverbindung nicht zurückgesetzt werden sollen</string>
-    <string name="speech_focus_title">Focus</string>
+    <string name="speech_focus" translatable="false">speech_focus</string>
+    <string name="speech_focus_title">Fokus</string>
 
 </resources>

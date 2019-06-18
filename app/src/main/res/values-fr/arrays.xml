@@ -175,7 +175,7 @@
     </string-array>
 
     <string-array name="livemap_publication_delay">
-        <item>No delay</item>
+        <item>Sans délai</item>
         <item>5 minutes</item>
         <item>15 minutes</item>
         <item>30 minutes</item>
@@ -239,8 +239,8 @@
     </string-array>
 
     <string-array name="speech_focus">
-        <item>Disabled</item>
-        <item>Decrease volume</item>
+        <item>Désactivé</item>
+        <item>Baisser le volume</item>
         <item>Pause</item>
     </string-array>
 
@@ -251,7 +251,7 @@
     </string-array>
 
     <string-array name="livemap_auto_finish_delay">
-        <item>No delay</item>
+        <item>Sans délai</item>
         <item>1 minute</item>
         <item>2 minutes</item>
         <item>3 minutes</item>

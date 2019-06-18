@@ -94,7 +94,7 @@
 
     <string-array name="speech_pitch">
         <item>Basso</item>
-        <item>Normal</item>
+        <item>Normale</item>
         <item>Acuto</item>
     </string-array>
 
@@ -106,7 +106,7 @@
 
     <string-array name="speech_rate">
         <item>Lento</item>
-        <item>Normal</item>
+        <item>Normale</item>
         <item>Veloce</item>
     </string-array>
 
@@ -128,7 +128,7 @@
 
     <string-array name="speech_messages">
         <item>Velocità</item>
-        <item>Velocità media</item>
+        <item>Media</item>
         <item>Batteria</item>
         <item>Voltaggio</item>
         <item>Corrente</item>
@@ -142,7 +142,7 @@
 
     <string-array name="speech_messages_values">
         <item>velocità</item>
-        <item>velocità media</item>
+        <item>media</item>
         <item>batteria</item>
         <item>voltaggio</item>
         <item>corrente</item>
@@ -239,9 +239,9 @@
     </string-array>
 
     <string-array name="speech_focus">
-        <item>Disabled</item>
-        <item>Decrease volume</item>
-        <item>Pause</item>
+        <item>Disattivato</item>
+        <item>Volume basso</item>
+        <item>Pausa</item>
     </string-array>
 
     <string-array name="speech_focus_values">
@@ -251,13 +251,13 @@
     </string-array>
 
     <string-array name="livemap_auto_finish_delay">
-        <item>No delay</item>
-        <item>1 minute</item>
-        <item>2 minutes</item>
-        <item>3 minutes</item>
-        <item>5 minutes</item>
-        <item>10 minutes</item>
-        <item>15 minutes</item>
+        <item>Nessun ritardo</item>
+        <item>1 minuto</item>
+        <item>2 minuti</item>
+        <item>3 minuti</item>
+        <item>5 minuti</item>
+        <item>10 minuti</item>
+        <item>15 minuti</item>
     </string-array>
 
     <string-array name="livemap_auto_finish_delay_values">

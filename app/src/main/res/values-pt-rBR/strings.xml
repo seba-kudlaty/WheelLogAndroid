@@ -378,15 +378,15 @@
     <string name="speech_gps_bt_status" translatable="false">speech_gps_bt_status</string>
     <string name="speech_gps_bt_status_title"><![CDATA[Mensagem do estado do GPS & BT]]></string>
     <string name="speech_text_disconnected">Desconectado.</string>
-    <string name="update_available_download">Download</string>
-    <string name="update_available">Update to %s is available</string>
-    <string name="speed_correction_title">Wheel speed correction</string>
-    <string name="speech_use_a2dp_only_title">Messages only over BT</string>
-    <string name="speech_focus_title">Focus</string>
-    <string name="about_content"><![CDATA[<p>This open-source software is licensed under GPL 3.0. Originally created by Kevin Cooper, later developed by others. This version is actively maintained and developed by Sebastian Łastowski (sebastian@euc.world).</p><p>This version is also an official application for "World of electric unicycles" available at https://euc.world. Feel invited!</p>]]></string>
-    <string name="about_version">Version</string>
-    <string name="dist_correction_title">Wheel distance correction</string>
-    <string name="dont_reset_data_summary">Check if you don\'t want to reset wheel data on manual reconnection</string>
-    <string name="dont_reset_data_title">Don\'t reset wheel data</string>
+    <string name="update_available_download">Baixar</string>
+    <string name="update_available">Atualização para %s está disponível</string>
+    <string name="speed_correction_title">Correção da velocidade do Monociclo</string>
+    <string name="speech_use_a2dp_only_title">Mensagens somente com BT</string>
+    <string name="speech_focus_title">Foco</string>
+    <string name="about_content"><![CDATA[<p>Este programa open-source é licenciado sobre o GPL 3.0. Criado originalmente por Kevin Cooper, depois desenvolvido por outros. Esta versão é atualmente mantida por Sebastian Łastowski (sebastian@euc.world).</p><p>Esta versão é também uma versão oficial do "World of electric unicycles" disponível em https://euc.world. Sinta-se convidado!</p>]]></string>
+    <string name="about_version">Versão</string>
+    <string name="dist_correction_title">Correção da distância do Monociclo</string>
+    <string name="dont_reset_data_summary">Marque se você não quiser resetar os dados do monociclo na reconexão manual</string>
+    <string name="dont_reset_data_title">Não resetar dados do monociclo</string>
 
 </resources>

@@ -979,6 +979,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         stopLoggingService();
         stopSpeechService();
         WheelData.getInstance().full_reset(false);
+        WheelData.getInstance().destroy();
         if (mBluetoothLeService != null) {
             unbindService(mServiceConnection);
             stopService(new Intent(getApplicationContext(), BluetoothLeService.class));
