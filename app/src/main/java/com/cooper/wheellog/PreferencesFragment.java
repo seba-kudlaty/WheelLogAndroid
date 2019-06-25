@@ -325,7 +325,6 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                                 }
                             }
                             //addPreferencesFromResource(R.xml.preferences_gotway);
-
                             setup_screen();
                             return true;
                         }
@@ -349,7 +348,6 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
-<<<<<<< HEAD
                 if (edit_user_distance_button != null) {
                     edit_user_distance_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
@@ -358,26 +356,12 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                             builder.setTitle(R.string.userdist_edit_type);
                             final EditText input = new EditText(getActivity());
                             input.setInputType(InputType.TYPE_CLASS_TEXT);
-                            input.setText(SettingsUtil.getUserDistance(getActivity(), SettingsUtil.getLastAddress(getActivity())));
-=======
-				if (edit_user_distance_button != null) {
-                        public boolean onPreferenceClick(Preference preference) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                            builder.setTitle(R.string.userdist_edit_type);
-
-                            final EditText input = new EditText(getActivity());
-                            input.setInputType(InputType.TYPE_CLASS_TEXT);
-                            input.setText(SettingsUtil.getUserDistance(getActivity()), SettingsUtil.getLastAddress(getActivity()));
->>>>>>> 148ee42... Introduce feature to edit user distance
+                            input.setText(Long.toString(SettingsUtil.getUserDistance(getActivity(),SettingsUtil.getLastAddress(getActivity()))));
                             builder.setView(input);
                             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-<<<<<<< HEAD
                                     final long originalDistance = Long.parseLong(input.getText().toString());
-=======
-	                                final long originalDistance = Long.parseLong(input.getText().toString());
->>>>>>> 148ee42... Introduce feature to edit user distance
                                     WheelData.getInstance().editUserDistance(originalDistance);
                                 }
                             });
@@ -388,20 +372,10 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                                 }
                             });
                             builder.show();
-<<<<<<< HEAD
                             return true;
                         }
                     });
                 }
-=======
-
-
-                            return true;
-                        }
-
-                    });
-				}
->>>>>>> 148ee42... Introduce feature to edit user distance
                 if (last_mac_button != null) {
                     last_mac_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
@@ -468,7 +442,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
-	                if (about_button != null) {
+                if (about_button != null) {
                     about_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {

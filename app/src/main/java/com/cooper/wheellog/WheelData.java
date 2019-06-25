@@ -599,6 +599,7 @@ public class WheelData {
 
 	public void editUserDistance(long originalDistance) {		
 			SettingsUtil.setUserDistance(mContext, mBluetoothLeService.getBluetoothDeviceAddress(), originalDistance);
+			mUserDistance = originalDistance;
 	}
 	
 	public void resetTopSpeed() {
