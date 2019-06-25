@@ -148,6 +148,7 @@
 	// TRIP PREFERENCES
 	<string name="reset_top_speed" translatable="false">reset_top_speed</string>
 	<string name="reset_user_distance" translatable="false">reset_user_distance</string>
+	<string name="edit_user_distance" translatable="false">edit_user_distance</string>
     <string name="last_mac" translatable="false">last_mac</string>
     <string name="about" translatable="false">about</string>
 
@@ -219,6 +220,7 @@
     <string name="last_mac_title">Edit MAC address</string>
     <string name="about_title">About WheelLog</string>
     <string name="reset_user_distance_title">Reset user distance</string>
+    <string name="edit_user_distance_title">Edit user distance</string>
     <string name="reset_top_speed_title">Reset top speed</string>
     <string name="wheel_settings_title">Wheel settings</string>
     <string name="watch_preferences_title">Watch preferences</string>
@@ -308,6 +310,7 @@
     <string name="no_settings_title">Wheel settings for Ninebot Z not available yet</string>
     <string name="reset_top_speed_title_2">Reset Top Speed</string>
     <string name="reset_user_distance_title_2">Reset User Distance</string>
+    <string name="edit_user_distance_title_2">Edit User Distance</string>
     <string name="horn_mode_title">Horn Mode</string>
     <string name="horn_mode_summary">Executed when the select button on the Pebble watch is pressed</string>
     <string name="speech_text_welcome_on_board">Welcome on board!</string>
@@ -338,6 +341,7 @@
     <string name="about_wheellog_title">About WheelLog</string>
     <string name="about_text"><![CDATA[Version %s built at %s<br>by Sebastian Łastowski <a href=\"sebastian@euc.world\">sebastian@euc.world</a><br><br><small>Hey, are you interested in using live map feature? Learn more and register for free at <a href=\"https://euc.world\">https://euc.world</a></small>]]></string>
     <string name="mac_edit_type">MAC Edit</string>
+    <string name="userdist_edit_type">Original Wheel Distance</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="wheel_password">Wheel Password (Inmotion only)</string>

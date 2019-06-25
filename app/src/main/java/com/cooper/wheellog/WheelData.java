@@ -595,13 +595,15 @@ public class WheelData {
 			SettingsUtil.setUserDistance(mContext, mBluetoothLeService.getBluetoothDeviceAddress(), mTotalDistance);
 			mUserDistance = mTotalDistance;
 		}
+	}
 
-    }
+	public void editUserDistance(long originalDistance) {		
+			SettingsUtil.setUserDistance(mContext, mBluetoothLeService.getBluetoothDeviceAddress(), originalDistance);
+	}
 	
 	public void resetTopSpeed() {
 		mTopSpeed = 0;
     }
-	
 
     public double getDistanceDouble() {
         return ((mTotalDistance - mStartTotalDistance) * SettingsUtil.getDistCorrectionFactor(mContext)) / 1000.0;

@@ -8,6 +8,11 @@
         android:title="@string/reset_top_speed_title_2" />
 
 	<Preference
+        android:key="@string/edit_user_distance"
+		android:enabled="true"
+        android:title="@string/edit_user_distance_title_2" />
+
+	<Preference
         android:key="@string/reset_user_distance"
 		android:enabled="true"
         android:title="@string/reset_user_distance_title_2" />
