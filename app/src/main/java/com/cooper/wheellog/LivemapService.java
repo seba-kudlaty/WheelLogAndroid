@@ -97,7 +97,7 @@ public class LivemapService extends Service {
         return instance != null;
     }
     public static LivemapService getInstance() { return instance; }
-7    public static double getDistance() { return currentDistance / 1000; }
+    public static double getDistance() { return currentDistance / 1000; }
     public static double getSpeed() { return (livemapGPS) ? currentSpeed : 0; }
     public static LivemapStatus getStatus() { return status; }
     public static String getUrl() { return url; }
@@ -226,7 +226,9 @@ public class LivemapService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceiver(receiver);
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
         stopLivemap();
         autoStarted = false;
         if (locationManager != null)
