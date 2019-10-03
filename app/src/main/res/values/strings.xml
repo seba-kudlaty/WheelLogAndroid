@@ -221,7 +221,7 @@
     <string name="reset_user_distance_title">Reset user distance</string>
     <string name="reset_top_speed_title">Reset top speed</string>
     <string name="wheel_settings_title">Wheel settings</string>
-    <string name="watch_preferences_title">Watch preferences</string>
+    <string name="watch_preferences_title">Watch settings</string>
     <string name="speech_preferences_title">Voice settings</string>
     <string name="livemap_preferences_title">Live map settings</string>
     <string name="alarm_preferences_title">Alarm settings</string>
@@ -247,8 +247,8 @@
     <string name="alarm_3_battery_title">Battery percent</string>
     <string name="alarm_3_battery_summary">Enable alarm when battery at or below this value</string>
     <string name="current_alarm_title">Current alarm</string>
-    <string name="alarm_current_title">Current</string>
-    <string name="alarm_current_summary">Current that triggers the alarm</string>
+    <string name="alarm_current_title">Peak current</string>
+    <string name="alarm_current_summary">Peak current that triggers the alarm</string>
     <string name="temperature_alarm_title">Temperature alarm</string>
     <string name="alarm_temperature_title">Temperature</string>
     <string name="alarm_temperature_summary">Temperature that triggers the alarm</string>
@@ -396,5 +396,26 @@
     <string name="dont_reset_data_summary">Check if you don\'t want to reset wheel data on manual reconnection</string>
     <string name="speech_focus" translatable="false">speech_focus</string>
     <string name="speech_focus_title">Focus</string>
+    <string name="flic_button_setup" translatable="false">flic_button_setup</string>
+    <string name="flic_button_setup_title">Grab Flic button…</string>
+    <string name="flic_button_grabbed">Grabbed Flic button.</string>
+    <string name="flic_button_not_grabbed">Did not grab any Flic button.</string>
+    <string name="flic_preferences" translatable="false">flic_preferences</string>
+    <string name="flic_preferences_title">Flic settings</string>
+    <string name="flic_horn_mode" translatable="false">flic_horn_mode</string>
+    <string name="flic_horn_mode_title">Horn mode</string>
+    <string name="flic_action_single" translatable="false">flic_action_single</string>
+    <string name="flic_action_double" translatable="false">flic_action_double</string>
+    <string name="flic_action_hold" translatable="false">flic_action_hold</string>
+    <string name="flic_action_single_title">Single-click action</string>
+    <string name="flic_action_double_title">Double-click action</string>
+    <string name="flic_action_hold_title">Hold action</string>
+    <string name="alarm_current_sustained" translatable="false">alarm_current_sustained</string>
+    <string name="alarm_current_sustained_title">Current</string>
+    <string name="alarm_current_sustained_summary">Current that triggers the alarm</string>
+
+    <string name="optimized_battery_level" translatable="false">optimized_battery_level</string>
+    <string name="optimized_battery_level_title">Realistic battery level</string>
+    <string name="optimized_battery_level_summary">Show more realistic battery level with additional safety margin</string>
 
 </resources>

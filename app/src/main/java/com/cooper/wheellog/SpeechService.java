@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import android.util.Log;
 
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.SettingsUtil;
@@ -25,7 +24,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +55,7 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                 long now = SystemClock.elapsedRealtime();
                 // Periodic message
                 if ((isBTAudioConnected() || !SettingsUtil.getSpeechUseA2DPOnly(getApplicationContext())) && (LivemapService.getStatus() != LivemapService.LivemapStatus.PAUSED || getSpeed() >= Constants.MIN_RIDING_SPEED))
-                    sayPeriodicMessage();
+                    sayPeriodicMessage(false);
                 // Wheel connection stale warning
                 if (!WheelData.getInstance().isConnected() &&
                         !BluetoothLeService.isDisconnected() &&
@@ -121,6 +119,12 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
                         say(text, earcon, priority, nowOrNever);
                     }
                     break;
+                case Constants.ACTION_REQUEST_VOICE_REPORT:
+                    sayPeriodicMessage(true);
+                    break;
+                case Constants.ACTION_REQUEST_VOICE_DISMISS:
+                    say(" ", "", 2, true);
+                    break;
             }
         }
     };
@@ -150,6 +154,8 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         intentFilter.addAction(Constants.ACTION_WHEEL_CONNECTED);
         intentFilter.addAction(Constants.ACTION_WHEEL_DISCONNECTED);
         intentFilter.addAction(Constants.ACTION_WHEEL_CONNECTION_LOST);
+        intentFilter.addAction(Constants.ACTION_REQUEST_VOICE_DISMISS);
+        intentFilter.addAction(Constants.ACTION_REQUEST_VOICE_REPORT);
         intentFilter.addAction(Constants.ACTION_SPEECH_SAY);
         registerReceiver(receiver, intentFilter);
         Intent serviceStartedIntent = new Intent(Constants.ACTION_SPEECH_SERVICE_TOGGLED).putExtra(Constants.INTENT_EXTRA_IS_RUNNING, true);
@@ -280,45 +286,67 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
             return -1;
     }
 
-    private void sayPeriodicMessage() {
+    private void sayPeriodicMessage(boolean force) {
         if (sayPriority != -1) return;  // Wait for other messages to finish playing
         long now = SystemClock.elapsedRealtime();
         boolean useWheelData = WheelData.getInstance().isConnected();
         boolean useLivemapData = LivemapService.isConnected();
+
         // Distance
         double dist = 0;
         if (useWheelData)
             dist = WheelData.getInstance().getDistanceDouble();
         else if (useLivemapData)
             dist = LivemapService.getDistance();
-        // Speed
+
+        // General
         double speed = 0;
         if (useWheelData) {
             speed = WheelData.getInstance().getSpeedDouble();
         }
         else if (useLivemapData)
             speed = LivemapService.getSpeed();
-        // Speed avg
+
+        // General avg
         double speed_avg = 0;
         if (useWheelData) {
             speed_avg = WheelData.getInstance().getAverageSpeedDouble();
         }
         else if (useLivemapData)
-            speed_avg = 0;
-        if (SettingsUtil.getSpeechOnlyInMotion(this) && speed < Constants.MIN_RIDING_SPEED) return; // If activated in settings, inhibit periodic messages when speed < 3 km/h
-        if (SettingsUtil.getSpeechMsgMode(this) == 0) {
-            if (now - ttsLastPeriodicMessageTime < SettingsUtil.getSpeechMsgInterval(this) * 1000) return;  // Time interval not passed
-        }
-        else {
-            double d = (double)SettingsUtil.getSpeechMsgInterval(this) / 60;
-            if (dist < ttsLastPeriodicMessageDistance + d) return; // Distance interval not passed
+            speed_avg = LivemapService.getAverageSpeed();
+
+        // Ride time
+        int ridetime = 0;
+        if (useWheelData)
+            ridetime = WheelData.getInstance().getRideTime();
+        else if (useLivemapData)
+            ridetime = LivemapService.getRideTime();
+
+        // Riding time
+        int ridingtime = 0;
+        if (useWheelData)
+            ridingtime = WheelData.getInstance().getRidingTime();
+        else if (useLivemapData)
+            ridingtime = LivemapService.getRidingTime();
+
+        if (!force) {
+            if (SettingsUtil.getSpeechOnlyInMotion(this) && speed < Constants.MIN_RIDING_SPEED)
+                return; // If activated in settings, inhibit periodic messages when speed < 2 km/h
+            if (SettingsUtil.getSpeechMsgMode(this) == 0) {
+                if (now - ttsLastPeriodicMessageTime < SettingsUtil.getSpeechMsgInterval(this) * 1000)
+                    return;  // Time interval not passed
+            } else {
+                double d = (double) SettingsUtil.getSpeechMsgInterval(this) / 60;
+                if (dist < ttsLastPeriodicMessageDistance + d)
+                    return; // Distance interval not passed
+            }
         }
 
         String text = "";
         ttsLastPeriodicMessageTime = now;
         ttsLastPeriodicMessageDistance = dist;
 
-        // Speed
+        // General
         if (SettingsUtil.getSpeechMessagesSpeed(this) && speed >= Constants.MIN_RIDING_SPEED)
             text += " " + String.format(Locale.US, getString(R.string.speech_text_speed), formatSpeed(speed));
 
@@ -374,15 +402,15 @@ public class SpeechService extends Service implements TextToSpeech.OnInitListene
         }
 
         // Time from start
-        if (SettingsUtil.getSpeechMessagesTimeFromStart(this) && useWheelData) {
-            String timefromstart = formatDuration(WheelData.getInstance().getRideTime());
+        if (SettingsUtil.getSpeechMessagesTimeFromStart(this)) {
+            String timefromstart = formatDuration(ridetime);
             if (!timefromstart.equals(""))
                 text += " " + String.format(Locale.US, getString(R.string.speech_text_time_from_start), timefromstart);
         }
 
         // Time in motion
-        if (SettingsUtil.getSpeechMessagesTimeInMotion(this) && useWheelData) {
-            String timeinmotion = formatDuration(WheelData.getInstance().getRidingTime());
+        if (SettingsUtil.getSpeechMessagesTimeInMotion(this)) {
+            String timeinmotion = formatDuration(ridingtime);
             if (!timeinmotion.equals(""))
                 text += " " + String.format(Locale.US, getString(R.string.speech_text_time_in_motion), timeinmotion);
         }

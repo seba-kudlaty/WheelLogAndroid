@@ -16,7 +16,7 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-	
+
 	<string-array name="pedals_mode">
         <item>Hard</item>
         <item>Medium</item>
@@ -268,6 +268,34 @@
         <item>300</item>
         <item>600</item>
         <item>900</item>
+    </string-array>
+
+    <string-array name="flic_horn_modes">
+        <item>Disabled</item>
+        <item>On-board (KingSong)</item>
+        <item>Via Bluetooth audio</item>
+    </string-array>
+
+    <string-array name="flic_horn_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="flic_action">
+        <item>No action</item>
+        <item>Horn</item>
+        <item>Light</item>
+        <item>Request voice report</item>
+        <item>Dismiss voice report</item>
+    </string-array>
+
+    <string-array name="flic_action_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
     </string-array>
 
 </resources>

@@ -45,19 +45,23 @@ public class WheelView extends View {
     float boxTextSize;
     float boxTextHeight;
 
+    private int mMode = 0;
+
     private int mMaxSpeed = 300;
     private boolean mUseMPH = false;
     private int mSpeed = 0;
     private int mWarningSpeed = 0;
     private int mBattery = 0;
     private int mTemperature = 0;
-    private String mCurrentTime = "00:00:00";
+    private String mRideTime = "00:00:00";
+    private String mRidingTime = "00:00:00";
     private Double mDistance = 0.0;
     private Double mTotalDistance = 0.0;
     private Double mTopSpeed = 0.0;
     private Double mVoltage = 0.0;
     private Double mCurrent = 0.0;
     private Double mAverageSpeed = 0.0;
+    private Double mAverageRidingSpeed = 0.0;
     private Typeface tf;
 
 
@@ -171,10 +175,17 @@ public class WheelView extends View {
         refresh();
     }
 
-    public void setRideTime(String currentTime) {
-        if (mCurrentTime.equals(currentTime))
+    public void setRideTime(String rideTime) {
+        if (mRideTime.equals(rideTime))
             return;
-        mCurrentTime = currentTime;
+        mRideTime = rideTime;
+        refresh();
+    }
+
+    public void setRidingTime(String ridingTime) {
+        if (mRidingTime.equals(ridingTime))
+            return;
+        mRidingTime = ridingTime;
         refresh();
     }
 
@@ -212,7 +223,14 @@ public class WheelView extends View {
         mAverageSpeed = avg_speed;
         refresh();
     }
-	
+
+    public void setAverageRidingSpeed(Double avgRidingSpeed) {
+        if (mAverageRidingSpeed.equals(avgRidingSpeed))
+            return;
+        mAverageRidingSpeed = avgRidingSpeed;
+        refresh();
+    }
+
     public void setCurrent(Double current) {
         if (mCurrent.equals(current))
             return;
@@ -393,27 +411,31 @@ public class WheelView extends View {
         outerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_arc_dim));
         canvas.drawArc(outerArcRect, 144, 252, false, outerArcPaint);
 
-        outerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_speed_dial));
-        for (int i = 0; i < currentSpeed; i++) {
-            float value = (float) (144+(i*2.25));
-            canvas.drawArc(outerArcRect, value, 1.5F, false, outerArcPaint);
+        if (mMode > 0) {
+            outerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_speed_dial));
+            for (int i = 0; i < currentSpeed; i++) {
+                float value = (float) (144 + (i * 2.25));
+                canvas.drawArc(outerArcRect, value, 1.5F, false, outerArcPaint);
+            }
         }
 
         //####################################################
         //################# DRAW INNER ARC ###################
         //####################################################
 
-        innerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_arc_dim));
-        canvas.drawArc(innerArcRect, 144, 90, false, innerArcPaint);
-        canvas.drawArc(innerArcRect, 306, 90, false, innerArcPaint);
+        if (mMode > 1) {
+            innerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_arc_dim));
+            canvas.drawArc(innerArcRect, 144, 90, false, innerArcPaint);
+            canvas.drawArc(innerArcRect, 306, 90, false, innerArcPaint);
 
-        innerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_battery_dial));
-        for (int i = 0; i < 112; i++) {
-            if (i == currentTemperature)
-                innerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_temperature_dial));
-            if (i < currentBattery || i >= currentTemperature) {
-                float value = (144 + (i * 2.25F));
-                canvas.drawArc(innerArcRect, value, 1.5F, false, innerArcPaint);
+            innerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_battery_dial));
+            for (int i = 0; i < 112; i++) {
+                if (i == currentTemperature)
+                    innerArcPaint.setColor(getContext().getResources().getColor(R.color.wheelview_temperature_dial));
+                if (i < currentBattery || i >= currentTemperature) {
+                    float value = (144 + (i * 2.25F));
+                    canvas.drawArc(innerArcRect, value, 1.5F, false, innerArcPaint);
+                }
             }
         }
 
@@ -425,9 +447,9 @@ public class WheelView extends View {
 
         String speedString;
         if (speed < 100)
-            speedString = String.format(Locale.US, "%.1f", speed/10.0);
+            speedString = (mMode > 0) ? String.format(Locale.US, "%.1f", speed/10.0) : "—";
         else
-            speedString = String.format(Locale.US, "%02d", Math.round(speed/10.0));
+            speedString = (mMode > 0) ? String.format(Locale.US, "%02d", Math.round(speed/10.0)) : "—";
 
         if (mWarningSpeed > 0 && mSpeed >= mWarningSpeed)
             textPaint.setColor(getContext().getResources().getColor(R.color.accent));
@@ -445,7 +467,7 @@ public class WheelView extends View {
         //######## DRAW BATTERY AND TEMPERATURE TEXT #########
         //####################################################
 
-        if (mTemperature > 0 && mBattery > 0) {
+        if (mTemperature > 0 && mBattery > 0 && mMode > 1) {
             textPaint.setTextSize(innerArcTextSize);
             canvas.save();
             if (getWidth() > getHeight())
@@ -484,29 +506,80 @@ public class WheelView extends View {
             //####################################################
 
             textPaint.setTextSize(boxTextSize * 0.7f);
-            canvas.drawText(getResources().getString(R.string.voltage), tlRect.centerX(), tlRect.centerY() - (box_inner_padding / 2), textPaint);
-            canvas.drawText(getResources().getString(R.string.average_riding_speed), trRect.centerX(), trRect.centerY() - (box_inner_padding / 2), textPaint);
-            canvas.drawText(getResources().getString(R.string.riding_time), mlRect.centerX(), mlRect.centerY() - (box_inner_padding / 2), textPaint);
-            canvas.drawText(getResources().getString(R.string.top_speed), mrRect.centerX(), mrRect.centerY() - (box_inner_padding / 2), textPaint);
-            canvas.drawText(getResources().getString(R.string.distance), blRect.centerX(), blRect.centerY() - (box_inner_padding / 2), textPaint);
-            canvas.drawText(getResources().getString(R.string.total), brRect.centerX(), brRect.centerY() - (box_inner_padding / 2), textPaint);
+            if (mMode < 2) {
+                canvas.drawText(getResources().getString(R.string.riding_time), tlRect.centerX(), tlRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.top_speed), trRect.centerX(), trRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.average_speed), mlRect.centerX(), mlRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.average_riding_speed), mrRect.centerX(), mrRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.ride_time), blRect.centerX(), blRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.distance), brRect.centerX(), brRect.centerY() - (box_inner_padding / 2), textPaint);
+                textPaint.setTextSize(boxTextSize);
+                if (mMode == 0) {
+                    canvas.drawText("—", tlRect.centerX(), tlRect.centerY() + boxTextHeight, textPaint);    // Riding Time / Voltage
+                    canvas.drawText("—", trRect.centerX(), trRect.centerY() + boxTextHeight, textPaint);    // Top General / Current
+                    canvas.drawText("—", mlRect.centerX(), mlRect.centerY() + boxTextHeight, textPaint);    // Avg General
+                    canvas.drawText("—", mrRect.centerX(), mrRect.centerY() + boxTextHeight, textPaint);    // Avg Riding General
+                    canvas.drawText("—", blRect.centerX(), blRect.centerY() + boxTextHeight, textPaint);    // Journey Time
+                    canvas.drawText("—", brRect.centerX(), brRect.centerY() + boxTextHeight, textPaint);    // Distance
+                }
+                else {
+                    canvas.drawText(mRidingTime, tlRect.centerX(), tlRect.centerY() + boxTextHeight, textPaint); // Riding Time
+                    canvas.drawText(mRideTime, blRect.centerX(), blRect.centerY() + boxTextHeight, textPaint);   // Journey Time
+                    if (mUseMPH) {
+                        canvas.drawText(String.format(Locale.US, "%.1f mph", kmToMiles(mTopSpeed)), trRect.centerX(), trRect.centerY() + boxTextHeight, textPaint);    // Top General
+                        canvas.drawText(String.format(Locale.US, "%.1f mph", kmToMiles(mAverageSpeed)), mlRect.centerX(), mlRect.centerY() + boxTextHeight, textPaint);    // Avg General
+                        canvas.drawText(String.format(Locale.US, "%.1f mph", kmToMiles(mAverageRidingSpeed)), mrRect.centerX(), mrRect.centerY() + boxTextHeight, textPaint);    // Avg Riding General
+                        canvas.drawText(String.format(Locale.US, "%.2f mi", kmToMiles(mDistance)), brRect.centerX(), brRect.centerY() + boxTextHeight, textPaint);    // Distance
+                    }
+                    else {
+                        canvas.drawText(String.format(Locale.US, "%.1f km/h", mTopSpeed), trRect.centerX(), trRect.centerY() + boxTextHeight, textPaint);    // Top General
+                        canvas.drawText(String.format(Locale.US, "%.1f km/h", mAverageSpeed), mlRect.centerX(), mlRect.centerY() + boxTextHeight, textPaint);    // Avg General
+                        canvas.drawText(String.format(Locale.US, "%.1f km/h", mAverageRidingSpeed), mrRect.centerX(), mrRect.centerY() + boxTextHeight, textPaint);    // Avg Riding General
+                        canvas.drawText(String.format(Locale.US, "%.2f km", mDistance), brRect.centerX(), brRect.centerY() + boxTextHeight, textPaint);    // Distance
+                    }
+                }
+            }
+            else {
+                canvas.drawText(getResources().getString(R.string.voltage), tlRect.centerX(), tlRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.current), trRect.centerX(), trRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.average_speed), mlRect.centerX(), mlRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.average_riding_speed), mrRect.centerX(), mrRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.ride_time), blRect.centerX(), blRect.centerY() - (box_inner_padding / 2), textPaint);
+                canvas.drawText(getResources().getString(R.string.distance), brRect.centerX(), brRect.centerY() - (box_inner_padding / 2), textPaint);
+                textPaint.setTextSize(boxTextSize);
+                canvas.drawText(String.format(Locale.US, "%.2f V", mVoltage), tlRect.centerX(), tlRect.centerY() + boxTextHeight, textPaint);    // Voltage
+                canvas.drawText(String.format(Locale.US, "%.2f A", mCurrent), trRect.centerX(), trRect.centerY() + boxTextHeight, textPaint);    // Current
+                canvas.drawText(mRideTime, blRect.centerX(), blRect.centerY() + boxTextHeight, textPaint);    // Journey Time
+                if (mUseMPH) {
+                    canvas.drawText(String.format(Locale.US, "%.1f mph", kmToMiles(mAverageSpeed)), mlRect.centerX(), mlRect.centerY() + boxTextHeight, textPaint);    // Avg General
+                    canvas.drawText(String.format(Locale.US, "%.1f mph", kmToMiles(mAverageRidingSpeed)), mrRect.centerX(), mrRect.centerY() + boxTextHeight, textPaint);    // Avg Riding General
+                    canvas.drawText(String.format(Locale.US, "%.2f mi", kmToMiles(mDistance)), brRect.centerX(), brRect.centerY() + boxTextHeight, textPaint);    // Distance
+                }
+                else {
+                    canvas.drawText(String.format(Locale.US, "%.1f km/h", mAverageSpeed), mlRect.centerX(), mlRect.centerY() + boxTextHeight, textPaint);    // Avg General
+                    canvas.drawText(String.format(Locale.US, "%.1f km/h", mAverageRidingSpeed), mrRect.centerX(), mrRect.centerY() + boxTextHeight, textPaint);    // Avg Riding General
+                    canvas.drawText(String.format(Locale.US, "%.2f km", mDistance), brRect.centerX(), brRect.centerY() + boxTextHeight, textPaint);    // Distance
+                }
+            }
 
-            textPaint.setTextSize(boxTextSize);
-            //textPaint.setTypeface(tfb);
+            /*
+
             canvas.drawText(String.format(Locale.US, "%.2f V", mVoltage), tlRect.centerX(), tlRect.centerY() + boxTextHeight, textPaint);
-            canvas.drawText(mCurrentTime, mlRect.centerX(), mlRect.centerY() + boxTextHeight, textPaint);
+            canvas.drawText(mRideTime, mlRect.centerX(), mlRect.centerY() + boxTextHeight, textPaint);
 
             if (mUseMPH) {
                 canvas.drawText(String.format(Locale.US, "%.1f mph", kmToMiles(mTopSpeed)), mrRect.centerX(), mrRect.centerY() + boxTextHeight, textPaint);
                 canvas.drawText(String.format(Locale.US, "%.1f mph", kmToMiles(mAverageSpeed)), trRect.centerX(), trRect.centerY() + boxTextHeight, textPaint);
                 canvas.drawText(String.format(Locale.US, "%.2f mi", kmToMiles(mDistance)), blRect.centerX(), blRect.centerY() + boxTextHeight, textPaint);
                 canvas.drawText(String.format(Locale.US, "%.2f mi", kmToMiles(mTotalDistance)), brRect.centerX(), brRect.centerY() + boxTextHeight, textPaint);
-            } else {
+            }
+            else {
                 canvas.drawText(String.format(Locale.US, "%.1f km/h", mTopSpeed), mrRect.centerX(), mrRect.centerY() + boxTextHeight, textPaint);
 				canvas.drawText(String.format(Locale.US, "%.1f km/h", mAverageSpeed), trRect.centerX(), trRect.centerY() + boxTextHeight, textPaint);
                 canvas.drawText(String.format(Locale.US, "%.2f km", mDistance), blRect.centerX(), blRect.centerY() + boxTextHeight, textPaint);
                 canvas.drawText(String.format(Locale.US, "%.2f km", mTotalDistance), brRect.centerX(), brRect.centerY() + boxTextHeight, textPaint);
             }
+            */
             textPaint.setTypeface(tf);
         }
 
@@ -542,4 +615,26 @@ public class WheelView extends View {
         textPaint.getTextBounds(text, 0, text.length(), textBounds);
         return result;
     }
+
+    public void setDisabled() {
+        if (mMode != 0) {
+            mMode = 0;
+            refresh();
+        }
+    }
+
+    public void setGPS() {
+        if (mMode != 1) {
+            mMode = 1;
+            refresh();
+        }
+    }
+
+    public void setWheel() {
+        if (mMode != 2) {
+            mMode = 2;
+            refresh();
+        }
+    }
+
 }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Html;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -23,17 +22,22 @@ import com.cooper.wheellog.utils.Constants.WHEEL_TYPE;
 import com.cooper.wheellog.utils.SettingsUtil;
 import com.pavelsikun.seekbarpreference.SeekBarPreference;
 
+import io.flic.lib.FlicAppNotInstalledException;
+import io.flic.lib.FlicManager;
+import io.flic.lib.FlicManagerInitializedCallback;
+
 public class PreferencesFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     enum SettingsScreen {
         Main,
-        Speed,
+        General,
         Logs,
         Livemap,
         Alarms,
         Speech,
         SpeechMessages,
         Watch,
+        Flic,
 		Wheel
     }
 	
@@ -225,6 +229,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 Preference alarm_button = findPreference(getString(R.string.alarm_preferences));
                 Preference speech_button = findPreference(getString(R.string.speech_preferences));
                 Preference watch_button = findPreference(getString(R.string.watch_preferences));
+                Preference flic_button = findPreference(getString(R.string.flic_preferences));
 				Preference wheel_button = findPreference(getString(R.string.wheel_settings));
 				Preference reset_top_button = findPreference(getString(R.string.reset_top_speed));
 				Preference reset_user_distance_button = findPreference(getString(R.string.reset_user_distance));
@@ -237,7 +242,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                     speed_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            currentScreen = SettingsScreen.Speed;
+                            currentScreen = SettingsScreen.General;
                             getPreferenceScreen().removeAll();
                             addPreferencesFromResource(R.xml.preferences_general);
                             setup_screen();
@@ -305,6 +310,18 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
+                if (flic_button != null) {
+                    flic_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            currentScreen = SettingsScreen.Flic;
+                            getPreferenceScreen().removeAll();
+                            addPreferencesFromResource(R.xml.preferences_flic);
+                            setup_screen();
+                            return true;
+                        }
+                    });
+                }
 		        if (wheel_button != null) {
                     wheel_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
@@ -362,8 +379,6 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                         }
                     });
                 }
-
-
 
                 if (last_mac_button != null) {
                     last_mac_button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -432,7 +447,7 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 }
 
                 break;
-            case Speed:
+            case General:
                 tb.setTitle(R.string.speed_settings);
                 break;
             case Logs:
@@ -466,6 +481,29 @@ public class PreferencesFragment extends PreferenceFragment implements SharedPre
                 break;
             case Watch:
                 tb.setTitle(R.string.watch_preferences_title);
+                break;
+            case Flic:
+                tb.setTitle(R.string.flic_preferences_title);
+                Preference flic_button_setup = findPreference(getString(R.string.flic_button_setup));
+                if (flic_button_setup != null) {
+                    flic_button_setup.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            try {
+                                FlicManager.getInstance(getActivity(), new FlicManagerInitializedCallback() {
+                                    @Override
+                                    public void onInitialized(FlicManager manager) {
+                                        manager.initiateGrabButton(getActivity());
+                                    }
+                                });
+                            }
+                            catch (FlicAppNotInstalledException err) {
+                                Toast.makeText(getActivity(), "Flic App is not installed", Toast.LENGTH_SHORT).show();
+                            }
+                            return true;
+                        }
+                    });
+                }
                 break;
 			case Wheel:
                 tb.setTitle(R.string.wheel_settings_title);

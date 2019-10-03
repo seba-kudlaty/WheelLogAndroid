@@ -35,6 +35,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,6 +86,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import id.zelory.compressor.Compressor;
+import io.flic.lib.FlicAppNotInstalledException;
+import io.flic.lib.FlicBroadcastReceiverFlags;
+import io.flic.lib.FlicButton;
+import io.flic.lib.FlicManager;
+import io.flic.lib.FlicManagerInitializedCallback;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
@@ -142,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     WebView wvEucWorld;
     WheelView wheelView;
 
+    private LivemapService.LivemapStatus lastLivemapStatus = LivemapService.LivemapStatus.DISCONNECTED;
     private BluetoothLeService mBluetoothLeService;
     private BluetoothAdapter mBluetoothAdapter;
     private String mDeviceAddress;
@@ -253,6 +260,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 					break;
                 case Constants.ACTION_LIVEMAP_STATUS:
                     updateLivemapUI();
+                    break;
+                case Constants.ACTION_LIVEMAP_LOCATION_UPDATED:
+                    updateScreen(true);
                     break;
             }
         }
@@ -412,6 +422,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 tvPower.setVisibility(View.VISIBLE);
                 tvTitleTemperature.setVisibility(View.VISIBLE);
                 tvTemperature.setVisibility(View.VISIBLE);
+                tvTitleTemperature2.setVisibility(View.VISIBLE);
+                tvTemperature2.setVisibility(View.VISIBLE);
                 tvTitleFanStatus.setVisibility(View.VISIBLE);
                 tvFanStatus.setVisibility(View.VISIBLE);
                 tvTitleMode.setVisibility(View.VISIBLE);
@@ -608,16 +620,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private void updateScreen(boolean updateGraph) {
         switch (viewPagerPage) {
             case 0: // GUI View
-                wheelView.setSpeed(WheelData.getInstance().getSpeed());
-                wheelView.setBattery(WheelData.getInstance().getBatteryLevel());
-                wheelView.setTemperature(WheelData.getInstance().getTemperature());
-                wheelView.setRideTime(WheelData.getInstance().getRidingTimeString());
-                wheelView.setTopSpeed(WheelData.getInstance().getTopSpeedDouble());
-                wheelView.setDistance(WheelData.getInstance().getDistanceDouble());
-                wheelView.setTotalDistance(WheelData.getInstance().getTotalDistanceDouble());
-                wheelView.setVoltage(WheelData.getInstance().getVoltageDouble());
-                wheelView.setCurrent(WheelData.getInstance().getPowerDouble());
-				wheelView.setAverageSpeed(WheelData.getInstance().getAverageRidingSpeedDouble());
+                updateWheelView();
                 break;
             case 1: // Text View
                 if (use_mph) {
@@ -744,6 +747,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         WheelData.initiate(this);
+
+        FlicManager.setAppCredentials("1aa3a357-feb8-4da2-bbe6-f69d418420c9", "cac07edc-18bf-47d5-9e6e-169c41cb00bf", "WheelLog");
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.settings_frame, getPreferencesFragment(), Constants.PREFERENCES_FRAGMENT_TAG)
@@ -1109,7 +1114,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             int alarm1Battery = sharedPreferences.getInt(getString(R.string.alarm_1_battery), 0);
             int alarm2Battery = sharedPreferences.getInt(getString(R.string.alarm_2_battery), 0);
             int alarm3Battery = sharedPreferences.getInt(getString(R.string.alarm_3_battery), 0);
-            int current_alarm = sharedPreferences.getInt(getString(R.string.alarm_current), 0);
+            int current_peak_alarm = sharedPreferences.getInt(getString(R.string.alarm_current), 0);
+            int current_sustained_alarm = sharedPreferences.getInt(getString(R.string.alarm_current_sustained), 0);
 			int temperature_alarm = sharedPreferences.getInt(getString(R.string.alarm_temperature), 0);
             boolean disablePhoneVibrate = sharedPreferences.getBoolean(getString(R.string.disable_phone_vibrate), false);
 
@@ -1117,7 +1123,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     alarm1Speed, alarm1Battery,
                     alarm2Speed, alarm2Battery,
                     alarm3Speed, alarm3Battery,
-                    current_alarm, temperature_alarm, disablePhoneVibrate);
+                    current_peak_alarm, current_sustained_alarm, temperature_alarm, disablePhoneVibrate);
             wheelView.setWarningSpeed(alarm1Speed);
         } else
             wheelView.setWarningSpeed(0);
@@ -1269,8 +1275,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         Timber.i("onActivityResult");
+        try {
+            FlicManager.getInstance(this, new FlicManagerInitializedCallback() {
+                @Override
+                public void onInitialized(FlicManager manager) {
+                    FlicButton button = manager.completeGrabButton(requestCode, resultCode, data);
+                    if (button != null) {
+                        button.registerListenForBroadcast(FlicBroadcastReceiverFlags.CLICK_OR_DOUBLE_CLICK_OR_HOLD);
+                        Toast.makeText(MainActivity.this, R.string.flic_button_grabbed, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, R.string.flic_button_not_grabbed, Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         switch (requestCode) {
             case RESULT_DEVICE_SCAN_REQUEST:
                 if (resultCode == RESULT_OK) {
@@ -1320,6 +1343,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         intentFilter.addAction(Constants.ACTION_SPEECH_SERVICE_TOGGLED);
         intentFilter.addAction(Constants.ACTION_LIVEMAP_SERVICE_TOGGLED);
         intentFilter.addAction(Constants.ACTION_LIVEMAP_STATUS);
+        intentFilter.addAction(Constants.ACTION_LIVEMAP_LOCATION_UPDATED);
         intentFilter.addAction(Constants.ACTION_PREFERENCE_CHANGED);
 		intentFilter.addAction(Constants.ACTION_WHEEL_SETTING_CHANGED);
 		intentFilter.addAction(Constants.ACTION_WHEEL_TYPE_RECOGNIZED);	
@@ -1468,6 +1492,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (LivemapService.isInstanceCreated()) {
             switch (LivemapService.getStatus()) {
                 case DISCONNECTED:
+                    if (lastLivemapStatus != LivemapService.LivemapStatus.DISCONNECTED)
+                        wvEucWorld.reload();
+
                     tvLivemapStatus.setText(getString(R.string.livemap_offline));
                     setBtnState(ibLivemapStartFinish, false, !SettingsUtil.getLivemapApiKey(this).equals(""));
                     setBtnState(ibLivemapPause, false, false);
@@ -1489,6 +1516,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     setBtnState(ibLivemapShare, false, false);
                     break;
                 case STARTED:
+                    if (lastLivemapStatus != LivemapService.LivemapStatus.STARTED)
+                        wvEucWorld.reload();
+
                     tvLivemapStatus.setText(getString(R.string.livemap_live));
                     setBtnState(ibLivemapStartFinish, true, true);
                     setBtnState(ibLivemapPause, false, true);
@@ -1518,8 +1548,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     setBtnState(ibLivemapShare, false, false);
                     break;
             }
+            lastLivemapStatus = LivemapService.getStatus();
         }
         else {
+            lastLivemapStatus = LivemapService.LivemapStatus.DISCONNECTED;
             tvLivemapStatus.setText(getString(R.string.livemap_offline));
             setBtnState(ibLivemapStartFinish, false, !SettingsUtil.getLivemapApiKey(this).equals(""));
             setBtnState(ibLivemapPause, false, false);
@@ -1666,6 +1698,54 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             @Override
             public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, String responseString, Throwable throwable) { }
         });
+    }
+
+    private void updateWheelView() {
+        if (WheelData.getInstance().isConnected()) {
+            wheelView.setWheel();
+            wheelView.setSpeed(WheelData.getInstance().getSpeed());
+            wheelView.setBattery(WheelData.getInstance().getBatteryLevel());
+            wheelView.setTemperature(WheelData.getInstance().getTemperature());
+            wheelView.setRideTime(WheelData.getInstance().getRideTimeString());
+            wheelView.setRidingTime(WheelData.getInstance().getRidingTimeString());
+            wheelView.setTopSpeed(WheelData.getInstance().getTopSpeedDouble());
+            wheelView.setDistance(WheelData.getInstance().getDistanceDouble());
+            wheelView.setTotalDistance(WheelData.getInstance().getTotalDistanceDouble());
+            wheelView.setVoltage(WheelData.getInstance().getVoltageDouble());
+            wheelView.setCurrent(WheelData.getInstance().getCurrentDouble());
+            wheelView.setAverageSpeed(WheelData.getInstance().getAverageSpeedDouble());
+            wheelView.setAverageRidingSpeed(WheelData.getInstance().getAverageRidingSpeedDouble());
+        }
+        else
+        if (LivemapService.getLivemapGPS()) {
+            wheelView.setGPS();
+            wheelView.setSpeed((int)(LivemapService.getSpeed() * 10));
+            wheelView.setRideTime(LivemapService.getRideTimeString());
+            wheelView.setRidingTime(LivemapService.getRidingTimeString());
+            wheelView.setTopSpeed(LivemapService.getTopSpeed());
+            wheelView.setDistance(LivemapService.getDistance());
+            wheelView.setAverageSpeed(LivemapService.getAverageSpeed());
+            wheelView.setAverageRidingSpeed(LivemapService.getAverageRidingSpeed());
+        }
+    }
+
+    public void grabFlicButton() {
+        try {
+            FlicManager.getInstance(this, new FlicManagerInitializedCallback() {
+                @Override
+                public void onInitialized(FlicManager manager) {
+                    manager.initiateGrabButton(MainActivity.this);
+                }
+            });
+        }
+        catch (FlicAppNotInstalledException err) {
+            Toast.makeText(this, "Flic App is not installed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getFlicKey(String name) {
+        int id = getResources().getIdentifier(name, "string", getPackageName());
+        return (id > 0) ? getResources().getString(id)+"." : "";
     }
 
 }

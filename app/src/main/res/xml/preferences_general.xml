@@ -23,6 +23,12 @@
         android:title="@string/dont_reset_data_title"
         android:summary="@string/dont_reset_data_summary" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/optimized_battery_level"
+        android:title="@string/optimized_battery_level_title"
+        android:summary="@string/optimized_battery_level_summary" />
+
     <com.pavelsikun.seekbarpreference.SeekBarPreference
         android:key="@string/max_speed"
         android:title="@string/max_speed_title"

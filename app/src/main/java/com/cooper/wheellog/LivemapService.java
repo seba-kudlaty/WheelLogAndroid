@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cooper.wheellog.utils.Constants;
@@ -38,6 +39,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class LivemapService extends Service {
 
@@ -61,6 +63,9 @@ public class LivemapService extends Service {
     private static boolean livemapGPS = false;
     private static double currentDistance;
     private static double currentSpeed;
+    private static double topSpeed;
+    private static int ridingTime;
+    private static int rideTime;
     private static final int NOTIFY_ID = 36901;
     private static final String CHANNEL_ID = "chan_wl_livemap";
 
@@ -97,8 +102,25 @@ public class LivemapService extends Service {
         return instance != null;
     }
     public static LivemapService getInstance() { return instance; }
-7    public static double getDistance() { return currentDistance / 1000; }
+    public static double getDistance() { return currentDistance / 1000; }
+    public static double getAverageSpeed() { return (rideTime > 59) ? getDistance() / ((double)rideTime / 3600) : 0; }
+    public static double getAverageRidingSpeed() { return (ridingTime > 59) ? getDistance() / ((double)ridingTime / 3600) : 0; }
     public static double getSpeed() { return (livemapGPS) ? currentSpeed : 0; }
+    public static double getTopSpeed() { return topSpeed; }
+    public static int getRideTime() { return rideTime; }
+    public static int getRidingTime() { return ridingTime; }
+    public static String getRideTimeString() {
+        long hours = TimeUnit.SECONDS.toHours(rideTime);
+        long minutes = TimeUnit.SECONDS.toMinutes(rideTime) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(rideTime));
+        long seconds = TimeUnit.SECONDS.toSeconds(rideTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(rideTime));
+        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
+    }
+    public static String getRidingTimeString() {
+        long hours = TimeUnit.SECONDS.toHours(ridingTime);
+        long minutes = TimeUnit.SECONDS.toMinutes(ridingTime) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(ridingTime));
+        long seconds = TimeUnit.SECONDS.toSeconds(ridingTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(ridingTime));
+        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
+    }
     public static LivemapStatus getStatus() { return status; }
     public static String getUrl() { return url; }
     public static boolean getAutoStarted() { return autoStarted; }
@@ -118,6 +140,7 @@ public class LivemapService extends Service {
             lastGPS = SystemClock.elapsedRealtime();
             currentLocation = location;
             currentSpeed = location.getSpeed() * 3.6f;
+            if (topSpeed < currentSpeed) topSpeed = currentSpeed;
             lastLocationTime = location.getTime();
             lastLatitude = location.getLatitude();
             lastLongitude = location.getLongitude();
@@ -129,6 +152,7 @@ public class LivemapService extends Service {
             }
             else
                 lastLocation = currentLocation;
+            sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_LOCATION_UPDATED));
             updateLivemap();
         }
         public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -173,6 +197,9 @@ public class LivemapService extends Service {
                         WheelData.getInstance().getDataAge() > SettingsUtil.getLivemapAutoFinishDelay(getApplicationContext()) * 1000 &&
                         tourStartInitiated + SettingsUtil.getLivemapAutoFinishDelay(getApplicationContext()) * 1000 < now)
                     stop();
+                // Ride & riding time
+                ++rideTime;
+                if (livemapGPS & currentSpeed >= Constants.MIN_RIDING_SPEED) ++ridingTime;
             }
         };
         timer = new Timer();
@@ -212,6 +239,9 @@ public class LivemapService extends Service {
         livemapError = 0;
         currentDistance = 0;
         currentSpeed = 0;
+        topSpeed = 0;
+        ridingTime = 0;
+        rideTime = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) batteryManager = (BatteryManager)getSystemService(BATTERY_SERVICE);
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -280,10 +310,15 @@ public class LivemapService extends Service {
             requestParams.put("llt", String.format(Locale.US, "%.7f", currentLocation.getLatitude()));
             requestParams.put("lln", String.format(Locale.US, "%.7f", currentLocation.getLongitude()));
             requestParams.put("lds", String.format(Locale.US, "%.3f", currentDistance / 1000.0));
-            if (currentLocation.hasSpeed())     requestParams.put("lsp", String.format(Locale.US, "%.1f", currentLocation.getSpeed() * 3.6f));
-            if (currentLocation.hasAccuracy())  requestParams.put("lac", String.format(Locale.US, "%.1f", currentLocation.getAccuracy()));
-            if (currentLocation.hasAltitude())  requestParams.put("lat", String.format(Locale.US, "%.1f", currentLocation.getAltitude()));
-            if (currentLocation.hasBearing())   requestParams.put("lbg", String.format(Locale.US, "%.1f", currentLocation.getBearing()));
+            requestParams.put("lsa", String.format(Locale.US, "%.1f", getAverageSpeed()));
+            requestParams.put("lsr", String.format(Locale.US, "%.1f", getAverageRidingSpeed()));
+            requestParams.put("lst", String.format(Locale.US, "%.1f", getTopSpeed()));
+            requestParams.put("lrt", String.format(Locale.US, "%d", getRideTime()));
+            requestParams.put("lrr", String.format(Locale.US, "%d", getRidingTime()));
+            requestParams.put("lsp", String.format(Locale.US, "%.1f", currentLocation.getSpeed() * 3.6f));
+            requestParams.put("lac", String.format(Locale.US, "%.1f", currentLocation.getAccuracy()));
+            requestParams.put("lat", String.format(Locale.US, "%.1f", currentLocation.getAltitude()));
+            requestParams.put("lbg", String.format(Locale.US, "%.1f", currentLocation.getBearing()));
             // Device battery
             int deviceBattery = getDeviceBattery();
             if (deviceBattery > -1) requestParams.put("dbl", String.format(Locale.US, "%d", deviceBattery));
@@ -291,16 +326,25 @@ public class LivemapService extends Service {
             if (WheelData.getInstance().isConnected()) {
                 requestParams.put("was", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageSpeedDouble()));
                 requestParams.put("wbl", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageBatteryLevelDouble()));
-                requestParams.put("wcu", String.format(Locale.US, "%.1f", WheelData.getInstance().getCurrentDouble()));
+                requestParams.put("wcu", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageCurrentDouble()));
                 requestParams.put("wds", String.format(Locale.US, "%.3f", WheelData.getInstance().getDistanceDouble()));
-                requestParams.put("wpw", String.format(Locale.US, "%.1f", WheelData.getInstance().getPowerDouble()));
+                requestParams.put("wpw", String.format(Locale.US, "%.1f", WheelData.getInstance().getAveragePowerDouble()));
                 requestParams.put("wsp", String.format(Locale.US, "%.1f", WheelData.getInstance().getSpeedDouble()));
+                requestParams.put("wsa", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageSpeedDouble()));
+                requestParams.put("wsr", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageRidingSpeedDouble()));
+                requestParams.put("wst", String.format(Locale.US, "%.1f", WheelData.getInstance().getTopSpeedDouble()));
                 requestParams.put("wtm", String.format(Locale.US, "%.1f", WheelData.getInstance().getTemperatureDouble()));
-                requestParams.put("wvt", String.format(Locale.US, "%.1f", WheelData.getInstance().getVoltageDouble()));
+                requestParams.put("wvt", String.format(Locale.US, "%.1f", WheelData.getInstance().getAverageVoltageDouble()));
+                requestParams.put("wrt", String.format(Locale.US, "%d", WheelData.getInstance().getRideTime()));
+                requestParams.put("wrr", String.format(Locale.US, "%d", WheelData.getInstance().getRidingTime()));
             }
+            Log.d("", requestParams.toString());
             HttpClient.post(Constants.getEucWorldUrl() + "/api/tour/update", requestParams, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
+                    Log.d("", response.toString());
+
+
                     livemapError = 2;
                     if (status == LivemapStatus.WAITING_FOR_GPS) {
                         say(getString(R.string.livemap_speech_tour_started), "info", 1);
@@ -392,6 +436,7 @@ public class LivemapService extends Service {
         String i = info.toString();
 
         final RequestParams requestParams = new RequestParams();
+        requestParams.put("api", Constants.LIVEMAP_API_VERSION);
         requestParams.put("a", SettingsUtil.getLivemapApiKey(this));
         requestParams.put("p", (autoStarted) ? autoStartedPublish : SettingsUtil.getLivemapPublish(this));
         requestParams.put("i", SettingsUtil.getLivemapUpdateInterval(this));

@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.SystemClock;
 import android.os.Vibrator;
-import android.util.Log;
 
 import com.cooper.wheellog.utils.Constants;
 import com.cooper.wheellog.utils.Constants.ALARM_TYPE;
@@ -36,6 +35,8 @@ public class WheelData {
     private long graph_last_update_time;
     private static final int GRAPH_UPDATE_INTERVAL = 1000; // milliseconds
     private static final int MAX_BATTERY_AVERAGE_COUNT = 150;
+    private static final int MAX_CURRENT_AVERAGE_COUNT = 10;
+    private static final int MAX_VOLTAGE_AVERAGE_COUNT = 10;
 	private static final double RATIO_GW = 0.875;
     private ArrayList<String> xAxis = new ArrayList<>();
     private ArrayList<Float> currentAxis = new ArrayList<>();
@@ -50,6 +51,8 @@ public class WheelData {
     private int mSpeed;
     private long mTotalDistance;
     private int mCurrent;
+    private double mAverageCurrent;
+    private double mAverageCurrentCount;
     private int mTemperature;
 	private int mTemperature2;
 	private double mAngle;
@@ -60,6 +63,8 @@ public class WheelData {
     private double mAverageBattery;
     private double mAverageBatteryCount;
     private int mVoltage;
+    private double mAverageVoltage;
+    private double mAverageVoltageCount;
     private long mDistance;
 	private long mUserDistance;
     private int mRideTime;
@@ -67,6 +72,8 @@ public class WheelData {
     private int mLastRideTime;
     private int mTopSpeed;
     private int mFanStatus;
+    private int mVoiceStatus;
+    private int mLightStatus;
     private long mLastDataReceived = 0;
     private boolean mConnected = false;
 	private boolean mNewWheelSettings = false;
@@ -99,14 +106,16 @@ public class WheelData {
     private int mAlarm1Battery = 0;
     private int mAlarm2Battery = 0;
     private int mAlarm3Battery = 0;
-    private int mAlarmCurrent = 0;
+    private int mAlarmPeakCurrent = 0;
+    private int mAlarmSustainedCurrent = 0;
 	private int mAlarmTemperature = 0;
     private int mGotwayVoltageScaler = 0;
 
 	private boolean mUseRatio = false;
 	//private boolean mGotway84V = false;
 	private boolean mSpeedAlarmExecuted = false;
-    private boolean mCurrentAlarmExecuted = false;
+    private boolean mCurrentPeakAlarmExecuted = false;
+    private boolean mCurrentSustainedAlarmExecuted = false;
 	private boolean mTemperatureAlarmExecuted = false;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -456,9 +465,9 @@ public class WheelData {
 
     public double getAverageBatteryLevelDouble() { return mAverageBattery; }
 
-    int getFanStatus() {
-        return mFanStatus;
-    }
+    int getLightStatus() { return mLightStatus; }
+    int getVoiceStatus() { return mVoiceStatus; }
+    int getFanStatus() { return mFanStatus; }
 
     boolean isConnected() {
         return mConnected;
@@ -540,13 +549,20 @@ public class WheelData {
     double getSpeedDouble() { return (mSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)) / 100.0; }
     double getSpeedForTizen() { return (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? getSpeedDouble() / 1.609 : getSpeedDouble(); }
 
-    double getVoltageDouble() {
-        return mVoltage / 100.0;
-    }
+    double getAverageVoltageDouble() { return mAverageVoltage; }
+    double getVoltageDouble() { return mVoltage / 100.0; }
 
+    double getAveragePowerDouble() {
+        return mAverageCurrent * mAverageVoltage;
+    }
     double getPowerDouble() {
         return (mCurrent * mVoltage) / 10000.0;
     }
+
+    double getAverageCurrentDouble() {
+        return mAverageCurrent;
+    }
+    int getAverageCurrent() { return (int)Math.round(mAverageCurrent * 100); }
 
     double getCurrentDouble() {
         return mCurrent / 100.0;
@@ -554,11 +570,10 @@ public class WheelData {
 
     int getTopSpeed() { return (int)(mTopSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)); }
 
-    double getTopSpeedDouble() {
-        return (mTopSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)) / 100.0;
-    }
+    double getTopSpeedDouble() { return (mTopSpeed * SettingsUtil.getSpeedCorrectionFactor(mContext)) / 100.0; }
 
     int getDistance() { return (int) (mTotalDistance - mStartTotalDistance); }
+
     String getDistanceForTizen() {
         double dist = (SettingsUtil.isUseMiles(mBluetoothLeService.getApplicationContext())) ? getDistanceDouble() / 1.609 : getDistanceDouble();
         if (dist >= 10)
@@ -645,14 +660,15 @@ public class WheelData {
     void setPreferences(int alarm1Speed, int alarm1Battery,
                                    int alarm2Speed, int alarm2Battery,
                                    int alarm3Speed, int alarm3Battery,
-                                   int alarmCurrent,int alarmTemperature, boolean disablePhoneVibrate) {
+                                   int alarmPeakCurrent, int alarmSustainedCurrent, int alarmTemperature, boolean disablePhoneVibrate) {
         mAlarm1Speed = alarm1Speed * 100;
         mAlarm2Speed = alarm2Speed * 100;
         mAlarm3Speed = alarm3Speed * 100;
         mAlarm1Battery = alarm1Battery;
         mAlarm2Battery = alarm2Battery;
         mAlarm3Battery = alarm3Battery;
-        mAlarmCurrent = alarmCurrent*100;
+        mAlarmPeakCurrent = alarmPeakCurrent*100;
+        mAlarmSustainedCurrent = alarmSustainedCurrent*100;
 		mAlarmTemperature = alarmTemperature*100;
         mDisablePhoneVibrate = disablePhoneVibrate;
     }
@@ -692,6 +708,16 @@ public class WheelData {
         mAverageBattery += (battery - mAverageBattery) / mAverageBatteryCount;
     }
 
+    private void setAverageCurrent(double current) {
+        mAverageCurrentCount = mAverageCurrentCount < MAX_CURRENT_AVERAGE_COUNT ? mAverageCurrentCount + 1 : MAX_CURRENT_AVERAGE_COUNT;
+        mAverageCurrent += (current - mAverageCurrent) / mAverageCurrentCount;
+    }
+
+    private void setAverageVoltage(double voltage) {
+        mAverageVoltageCount = mAverageVoltageCount < MAX_VOLTAGE_AVERAGE_COUNT ? mAverageVoltageCount + 1 : MAX_VOLTAGE_AVERAGE_COUNT;
+        mAverageVoltage += (voltage - mAverageVoltage) / mAverageVoltageCount;
+    }
+
     boolean isSpeedAlarm1Active() {
         if (mAlarmsEnabled)
             return (mAlarm1Speed > 0 && mAlarm1Battery > 0 && mAverageBattery <= mAlarm1Battery && mSpeed >= mAlarm1Speed);
@@ -715,7 +741,7 @@ public class WheelData {
 
     boolean isCurrentAlarmActive() {
         if (mAlarmsEnabled)
-            return (mAlarmCurrent > 0 && mCurrent >= mAlarmCurrent);
+            return (mAlarmPeakCurrent > 0 && mCurrent >= mAlarmPeakCurrent) || (mAlarmSustainedCurrent > 0 && mAverageCurrent >= mAlarmSustainedCurrent);
         else
             return false;
     }
@@ -754,17 +780,27 @@ public class WheelData {
             mSpeedAlarmExecuted = alarm_finished;
         }
 
-        // CURRENT
-        if (!mCurrentAlarmExecuted) {
-            if (mAlarmCurrent > 0 &&
-                    mCurrent >= mAlarmCurrent) {
+        // PEAK CURRENT
+        if (!mCurrentPeakAlarmExecuted) {
+            if (mAlarmPeakCurrent > 0 &&
+                    mCurrent >= mAlarmPeakCurrent) {
                 raiseAlarm(ALARM_TYPE.CURRENT);
             }
         } else {
-            if (mCurrent < mAlarmCurrent)
-                mCurrentAlarmExecuted = false;
+            if (mCurrent < mAlarmPeakCurrent)
+                mCurrentPeakAlarmExecuted = false;
         }
-		
+
+        // SUSTAINED CURRENT
+        if (!mCurrentSustainedAlarmExecuted) {
+            if (mAlarmSustainedCurrent > 0 && getAverageCurrent() >= mAlarmSustainedCurrent) {
+                raiseAlarm(ALARM_TYPE.CURRENT);
+            }
+        } else {
+            if (getAverageCurrent() < mAlarmSustainedCurrent)
+                mCurrentSustainedAlarmExecuted = false;
+        }
+
 		// TEMP
 		if (!mTemperatureAlarmExecuted) {
             if (mAlarmTemperature > 0 && mTemperature >= mAlarmTemperature) {
@@ -774,7 +810,6 @@ public class WheelData {
             if (mTemperature < mAlarmTemperature)
                 mTemperatureAlarmExecuted = false;
         }
-		
     }
 
     private void raiseAlarm(ALARM_TYPE alarmType) {
@@ -790,11 +825,11 @@ public class WheelData {
                 break;
             case CURRENT:
                 pattern = new long[]{0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-                mCurrentAlarmExecuted = true;
+                mCurrentPeakAlarmExecuted = true;
                 break;
 			case TEMPERATURE:
                 pattern = new long[]{0, 500, 100, 100, 100, 500, 100, 100, 100, 500, 100, 100, 100};
-                mCurrentAlarmExecuted = true;
+                mCurrentPeakAlarmExecuted = true;
                 break;
         }
         mContext.sendBroadcast(intent);
@@ -871,11 +906,15 @@ public class WheelData {
             if ((data[16] & 255) == 169) { // Live data
 
 
+                mCurrent = ((data[10]&0xFF) + (data[11]<<8));
+                setAverageCurrent(getCurrentDouble());
+
                 mVoltage = byteArrayInt2(data[2], data[3]);
+                setAverageVoltage(getVoltageDouble());
+
                 mSpeed = byteArrayInt2(data[4], data[5]);
                 mTotalDistance = byteArrayInt4(data[6], data[7], data[8], data[9]);
-                mCurrent = ((data[10]&0xFF) + (data[11]<<8));
- 
+
 				mTemperature = byteArrayInt2(data[12], data[13]);
 
                 if ((data[15] & 255) == 224) {
@@ -885,7 +924,7 @@ public class WheelData {
 
                 int battery;
 
-                if (mModel.compareTo("KS-18L") == 0) {
+                if ((mModel.compareTo("KS-18L") == 0) || (mModel.compareTo("KS-16X") == 0)) {
                     if (mLastTimestamp > 0) {
                         double dt = (double)(System.currentTimeMillis() - mLastTimestamp) / (3600 * 1000);
                         double dah = getCurrentDouble() * dt;
@@ -902,49 +941,54 @@ public class WheelData {
                     mLastTimestamp = System.currentTimeMillis();
                 }
 
-                if ((mModel.compareTo("KS-18L") == 0) || (mBtName.compareTo("RW") == 0 ) || (mName.startsWith("ROCKW"))) {
-
-                    if (mVoltage > 8350) {
-                        battery = 100;
-                    } else if (mVoltage > 6800) {
-                        battery = (mVoltage - 6650) / 17;
-                    } else if (mVoltage > 6400){
-                        battery = (mVoltage - 6400) / 45;
-                    } else {
-                        battery = 0;
+                if (SettingsUtil.getOptimizedBatteryLevel(mContext)) {
+                    // Optimized, "WheelLog" battery level
+                    if ((mModel.compareTo("KS-18L") == 0) || (mModel.compareTo("KS-16X") == 0) || (mBtName.compareTo("RW") == 0 ) || (mName.startsWith("ROCKW"))) {
+                        if (mVoltage > 8350)        battery = 100;
+                        else if (mVoltage > 6800)   battery = (mVoltage - 6650) / 17;
+                        else if (mVoltage > 6400)   battery = (mVoltage - 6400) / 45;
+                        else                        battery = 0;
                     }
-
-                } else {
-//                    if (mVoltage > 6680) {
-//                        battery = 100;
-//                    } else if (mVoltage > 5440) {
-//                        battery = (int)Math.round((mVoltage - 5320) / 13.6);
-//                    } else if (mVoltage > 5120){
-//                        battery = (mVoltage - 5120) / 36;
-//                    } else {
-//                        battery = 0;
-//                    }
-                    if (mVoltage < 5000) {
-                        battery = 0;
-                    } else if (mVoltage >= 6600) {
-                        battery = 100;
-                    } else {
-                        battery = (mVoltage - 5000) / 16;
+                    else {
+                        if (mVoltage >= 6600)       battery = 100;
+                        else if (mVoltage < 5000)   battery = 0;
+                        else                        battery = (mVoltage - 5000) / 16;
                     }
-
+                }
+                else {
+                    // Standard, "OEM" battery level
+                    if ((mModel.compareTo("KS-18L") == 0) || (mBtName.compareTo("RW") == 0 ) || (mName.startsWith("ROCKW"))) {
+                        if (mVoltage >= 8400)       battery = 100;
+                        else if (mVoltage < 6000)   battery = 0;
+                        else                        battery = (mVoltage - 6000) / 24;
+                    }
+                    else
+                    if (mModel.compareTo("KS-16X") == 0) {
+                        if (mVoltage >= 8400)       battery = 100;
+                        else if (mVoltage < 6300)   battery = 0;
+                        else                        battery = (mVoltage - 6000) / 21;
+                    }
+                    else {
+                        if (mVoltage >= 6600)       battery = 100;
+                        else if (mVoltage < 5000)   battery = 0;
+                        else                        battery = (mVoltage - 5000) / 16;
+                    }
                 }
 
                 setBatteryPercent(battery);
 
                 return true;
-            } else if ((data[16] & 255) == 185) { // Distance/Time/Fan Data
+            } else if ((data[16] & 255) == 185) { // Distance/Time/Fan Data/Motor Temperature
                 long distance = byteArrayInt4(data[2], data[3], data[4], data[5]);
                 setDistance(distance);
                 //int currentTime = byteArrayInt2(data[6], data[7]);
 	            int currentTime = (int) (Calendar.getInstance().getTimeInMillis() - rideStartTime) / 1000;
                 setCurrentTime(currentTime);
                 setTopSpeed(byteArrayInt2(data[8], data[9]));
+                mLightStatus = data[10];
+                mVoiceStatus = data[11];
                 mFanStatus = data[12];
+                mTemperature2 = byteArrayInt2(data[14], data[15]);
             } else if ((data[16] & 255) == 187) { // Name and Type data
                 int end = 0;
                 int i = 0;
@@ -1005,8 +1049,10 @@ public class WheelData {
             setDistance(distance);
 
             mVoltage = (data[2] * 256) + (data[3] & 255);
+            setAverageVoltage(getVoltageDouble());
 
             mCurrent = Math.abs((data[10] * 256) + data[11]);
+            setAverageCurrent(getCurrentDouble());
 
             int battery;
 
@@ -1065,7 +1111,9 @@ public class WheelData {
             } else {
                 mSpeed = status.getSpeed();
                 mVoltage = status.getVoltage();
+                setAverageVoltage(getVoltageDouble());
                 mCurrent = status.getCurrent();
+                setAverageCurrent(getCurrentDouble());
                 mTotalDistance = (long) (status.getDistance());
                 mTemperature = status.getTemperature() * 10;
 
@@ -1108,7 +1156,9 @@ public class WheelData {
 			} else {
                 mSpeed = (int) (status.getSpeed() * 360d);
                 mVoltage = (int) (status.getVoltage() * 100d);
+                setAverageVoltage(getVoltageDouble());
                 mCurrent = (int) (status.getCurrent() * 100d);
+                setAverageCurrent(getCurrentDouble());
 				mTemperature = (int) (status.getTemperature() * 100d);
 				mTemperature2 = (int) (status.getTemperature2() * 100d);
 				mTotalDistance = (long) (status.getDistance()*1000d);
@@ -1148,6 +1198,8 @@ public class WheelData {
         mSpeed = 0;
         mTotalDistance = 0;
         mCurrent = 0;
+        mAverageCurrentCount = 0;
+        mAverageCurrent = 0;
         mTemperature = 0;
 		mTemperature2 = 0;
 		mAngle = 0;
@@ -1157,6 +1209,8 @@ public class WheelData {
         mAverageBatteryCount = 0;
         mAverageBattery = 0;
         mVoltage = 0;
+        mAverageVoltageCount = 0;
+        mAverageVoltage = 0;
         mRideTime = 0;
 		mRidingTime = 0;
         mTopSpeed = 0;

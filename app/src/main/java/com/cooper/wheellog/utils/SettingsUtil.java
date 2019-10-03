@@ -253,12 +253,32 @@ public class SettingsUtil {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.speech_use_a2dp_only), false);
     }
 
+    public static boolean getOptimizedBatteryLevel(Context context) {
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.optimized_battery_level), true);
+    }
+
     public static boolean getDontResetData(Context context) {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.dont_reset_data), false);
     }
 
     public static int getSpeechFocus(Context context) {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_focus), "1"));
+    }
+
+    public static int getFlicHornMode(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_horn_mode), "0"));
+    }
+
+    public static int getFlicActionSingle(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_action_single), "0"));
+    }
+
+    public static int getFlicActionDouble(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_action_double), "0"));
+    }
+
+    public static int getFlicActionHold(Context context) {
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_action_hold), "0"));
     }
 
 }

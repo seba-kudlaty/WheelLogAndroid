@@ -270,4 +270,32 @@
         <item>900</item>
     </string-array>
 
+    <string-array name="flic_horn_modes">
+        <item>Wyłączony</item>
+        <item>Wbudowany (King Song)</item>
+        <item>Przez Bluetooth</item>
+    </string-array>
+
+    <string-array name="flic_horn_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="flic_action">
+        <item>Brak</item>
+        <item>Klakson</item>
+        <item>Światło</item>
+        <item>Komunikat głosowy</item>
+        <item>Kasuj komunikat głosowy</item>
+    </string-array>
+
+    <string-array name="flic_action_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
 </resources>

@@ -149,8 +149,8 @@
     <string name="alarm_3_battery_title">Poziom baterii</string>
     <string name="alarm_3_battery_summary">Włącz alarm przy poziomie baterii równym lub niższym niż</string>
     <string name="current_alarm_title">Alarm prądu</string>
-    <string name="alarm_current_title">Prąd</string>
-    <string name="alarm_current_summary">Prąd wyzwolenia alarmu</string>
+    <string name="alarm_current_title">Prąd szczytowy</string>
+    <string name="alarm_current_summary">Prąd szczytowy wyzwolenia alarmu</string>
     <string name="temperature_alarm_title">Alarm temperatury</string>
     <string name="alarm_temperature_title">Temperatura</string>
     <string name="alarm_temperature_summary">Włącz alarm przy temperaturze równej lub wyższej niż</string>
@@ -285,4 +285,16 @@
     <string name="speed_correction_title">Korekta prędkości monocykla</string>
     <string name="update_available">Dostępna aktualizacja do %s</string>
     <string name="update_available_download">Pobierz</string>
+    <string name="alarm_current_sustained_summary">Prąd wyzwolenia alarmu</string>
+    <string name="alarm_current_sustained_title">Prąd</string>
+    <string name="flic_action_double_title">Podwójne naciśnięcie</string>
+    <string name="flic_action_hold_title">Przytrzymanie</string>
+    <string name="flic_action_single_title">Naciśnięcie</string>
+    <string name="flic_button_grabbed">Przycisk Flic został powiązany.</string>
+    <string name="flic_button_not_grabbed">Nie powiązano żadnego przycisku Flic.</string>
+    <string name="flic_preferences_title">Ustawienia przycisku Flic</string>
+    <string name="flic_horn_mode_title">Tryb klaksonu</string>
+    <string name="flic_button_setup_title">Powiąż przycisk Flic…</string>
+    <string name="optimized_battery_level_title">Realistyczny poziom baterii</string>
+    <string name="optimized_battery_level_summary">Pokazuj bardziej realistyczny poziom baterii z dodatkowym zapasem bezpieczeństwa</string>
 </resources>

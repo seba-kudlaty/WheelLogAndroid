@@ -33,11 +33,16 @@
         android:icon="@drawable/ic_watch_white_24dp" />
 
     <Preference
+        android:key="@string/flic_preferences"
+        android:title="@string/flic_preferences_title"
+        android:icon="@drawable/ic_action_flic_white" />
+
+    <Preference
         android:key="@string/wheel_settings"
 		android:enabled="false"
         android:title="@string/wheel_settings_title"
         android:icon="@drawable/ic_action_wheel_white" />
-	
+
 	<Preference
         android:key="@string/reset_top_speed"
 		android:enabled="true"

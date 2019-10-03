@@ -52,6 +52,14 @@
         <service android:name="com.cooper.wheellog.SpeechService" />
         <service android:name="com.cooper.wheellog.LivemapService" />
         <receiver
+            android:name="com.cooper.wheellog.FlicButtonBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="io.flic.FLICLIB_EVENT" />
+            </intent-filter>
+        </receiver>
+        <receiver
             android:name="com.cooper.wheellog.PebbleBroadcastReceiver"
             android:exported="true">
             <intent-filter>

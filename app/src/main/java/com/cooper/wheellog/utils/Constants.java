@@ -4,6 +4,8 @@ import java.util.UUID;
 
 public class Constants {
 
+    public static final double LIVEMAP_API_VERSION = 2;
+
     public static final double MIN_RIDING_SPEED = 2.0d;     // km/h
     public static final int LIVEMAP_UPDATE_TIMEOUT = 10;    // Seconds
     public static final int WHEEL_DATA_VALIDITY = 3000;     // Milliseconds
@@ -26,6 +28,10 @@ public class Constants {
     public static final String ACTION_REQUEST_KINGSONG_SERIAL_DATA = "com.cooper.wheellog.requestSerialData";
     public static final String ACTION_REQUEST_KINGSONG_NAME_DATA = "com.cooper.wheellog.requestNameData";
     public static final String ACTION_REQUEST_KINGSONG_HORN = "com.cooper.wheellog.requestHorn";
+    public static final String ACTION_REQUEST_LIGHT_TOGGLE = "com.cooper.wheellog.requestLightToggle";
+    public static final String ACTION_REQUEST_VOICE_REPORT = "com.cooper.wheellog.requestVoiceReport";
+    public static final String ACTION_REQUEST_VOICE_DISMISS = "com.cooper.wheellog.requestVoiceDismiss";
+
     public static final String ACTION_PEBBLE_SERVICE_TOGGLED = "com.cooper.wheellog.pebbleServiceToggled";
     public static final String ACTION_LOGGING_SERVICE_TOGGLED = "com.cooper.wheellog.loggingServiceToggled";
     public static final String ACTION_SPEECH_SERVICE_TOGGLED = "com.cooper.wheellog.speechServiceToggled";
@@ -33,6 +39,7 @@ public class Constants {
     public static final String ACTION_LIVEMAP_STATUS = "com.cooper.wheellog.livemapStatus";
     public static final String ACTION_LIVEMAP_PAUSE = "com.cooper.wheellog.livemapPause";
     public static final String ACTION_LIVEMAP_RESUME = "com.cooper.wheellog.livemapResume";
+    public static final String ACTION_LIVEMAP_LOCATION_UPDATED = "com.cooper.wheellog.livemapLocationUpdated";
     public static final String ACTION_REQUEST_CONNECTION_TOGGLE = "com.cooper.wheellog.requestConnectionToggle";
     public static final String ACTION_PREFERENCE_CHANGED = "com.cooper.wheellog.preferenceChanged";
     public static final String ACTION_PEBBLE_AFFECTING_PREFERENCE_CHANGED = "com.cooper.wheellog.pebblePreferenceChanged";
@@ -142,7 +149,8 @@ public class Constants {
     }
 
     public static String getEucWorldUrl() {
-        return (android.os.Debug.isDebuggerConnected()) ? "http://192.168.28.100" : "https://euc.world";
+        //return (android.os.Debug.isDebuggerConnected()) ? "http://192.168.28.100" : "https://euc.world";
+        return "https://euc.world";
     }
 
 

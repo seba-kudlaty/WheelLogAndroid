@@ -47,6 +47,7 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private boolean disconnectRequested = false;
     private boolean autoConnect = false;
+    private boolean lightOn = false;
     private NotificationUtil mNotificationHandler;
 
     public static boolean isInstanceCreated() {
@@ -123,6 +124,20 @@ public class BluetoothLeService extends Service {
                         writeBluetoothGattCharacteristic(data);
                     }
                     break;
+                case Constants.ACTION_REQUEST_LIGHT_TOGGLE:
+                    if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.KINGSONG) {
+                        byte[] data = new byte[20];
+                        data[0] = (byte) 0xaa;
+                        data[1] = (byte) 0x55;
+                        data[2] = (WheelData.getInstance().getLightStatus() == 0x12) ? (byte) 0x13 : (byte) 0x12;
+                        data[3] = (byte) WheelData.getInstance().getVoiceStatus();
+                        data[16] = (byte) 0x73;
+                        data[17] = (byte) 0x45;
+                        data[18] = (byte) 0xa5;
+                        data[19] = (byte) 0xa5;
+                        writeBluetoothGattCharacteristic(data);
+                    }
+                    break;
                 case Constants.ACTION_REQUEST_CONNECTION_TOGGLE:
                     if (mConnectionState == STATE_DISCONNECTED)
                         connect();
@@ -141,6 +156,7 @@ public class BluetoothLeService extends Service {
         intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_SERIAL_DATA);
         intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_NAME_DATA);
         intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_HORN);
+        intentFilter.addAction(Constants.ACTION_REQUEST_LIGHT_TOGGLE);
         intentFilter.addAction(Constants.ACTION_REQUEST_CONNECTION_TOGGLE);
         return intentFilter;
     }
