@@ -17,6 +17,7 @@ import com.cooper.wheellog.utils.InMotionAdapter;
 import com.cooper.wheellog.utils.NinebotZAdapter;
 import com.cooper.wheellog.utils.SettingsUtil;
 
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -373,7 +374,32 @@ public class WheelData {
 		}
     }
 
-	public void updateMaxSpeed(int wheelMaxSpeed) {
+    public void lockKingsong() {
+        byte[] data = new byte[20];
+        data[0] = (byte) -86;
+        data[1] = (byte) 85;
+        data[2] = (byte) 1;
+        data[16] = (byte) 93;
+        data[17] = (byte) 20;
+        data[18] = (byte) 90;
+        data[19] = (byte) 90;
+        mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+    public void unlockKingsong() {
+        byte[] data = new byte[20];
+        data[0] = (byte) -86;
+        data[1] = (byte) 85;
+        data[2] = (byte) 0;
+        data[16] = (byte) 93;
+        data[17] = (byte) 20;
+        data[18] = (byte) 90;
+        data[19] = (byte) 90;
+        mBluetoothLeService.writeBluetoothGattCharacteristic(data);
+    }
+
+
+    public void updateMaxSpeed(int wheelMaxSpeed) {
 		if (mWheelType == WHEEL_TYPE.INMOTION) {
 			if (mWheelMaxSpeed != wheelMaxSpeed) {
 				mWheelMaxSpeed = wheelMaxSpeed;
@@ -976,7 +1002,6 @@ public class WheelData {
                 }
 
                 setBatteryPercent(battery);
-
                 return true;
             } else if ((data[16] & 255) == 185) { // Distance/Time/Fan Data/Motor Temperature
                 long distance = byteArrayInt4(data[2], data[3], data[4], data[5]);
@@ -1240,7 +1265,7 @@ public class WheelData {
         String wheel_types[] = mContext.getResources().getStringArray(R.array.wheel_types);
         for (String wheel_Type : wheel_types) {
             boolean detected_wheel = true;
-            java.lang.reflect.Field services_res = null;
+            Field services_res = null;
             try {
                 services_res = res.getField(wheel_Type + "_services");
             } catch (Exception ignored) {
@@ -1261,7 +1286,7 @@ public class WheelData {
                 UUID s_uuid = UUID.fromString(service_uuid.replace("_", "-"));
                 BluetoothGattService service = mBluetoothLeService.getGattService(s_uuid);
                 if (service != null) {
-                    java.lang.reflect.Field characteristic_res = null;
+                    Field characteristic_res = null;
                     try {
                         characteristic_res = res.getField(wheel_Type + "_" + service_uuid);
                     } catch (Exception ignored) {
@@ -1363,5 +1388,4 @@ public class WheelData {
         }
         return false;
     }
-
 }

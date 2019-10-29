@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 
+import com.cooper.wheellog.FlicButtonBroadcastReceiver;
+import com.cooper.wheellog.HornMode;
 import com.cooper.wheellog.R;
 
 
@@ -98,8 +100,8 @@ public class SettingsUtil {
         return getSharedPreferences(context).getInt(context.getString(R.string.max_speed), 30);
     }
 
-    public static int getHornMode(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.horn_mode), "0"));
+    public static HornMode getHornMode(Context context) {
+        return HornMode.valueOf(getSharedPreferences(context).getString(context.getString(R.string.horn_mode), "SYSTEM"));
     }
 
     //Inmotion Specific, but can be the same for other wheels
@@ -265,20 +267,20 @@ public class SettingsUtil {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.speech_focus), "1"));
     }
 
-    public static int getFlicHornMode(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_horn_mode), "0"));
+    public static HornMode getFlicHornMode(Context context) {
+        return HornMode.valueOf(getSharedPreferences(context).getString(context.getString(R.string.flic_horn_mode), "NONE"));
     }
 
-    public static int getFlicActionSingle(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_action_single), "0"));
+    public static FlicButtonBroadcastReceiver.FlicAction getFlicActionSingle(Context context) {
+        return FlicButtonBroadcastReceiver.FlicAction.valueOf(getSharedPreferences(context).getString(context.getString(R.string.flic_action_single), "NONE"));
     }
 
-    public static int getFlicActionDouble(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_action_double), "0"));
+    public static FlicButtonBroadcastReceiver.FlicAction getFlicActionDouble(Context context) {
+        return FlicButtonBroadcastReceiver.FlicAction.valueOf(getSharedPreferences(context).getString(context.getString(R.string.flic_action_double), "NONE"));
     }
 
-    public static int getFlicActionHold(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.flic_action_hold), "0"));
+    public static FlicButtonBroadcastReceiver.FlicAction getFlicActionHold(Context context) {
+        return FlicButtonBroadcastReceiver.FlicAction.valueOf(getSharedPreferences(context).getString(context.getString(R.string.flic_action_hold), "NONE"));
     }
 
 }

@@ -75,11 +75,11 @@ public class PebbleBroadcastReceiver extends BroadcastReceiver {
                 pebbleScreenIntent.putExtra(INTENT_EXTRA_PEBBLE_DISPLAYED_SCREEN, displayed_screen);
                 context.sendBroadcast(pebbleScreenIntent);
             } else if (data.contains(PEBBLE_KEY_PLAY_HORN)) {
-                int horn_mode = SettingsUtil.getHornMode(context);
-                if (horn_mode == 1) {
+                HornMode horn_mode = SettingsUtil.getHornMode(context);
+                if (horn_mode == HornMode.KINGSONG) {
                     final Intent hornIntent = new Intent(ACTION_REQUEST_KINGSONG_HORN);
                     context.sendBroadcast(hornIntent);
-                } else if (horn_mode == 2) {
+                } else if (horn_mode == HornMode.SYSTEM) {
                     MediaPlayer mp = MediaPlayer.create(context, R.raw.bicycle_bell);
                     mp.start();
                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {

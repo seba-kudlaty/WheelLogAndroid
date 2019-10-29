@@ -13,14 +13,25 @@ import io.flic.lib.FlicManager;
 
 public class FlicButtonBroadcastReceiver extends FlicBroadcastReceiver {
 
-    private void performAction(int action, Context context) {
+    public static enum FlicAction {
+        NONE,
+        HORN,
+        LIGHT,
+        TOGGLE_TRACKING,
+        LOCK,
+        UNLOCK,
+        REQUEST_VOICE_MESSAGE,
+        DISMISS_VOICE_MESSAGE
+    }
+
+    private void performAction(FlicAction action, Context context) {
         switch (action) {
-            case 1: // Horn
-                int horn_mode = SettingsUtil.getFlicHornMode(context);
-                if (horn_mode == 1) {
+            case HORN: // Horn
+                HornMode horn_mode = SettingsUtil.getFlicHornMode(context);
+                if (horn_mode == HornMode.KINGSONG) {
                     context.sendBroadcast(new Intent(Constants.ACTION_REQUEST_KINGSONG_HORN));
                 }
-                else if (horn_mode == 2) {
+                else if (horn_mode == HornMode.SYSTEM) {
                     MediaPlayer mp = MediaPlayer.create(context, R.raw.bicycle_bell);
                     mp.start();
                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -31,13 +42,22 @@ public class FlicButtonBroadcastReceiver extends FlicBroadcastReceiver {
                     });
                 }
                 break;
-            case 2: // Light
+            case LIGHT: // Light
                 context.sendBroadcast(new Intent(Constants.ACTION_REQUEST_LIGHT_TOGGLE));
                 break;
-            case 3: // Request voice message
+            case TOGGLE_TRACKING:
+                context.sendBroadcast(new Intent(Constants.ACTION_LIVEMAP_TOGGLE));
+                break;
+            case LOCK:
+                context.sendBroadcast(new Intent(Constants.ACTION_REQUEST_KINGSONG_LOCK));
+                break;
+            case UNLOCK:
+                context.sendBroadcast(new Intent(Constants.ACTION_REQUEST_KINGSONG_UNLOCK));
+                break;
+            case REQUEST_VOICE_MESSAGE: // Request voice message
                 context.sendBroadcast(new Intent(Constants.ACTION_REQUEST_VOICE_REPORT));
                 break;
-            case 4: // Dismiss voice message
+            case DISMISS_VOICE_MESSAGE: // Dismiss voice message
                 context.sendBroadcast(new Intent(Constants.ACTION_REQUEST_VOICE_DISMISS));
                 break;
             default:

@@ -277,25 +277,31 @@
     </string-array>
 
     <string-array name="flic_horn_mode_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item>NONE</item>
+        <item>KINGSONG</item>
+        <item>SYSTEM</item>
     </string-array>
 
     <string-array name="flic_action">
         <item>No action</item>
         <item>Horn</item>
         <item>Light</item>
+        <item>Lock (kingsong)</item>
+        <item>Unlock (kingsong)</item>
+        <item>Toggle tracking</item>
         <item>Request voice report</item>
         <item>Dismiss voice report</item>
     </string-array>
 
     <string-array name="flic_action_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
+        <item>NONE</item>
+        <item>HORN</item>
+        <item>LIGHT</item>
+        <item>LOCK</item>
+        <item>UNLOCK</item>
+        <item>TOGGLE_TRACKING</item>
+        <item>REQUEST_VOICE_MESSAGE</item>
+        <item>DISMISS_VOICE_MESSAGE</item>
     </string-array>
 
 </resources>

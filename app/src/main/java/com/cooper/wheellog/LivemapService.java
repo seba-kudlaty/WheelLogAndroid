@@ -165,13 +165,23 @@ public class LivemapService extends Service {
         public void onReceive(Context context, Intent intent)
         {
             String action = intent.getAction();
-            switch (action) {
-                case Constants.ACTION_LIVEMAP_PAUSE:
-                    pauseLivemap();
-                    break;
-                case Constants.ACTION_LIVEMAP_RESUME:
-                    resumeLivemap();
-                    break;
+            if (action != null) {
+                switch (action) {
+                    case Constants.ACTION_LIVEMAP_PAUSE:
+                        pauseLivemap();
+                        break;
+                    case Constants.ACTION_LIVEMAP_RESUME:
+                        resumeLivemap();
+                        break;
+                    case Constants.ACTION_LIVEMAP_TOGGLE:
+                        if (status == LivemapStatus.STARTED)
+                            pauseLivemap();
+                        if (status == LivemapStatus.PAUSED)
+                            resumeLivemap();
+                        if (status == LivemapStatus.DISCONNECTED)
+                            startLivemap();
+                        break;
+                }
             }
         }
     };
@@ -211,6 +221,7 @@ public class LivemapService extends Service {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_LIVEMAP_PAUSE);
         intentFilter.addAction(Constants.ACTION_LIVEMAP_RESUME);
+        intentFilter.addAction(Constants.ACTION_LIVEMAP_TOGGLE);
         registerReceiver(receiver, intentFilter);
         if (!PermissionsUtil.checkLocationPermission(this)) {
             showToast(R.string.livemap_error_no_location_permission, Toast.LENGTH_LONG);

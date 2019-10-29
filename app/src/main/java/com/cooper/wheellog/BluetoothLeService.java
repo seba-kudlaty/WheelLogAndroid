@@ -59,7 +59,7 @@ public class BluetoothLeService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            switch (intent.getAction()) {
+            switch (Objects.requireNonNull(intent.getAction())) {
                 case Constants.ACTION_BLUETOOTH_CONNECTION_STATE:
                     int connectionState = intent.getIntExtra(Constants.INTENT_EXTRA_CONNECTION_STATE, STATE_DISCONNECTED);
                     switch (connectionState) {
@@ -124,6 +124,16 @@ public class BluetoothLeService extends Service {
                         writeBluetoothGattCharacteristic(data);
                     }
                     break;
+                case Constants.ACTION_REQUEST_KINGSONG_LOCK:
+                    if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.KINGSONG) {
+                        WheelData.getInstance().lockKingsong();
+                    }
+                    break;
+                case Constants.ACTION_REQUEST_KINGSONG_UNLOCK:
+                    if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.KINGSONG) {
+                        WheelData.getInstance().unlockKingsong();
+                    }
+                    break;
                 case Constants.ACTION_REQUEST_LIGHT_TOGGLE:
                     if (WheelData.getInstance().getWheelType() == WHEEL_TYPE.KINGSONG) {
                         byte[] data = new byte[20];
@@ -156,6 +166,8 @@ public class BluetoothLeService extends Service {
         intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_SERIAL_DATA);
         intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_NAME_DATA);
         intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_HORN);
+        intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_LOCK);
+        intentFilter.addAction(Constants.ACTION_REQUEST_KINGSONG_UNLOCK);
         intentFilter.addAction(Constants.ACTION_REQUEST_LIGHT_TOGGLE);
         intentFilter.addAction(Constants.ACTION_REQUEST_CONNECTION_TOGGLE);
         return intentFilter;

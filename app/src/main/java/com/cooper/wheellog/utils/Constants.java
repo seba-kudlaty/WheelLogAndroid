@@ -28,6 +28,8 @@ public class Constants {
     public static final String ACTION_REQUEST_KINGSONG_SERIAL_DATA = "com.cooper.wheellog.requestSerialData";
     public static final String ACTION_REQUEST_KINGSONG_NAME_DATA = "com.cooper.wheellog.requestNameData";
     public static final String ACTION_REQUEST_KINGSONG_HORN = "com.cooper.wheellog.requestHorn";
+    public static final String ACTION_REQUEST_KINGSONG_LOCK = "com.cooper.wheellog.requestLock";
+    public static final String ACTION_REQUEST_KINGSONG_UNLOCK = "com.cooper.wheellog.requestUnlock";
     public static final String ACTION_REQUEST_LIGHT_TOGGLE = "com.cooper.wheellog.requestLightToggle";
     public static final String ACTION_REQUEST_VOICE_REPORT = "com.cooper.wheellog.requestVoiceReport";
     public static final String ACTION_REQUEST_VOICE_DISMISS = "com.cooper.wheellog.requestVoiceDismiss";
@@ -40,6 +42,7 @@ public class Constants {
     public static final String ACTION_LIVEMAP_PAUSE = "com.cooper.wheellog.livemapPause";
     public static final String ACTION_LIVEMAP_RESUME = "com.cooper.wheellog.livemapResume";
     public static final String ACTION_LIVEMAP_LOCATION_UPDATED = "com.cooper.wheellog.livemapLocationUpdated";
+    public static final String ACTION_LIVEMAP_TOGGLE = "com.cooper.wheellog.livemapToggle";
     public static final String ACTION_REQUEST_CONNECTION_TOGGLE = "com.cooper.wheellog.requestConnectionToggle";
     public static final String ACTION_PREFERENCE_CHANGED = "com.cooper.wheellog.preferenceChanged";
     public static final String ACTION_PEBBLE_AFFECTING_PREFERENCE_CHANGED = "com.cooper.wheellog.pebblePreferenceChanged";
